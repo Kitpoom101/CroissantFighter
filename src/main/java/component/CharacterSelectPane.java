@@ -5,12 +5,11 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import logic.gameLogic.SelectState;
-import logic.gameLogic.Selection;
 
 public class CharacterSelectPane extends VBox {
     private CharacterPane selectedPane;
     private final PlayerSelection playerSelection;
-    private int player = 1;
+    private SelectState selectState = SelectState.PLAYER1_SELECT;
 
     public CharacterSelectPane(){
         playerSelection = new PlayerSelection();
@@ -33,13 +32,20 @@ public class CharacterSelectPane extends VBox {
         Button confirmBtn = new Button("Confirm");
         confirmBtn.setOnAction(e -> confirmSelection());
 
+        Button cancelBtn = new Button("Cancel");
+        cancelBtn.setOnAction(e -> cancelSelection());
+
+        HBox actionRow = new HBox(10);
+        actionRow.setAlignment(Pos.CENTER);
+        actionRow.getChildren().addAll(confirmBtn, cancelBtn);
+
         setSpacing(20);
         setAlignment(Pos.CENTER);
 
         getChildren().addAll(
                 playerSelection,
                 characterRow,
-                confirmBtn
+                actionRow
         );
     }
 
@@ -59,19 +65,35 @@ public class CharacterSelectPane extends VBox {
 
         String chosenName = selectedPane.getName();
 
-        if (player == 1) {
+        if (selectState == SelectState.PLAYER1_SELECT) {
             playerSelection.setPlayer1(chosenName);
             System.out.println("Player 1 locked in: " + chosenName);
+            selectState = SelectState.PLAYER2_SELECT;
         }
-        if (player == 2) {
+        else if (selectState == SelectState.PLAYER2_SELECT) {
             playerSelection.setPlayer2(chosenName);
             System.out.println("Player 2 locked in: " + chosenName);
+            selectState = SelectState.DONE;
         }
 
         selectedPane.setSelected(false);
         selectedPane = null;
-
-        player = (player == 1) ? 2 : 1;
     }
 
+    private void cancelSelection() {
+        if (selectedPane != null) {
+            selectedPane.setSelected(false);
+            selectedPane = null;
+        }
+
+        if (selectState == SelectState.PLAYER2_SELECT) {
+            playerSelection.clearPlayer1();
+            selectState = SelectState.PLAYER1_SELECT;
+            System.out.println("Player 1 selection canceled");
+        } else if (selectState == SelectState.DONE) {
+            playerSelection.clearPlayer2();
+            selectState = SelectState.PLAYER2_SELECT;
+            System.out.println("Player 2 selection canceled");
+        }
+    }
 }
