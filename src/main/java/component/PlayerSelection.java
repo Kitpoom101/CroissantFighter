@@ -9,6 +9,9 @@ import javafx.scene.text.Text;
 
 public class PlayerSelection extends HBox {
 
+    private static final String PLAYER_1_SELECTING_TEXT = "Player 1 : Selecting";
+    private static final String PLAYER_2_SELECTING_TEXT = "Player 2 : Selecting";
+
     Text player1 = new Text("Player 1 : Selecting ");
     Text player2 = new Text("Player 2 : Selecting ");
 
@@ -22,11 +25,11 @@ public class PlayerSelection extends HBox {
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         player1 = new Text();
-        player1.setText("Player 1 : ");
+        player1.setText(PLAYER_1_SELECTING_TEXT);
         player1.setFont(Font.font(35));
 
         player2 = new Text();
-        player2.setText("Player 2 : ");
+        player2.setText(PLAYER_2_SELECTING_TEXT);
         player2.setFont(Font.font(35));
 
         getChildren().addAll(
@@ -49,5 +52,13 @@ public class PlayerSelection extends HBox {
 
     public void setPlayer2(String name){
         player2.setText("Player 2 : " + name);
+    }
+
+    public void clearPlayer1() {
+        player1.setText(PLAYER_1_SELECTING_TEXT);
+    }
+
+    public void clearPlayer2() {
+        player2.setText(PLAYER_2_SELECTING_TEXT);
     }
 }
