@@ -4,8 +4,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import logic.gameLogic.SelectState;
-import logic.gameLogic.Selection;
 
 public class CharacterSelectPane extends VBox {
     private CharacterPane selectedPane;
