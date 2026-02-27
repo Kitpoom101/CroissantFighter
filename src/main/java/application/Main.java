@@ -20,9 +20,7 @@ public class Main extends Application {
                 characterSelectPane
         );
 
-        Scene scene = new Scene(root);
-
-        primaryStage.setScene(scene);
+        SceneHandler.init(primaryStage, root);
         primaryStage.setTitle("CroissantFighter");
         primaryStage.show();
     }

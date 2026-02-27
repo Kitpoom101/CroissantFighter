@@ -1,10 +1,15 @@
 package component;
 
+import application.SceneHandler;
+import component.scene2.Scene2;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import logic.gameLogic.SelectState;
+
+import static logic.gameLogic.Selection.setPlayer_1_Character;
+import static logic.gameLogic.Selection.setPlayer_2_Character;
 
 public class CharacterSelectPane extends VBox {
     private CharacterPane selectedPane;
@@ -61,6 +66,10 @@ public class CharacterSelectPane extends VBox {
 
     private void confirmSelection(){
 
+        if (selectState == SelectState.DONE) {
+            SceneHandler.switchRoot(new Scene2());
+        }
+
         if(selectedPane == null) return;
 
         String chosenName = selectedPane.getName();
@@ -68,11 +77,13 @@ public class CharacterSelectPane extends VBox {
         if (selectState == SelectState.PLAYER1_SELECT) {
             playerSelection.setPlayer1(chosenName);
             System.out.println("Player 1 locked in: " + chosenName);
+            setPlayer_1_Character(chosenName);
             selectState = SelectState.PLAYER2_SELECT;
         }
         else if (selectState == SelectState.PLAYER2_SELECT) {
             playerSelection.setPlayer2(chosenName);
             System.out.println("Player 2 locked in: " + chosenName);
+            setPlayer_2_Character(chosenName);
             selectState = SelectState.DONE;
         }
 
