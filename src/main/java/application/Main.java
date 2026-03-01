@@ -1,7 +1,6 @@
 package application;
 
 import component.CharacterSelectPane;
-import component.PlayerSelection;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
@@ -16,15 +15,12 @@ public class Main extends Application {
         root.setPrefWidth(1000);
 
         CharacterSelectPane characterSelectPane = new CharacterSelectPane();
-        PlayerSelection playerSelection = new PlayerSelection();
 
         root.getChildren().addAll(
                 characterSelectPane
         );
 
-        Scene scene = new Scene(root);
-
-        primaryStage.setScene(scene);
+        SceneHandler.init(primaryStage, root);
         primaryStage.setTitle("CroissantFighter");
         primaryStage.show();
     }
