@@ -12,6 +12,11 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import logic.gameLogic.SelectState;
 
+import java.net.URL;
+
+import static logic.gameLogic.Selection.setPlayer_1_Character;
+import static logic.gameLogic.Selection.setPlayer_2_Character;
+
 public class CharacterSelectPane extends VBox {
     private CharacterPane selectedPane;
     private final PlayerSelection playerSelection;
