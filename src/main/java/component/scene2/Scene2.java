@@ -3,8 +3,6 @@ package component.scene2;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import logic.gameLogic.Player;
@@ -20,17 +18,20 @@ public class Scene2 extends Pane {
     private PlayerLogic playerLogic1;
     private PlayerLogic playerLogic2;
 
+
     public Scene2() {
 
-        player1 = new Player(getPlayer_1_Character());
-        playerLogic1 = new PlayerLogic(player1, 1);
+        player1 = new Player(getPlayer_1_Character(), 1);
+        player2 = new Player(getPlayer_2_Character(), 2);
 
-        player2 = new Player(getPlayer_2_Character());
-        playerLogic2 = new PlayerLogic(player2, 2);
+        playerLogic1 = new PlayerLogic(player1, player2, 1);
+        playerLogic2 = new PlayerLogic(player2, player1, 2);
 
         getChildren().addAll(
                 player1.getSprite(),
-                player2.getSprite()
+                player2.getSprite(),
+                playerLogic1.getAttackHitbox(),
+                playerLogic2.getAttackHitbox()
         );
 
         draw(Color.GREEN);

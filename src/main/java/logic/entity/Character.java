@@ -38,6 +38,16 @@ public abstract class Character implements Attackable {
     public void attack() {};
     public void useSpecialSkill() {};
 
+    public void takeDamage(int damage) {
+
+        int finalDamage = Math.max(0, damage - def);
+
+        hp -= finalDamage;
+
+        if (hp < 0)
+            hp = 0;
+    }
+
     public int getAttackRange() {
         return attackRange;
     }
