@@ -12,9 +12,19 @@ public class PlayerLogic {
 
     private final double speed = 5;
 
+    /* ===== MOVEMENT PHYSICS ===== */
+
+    private double velocityX = 0;
+
+    private final double ACCELERATION = 0.8;
+    private final double MAX_SPEED = 6;
+    private final double FRICTION = 0.85;
+
     public PlayerLogic(Player player) {
         this.player = player;
     }
+
+    /* ---------- INPUT ---------- */
 
     /* KEY PRESSED */
     public void handleKeyPressed(KeyEvent event) {
@@ -37,14 +47,32 @@ public class PlayerLogic {
     /* CALLED EVERY FRAME */
     public void update() {
 
+        /* acceleration */
         if (moveLeft) {
-            player.translate(-speed, 0);
+            velocityX -= ACCELERATION;
             player.faceLeft();
         }
 
         if (moveRight) {
-            player.translate(speed, 0);
+            velocityX += ACCELERATION;
             player.faceRight();
         }
+
+        /* clamp max speed */
+        if (velocityX > MAX_SPEED)
+            velocityX = MAX_SPEED;
+
+        if (velocityX < -MAX_SPEED)
+            velocityX = -MAX_SPEED;
+
+        /* friction */
+        velocityX *= FRICTION;
+
+        /* stop tiny sliding */
+        if (Math.abs(velocityX) < 0.05)
+            velocityX = 0;
+
+        /* apply movement */
+        player.translate(velocityX, 0);
     }
 }
