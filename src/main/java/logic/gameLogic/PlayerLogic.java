@@ -5,8 +5,15 @@ import javafx.scene.input.KeyEvent;
 
 public class PlayerLogic {
 
+    // store player
     private Player player;
+    private int playerNum;
 
+    // store keycode
+    private KeyCode leftKey;
+    private KeyCode rightKey;
+
+    // store movement
     private boolean moveLeft;
     private boolean moveRight;
 
@@ -20,8 +27,19 @@ public class PlayerLogic {
     private final double MAX_SPEED = 6;
     private final double FRICTION = 0.85;
 
-    public PlayerLogic(Player player) {
+    public PlayerLogic(Player player, int i) {
         this.player = player;
+        this.playerNum = i;
+
+
+        if(playerNum == 1){
+            leftKey = KeyCode.A;
+            rightKey = KeyCode.D;
+        }
+        else if(playerNum == 2){
+            leftKey = KeyCode.LEFT;
+            rightKey = KeyCode.RIGHT;
+        }
     }
 
     /* ---------- INPUT ---------- */
@@ -29,19 +47,21 @@ public class PlayerLogic {
     /* KEY PRESSED */
     public void handleKeyPressed(KeyEvent event) {
 
-        switch (event.getCode()) {
-            case A, LEFT -> moveLeft = true;
-            case D, RIGHT -> moveRight = true;
-        }
+        if(event.getCode() == leftKey)
+            moveLeft = true;
+
+        if(event.getCode() == rightKey)
+            moveRight = true;
     }
 
     /* KEY RELEASED */
     public void handleKeyReleased(KeyEvent event) {
 
-        switch (event.getCode()) {
-            case A, LEFT -> moveLeft = false;
-            case D, RIGHT -> moveRight = false;
-        }
+        if(event.getCode() == leftKey)
+            moveLeft = false;
+
+        if(event.getCode() == rightKey)
+            moveRight = false;
     }
 
     /* CALLED EVERY FRAME */

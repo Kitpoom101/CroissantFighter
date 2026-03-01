@@ -23,7 +23,7 @@ import java.util.Objects;
 
 public class CharacterPane extends StackPane {
 
-    private final String[] allSprite = {"/Katana.png"};
+    private final String[] allSprite = {"/Katana.png", "/Hammer.png", "/Pyro.png"};
     private final String[] names = {"Katana"};
     private Character character;
     private ArrayList<Character> characterList = new ArrayList<>();

@@ -15,15 +15,23 @@ import static logic.gameLogic.Selection.getPlayer_2_Character;
 
 public class Scene2 extends Pane {
 
-    private Player player;
-    private PlayerLogic playerLogic;
+    private Player player1;
+    private Player player2;
+    private PlayerLogic playerLogic1;
+    private PlayerLogic playerLogic2;
 
     public Scene2() {
 
-        player = new Player("/Katana.png");
-        playerLogic = new PlayerLogic(player);
+        player1 = new Player(getPlayer_1_Character());
+        playerLogic1 = new PlayerLogic(player1, 1);
 
-        getChildren().add(player.getSprite());
+        player2 = new Player(getPlayer_2_Character());
+        playerLogic2 = new PlayerLogic(player2, 2);
+
+        getChildren().addAll(
+                player1.getSprite(),
+                player2.getSprite()
+        );
 
         draw(Color.GREEN);
 
@@ -35,8 +43,6 @@ public class Scene2 extends Pane {
             }
         });
 
-        System.out.println(getPlayer_1_Character());
-        System.out.println(getPlayer_2_Character());
     }
 
     private void draw(Color backgroundColor) {
@@ -46,38 +52,18 @@ public class Scene2 extends Pane {
         this.setBackground(new Background(bgFillA));
     }
 
-    private void spawnPlayer1() {
-
-        Image image = new Image(
-                getClass().getResource("/" + getPlayer_1_Character() + ".png").toExternalForm()
-        );
-
-        ImageView sprite = new ImageView(image);
-
-        sprite.setFitWidth(100);
-        sprite.setPreserveRatio(true);
-
-        this.getChildren().add(sprite);
-    }
-
-    private void spawnPlayer2() {
-
-        Image image = new Image(
-                getClass().getResource("/" + getPlayer_2_Character() + ".png").toExternalForm()
-        );
-
-        ImageView sprite = new ImageView(image);
-
-        sprite.setFitWidth(100);
-        sprite.setPreserveRatio(true);
-
-        this.getChildren().add(sprite);
-    }
 
     private void setupControls(Scene scene) {
 
-        scene.setOnKeyPressed(playerLogic::handleKeyPressed);
-        scene.setOnKeyReleased(playerLogic::handleKeyReleased);
+        scene.setOnKeyPressed(e -> {
+            playerLogic1.handleKeyPressed(e);
+            playerLogic2.handleKeyPressed(e);
+        });
+
+        scene.setOnKeyReleased(e -> {
+            playerLogic1.handleKeyReleased(e);
+            playerLogic2.handleKeyReleased(e);
+        });
     }
 
     private void startGameLoop() {
@@ -86,7 +72,8 @@ public class Scene2 extends Pane {
             @Override
             public void handle(long now) {
 
-                playerLogic.update(); // runs every frame
+                playerLogic1.update(); // runs every frame
+                playerLogic2.update(); // runs every frame
             }
         };
 

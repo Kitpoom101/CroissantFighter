@@ -2,16 +2,17 @@ package logic.gameLogic;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import logic.entity.Character;
 
 public class Player {
 
     private Character character;
     private ImageView sprite;
 
-    public Player(String spritePath) {
+    public Player(Character character) {
 
         Image image = new Image(
-                getClass().getResource(spritePath).toExternalForm()
+                getClass().getResource("/" + character.getName() + ".png").toExternalForm()
         );
 
         sprite = new ImageView(image);
