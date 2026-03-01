@@ -1,39 +1,50 @@
 package logic.gameLogic;
 
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 public class PlayerLogic {
 
     private Player player;
-    private double speed = 10;
+
+    private boolean moveLeft;
+    private boolean moveRight;
+
+    private final double speed = 5;
 
     public PlayerLogic(Player player) {
         this.player = player;
     }
 
+    /* KEY PRESSED */
     public void handleKeyPressed(KeyEvent event) {
 
         switch (event.getCode()) {
+            case A, LEFT -> moveLeft = true;
+            case D, RIGHT -> moveRight = true;
+        }
+    }
 
-            case W:
-            case UP:
-                player.move(0, -speed);
-                break;
+    /* KEY RELEASED */
+    public void handleKeyReleased(KeyEvent event) {
 
-            case S:
-            case DOWN:
-                player.move(0, speed);
-                break;
+        switch (event.getCode()) {
+            case A, LEFT -> moveLeft = false;
+            case D, RIGHT -> moveRight = false;
+        }
+    }
 
-            case A:
-            case LEFT:
-                player.move(-speed, 0);
-                break;
+    /* CALLED EVERY FRAME */
+    public void update() {
 
-            case D:
-            case RIGHT:
-                player.move(speed, 0);
-                break;
+        if (moveLeft) {
+            player.translate(-speed, 0);
+            player.faceLeft();
+        }
+
+        if (moveRight) {
+            player.translate(speed, 0);
+            player.faceRight();
         }
     }
 }

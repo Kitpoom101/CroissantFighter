@@ -1,6 +1,8 @@
 package component.scene2;
 
+import javafx.animation.AnimationTimer;
 import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -10,14 +12,14 @@ import logic.gameLogic.PlayerLogic;
 
 import static logic.gameLogic.Selection.getPlayer_1_Character;
 import static logic.gameLogic.Selection.getPlayer_2_Character;
+import javafx.scene.layout.*;
 
 public class Scene2 extends Pane {
 
     private Player player;
     private PlayerLogic playerLogic;
 
-    public Scene2(){
-        super();
+    public Scene2() {
 
         player = new Player("/KatanaManEx.png");
         playerLogic = new PlayerLogic(player);
@@ -26,17 +28,13 @@ public class Scene2 extends Pane {
 
         draw(Color.GREEN);
 
+        /* ✅ WAIT UNTIL SCENE EXISTS */
         sceneProperty().addListener((obs, oldScene, newScene) -> {
-
             if (newScene != null) {
-
-                newScene.setOnKeyPressed(e ->
-                        playerLogic.handleKeyPressed(e)
-                );
+                setupControls(newScene);
+                startGameLoop();
             }
         });
-
-        draw(Color.GREEN);
 
         System.out.println(getPlayer_1_Character());
         System.out.println(getPlayer_2_Character());
@@ -75,5 +73,24 @@ public class Scene2 extends Pane {
         sprite.setPreserveRatio(true);
 
         this.getChildren().add(sprite);
+    }
+
+    private void setupControls(Scene scene) {
+
+        scene.setOnKeyPressed(playerLogic::handleKeyPressed);
+        scene.setOnKeyReleased(playerLogic::handleKeyReleased);
+    }
+
+    private void startGameLoop() {
+
+        AnimationTimer gameLoop = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+
+                playerLogic.update(); // runs every frame
+            }
+        };
+
+        gameLoop.start();
     }
 }

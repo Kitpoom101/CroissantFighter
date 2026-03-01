@@ -19,15 +19,23 @@ public class Player {
         sprite.setPreserveRatio(true);
 
         sprite.setLayoutX(300);
-        sprite.setLayoutY(300);
+        sprite.setLayoutY(400);
     }
 
     public ImageView getSprite() {
         return sprite;
     }
 
-    public void move(double dx, double dy) {
+    public void translate(double dx, double dy) {
         sprite.setLayoutX(sprite.getLayoutX() + dx);
         sprite.setLayoutY(sprite.getLayoutY() + dy);
+    }
+
+    public void faceLeft() {
+        sprite.setScaleX(-1);
+    }
+
+    public void faceRight() {
+        sprite.setScaleX(1);
     }
 }
