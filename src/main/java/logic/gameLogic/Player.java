@@ -5,6 +5,7 @@ import javafx.scene.image.ImageView;
 
 public class Player {
 
+    private Character character;
     private ImageView sprite;
 
     public Player(String spritePath) {

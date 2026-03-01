@@ -1,8 +1,7 @@
 package application;
 
-import component.CharacterSelectPane;
+import component.CharacterSelectScene;
 import javafx.application.Application;
-import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -14,7 +13,7 @@ public class Main extends Application {
         root.setPrefHeight(600);
         root.setPrefWidth(1000);
 
-        CharacterSelectPane characterSelectPane = new CharacterSelectPane();
+        CharacterSelectScene characterSelectPane = new CharacterSelectScene();
 
         root.getChildren().addAll(
                 characterSelectPane

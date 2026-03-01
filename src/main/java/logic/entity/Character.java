@@ -1,18 +1,35 @@
 package logic.entity;
 
+import javafx.scene.image.Image;
 import logic.interfaces.Attackable;
+
+import java.util.Objects;
 
 public abstract class Character implements Attackable {
     private int hp;
     private int atk;
     private int def;
     private int attackRange;
+    private String allSprite[] = {"Katana"};
 
     public Character(int hp, int atk, int def, int attackRange) {
         this.setHp(hp);
         this.setAtk(atk);
         this.setDef(def);
         this.setAttackRange(attackRange);
+    }
+
+    private Image spriteLoader(String name){
+        String path = "Missing.png";
+        for (int i = 0; i < 9; i++) {
+            if(Objects.equals(name, allSprite[i])) path = name + ".png";
+        }
+
+        return new Image(
+                Objects.requireNonNull(
+                        getClass().getResourceAsStream(path)
+                )
+        );
     }
 
     public void moveLeft() {}
@@ -53,4 +70,6 @@ public abstract class Character implements Attackable {
     public void setHp(int hp) {
         this.hp = hp;
     }
+
+
 }

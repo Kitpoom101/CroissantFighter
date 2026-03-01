@@ -17,14 +17,14 @@ import java.net.URL;
 import static logic.gameLogic.Selection.setPlayer_1_Character;
 import static logic.gameLogic.Selection.setPlayer_2_Character;
 
-public class CharacterSelectPane extends VBox {
+public class CharacterSelectScene extends VBox {
     private CharacterPane selectedPane;
     private final PlayerSelection playerSelection;
     private final ImageView player1PreviewImage;
     private final ImageView player2PreviewImage;
     private SelectState selectState = SelectState.PLAYER1_SELECT;
 
-    public CharacterSelectPane(){
+    public CharacterSelectScene(){
         playerSelection = new PlayerSelection();
         player1PreviewImage = createPreviewImageView();
         player2PreviewImage = createPreviewImageView();

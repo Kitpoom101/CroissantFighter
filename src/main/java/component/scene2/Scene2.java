@@ -12,7 +12,6 @@ import logic.gameLogic.PlayerLogic;
 
 import static logic.gameLogic.Selection.getPlayer_1_Character;
 import static logic.gameLogic.Selection.getPlayer_2_Character;
-import javafx.scene.layout.*;
 
 public class Scene2 extends Pane {
 
@@ -21,7 +20,7 @@ public class Scene2 extends Pane {
 
     public Scene2() {
 
-        player = new Player("/KatanaManEx.png");
+        player = new Player("/Katana.png");
         playerLogic = new PlayerLogic(player);
 
         getChildren().add(player.getSprite());

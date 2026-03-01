@@ -10,7 +10,7 @@ import java.util.Objects;
 
 public class CharacterPane extends StackPane {
 
-    private final String[] allSprite = {"/KatanaManEx.png"};
+    private final String[] allSprite = {"/Katana.png"};
     private final String[] names = {"KatanaManEx"};
     private String name;
 
