@@ -6,14 +6,15 @@ import logic.interfaces.Attackable;
 import java.util.Objects;
 
 public abstract class Character implements Attackable {
+
+    private String name;
     private int hp;
     private int atk;
     private int def;
     private int attackRange;
     private float attackSpeed;
-    private String allSprite[] = {"Katana"};
 
-    public Character(int hp, int atk, int def, int attackRange) {
+    public Character(int hp, int atk, int def, int attackRange, float attackSpeed) {
         this.setHp(hp);
         this.setAtk(atk);
         this.setDef(def);
@@ -29,18 +30,6 @@ public abstract class Character implements Attackable {
         this.setAttackSpeed(1.0F);
     }
 
-    private Image spriteLoader(String name){
-        String path = "Missing.png";
-        for (int i = 0; i < 9; i++) {
-            if(Objects.equals(name, allSprite[i])) path = name + ".png";
-        }
-
-        return new Image(
-                Objects.requireNonNull(
-                        getClass().getResourceAsStream(path)
-                )
-        );
-    }
 
     public void moveLeft() {}
     public void moveRight() {}
@@ -87,5 +76,13 @@ public abstract class Character implements Attackable {
 
     public void setAttackSpeed(float attackSpeed) {
         this.attackSpeed = attackSpeed;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

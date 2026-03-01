@@ -10,9 +10,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import logic.entity.Character;
 import logic.gameLogic.SelectState;
 
 import java.net.URL;
+import java.util.List;
 
 import static logic.gameLogic.Selection.setPlayer_1_Character;
 import static logic.gameLogic.Selection.setPlayer_2_Character;
@@ -100,19 +102,20 @@ public class CharacterSelectScene extends VBox {
         if(selectedPane == null) return;
 
         String chosenName = selectedPane.getName();
+        Character chosenChar = selectedPane.getCharacter();
 
         if (selectState == SelectState.PLAYER1_SELECT) {
             playerSelection.setPlayer1(chosenName);
             player1PreviewImage.setImage(loadCharacterImage(chosenName));
             System.out.println("Player 1 locked in: " + chosenName);
-            setPlayer_1_Character(chosenName);
+            setPlayer_1_Character(chosenChar);
             selectState = SelectState.PLAYER2_SELECT;
         }
         else if (selectState == SelectState.PLAYER2_SELECT) {
             playerSelection.setPlayer2(chosenName);
             player2PreviewImage.setImage(loadCharacterImage(chosenName));
             System.out.println("Player 2 locked in: " + chosenName);
-            setPlayer_2_Character(chosenName);
+            setPlayer_2_Character(chosenChar);
             selectState = SelectState.DONE;
         }
 
@@ -152,9 +155,7 @@ public class CharacterSelectScene extends VBox {
         if (imageUrl == null) {
             imageUrl = getClass().getResource("/Missing.png");
         }
-        if (imageUrl == null) {
-            return null;
-        }
+
         return new Image(imageUrl.toExternalForm());
     }
 }

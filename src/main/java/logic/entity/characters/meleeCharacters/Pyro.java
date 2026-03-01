@@ -5,9 +5,11 @@ import logic.entity.characterClass.MeleeClass;
 public class Pyro extends MeleeClass {
     public Pyro(int hp, int atk, int def, int attackRange, float attackSpeed) {
         super(hp, atk, def, attackRange, attackSpeed);
+        setName("Pyro");
     }
 
     public Pyro() {
         super();
+        setName("Pyro");
     }
 }
