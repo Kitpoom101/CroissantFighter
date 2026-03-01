@@ -10,6 +10,7 @@ public abstract class Character implements Attackable {
     private int atk;
     private int def;
     private int attackRange;
+    private float attackSpeed;
     private String allSprite[] = {"Katana"};
 
     public Character(int hp, int atk, int def, int attackRange) {
@@ -17,6 +18,15 @@ public abstract class Character implements Attackable {
         this.setAtk(atk);
         this.setDef(def);
         this.setAttackRange(attackRange);
+        this.setAttackSpeed(attackSpeed);
+    }
+
+    public Character() {
+        this.setHp(100);
+        this.setAtk(15);
+        this.setDef(5);
+        this.setAttackRange(1);
+        this.setAttackSpeed(1.0F);
     }
 
     private Image spriteLoader(String name){
@@ -71,5 +81,11 @@ public abstract class Character implements Attackable {
         this.hp = hp;
     }
 
+    public float getAttackSpeed() {
+        return attackSpeed;
+    }
 
+    public void setAttackSpeed(float attackSpeed) {
+        this.attackSpeed = attackSpeed;
+    }
 }
