@@ -116,6 +116,8 @@ public class PlayerLogic {
                 .intersects(enemy.getSprite().getBoundsInParent())) {
 
             System.out.println("HIT!");
+
+            enemy.getCharacter().takeDamage(player.getCharacter().getAtk());
         }
     }
 
@@ -165,3 +167,4 @@ public class PlayerLogic {
         player.translate(velocityX, 0);
     }
 }
+

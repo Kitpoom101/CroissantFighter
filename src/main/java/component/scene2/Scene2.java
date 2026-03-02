@@ -12,11 +12,16 @@ import static logic.gameLogic.Selection.getPlayer_1_Character;
 import static logic.gameLogic.Selection.getPlayer_2_Character;
 
 public class Scene2 extends Pane {
+    
+    private static final double HEALTH_BAR_TOP_MARGIN = 20;
+    private static final double HEALTH_BAR_SIDE_MARGIN = 20;
 
     private Player player1;
     private Player player2;
     private PlayerLogic playerLogic1;
     private PlayerLogic playerLogic2;
+    private HealthBar player1HealthBar;
+    private HealthBar player2HealthBar;
 
 
     public Scene2() {
@@ -26,8 +31,23 @@ public class Scene2 extends Pane {
 
         playerLogic1 = new PlayerLogic(player1, player2, 1);
         playerLogic2 = new PlayerLogic(player2, player1, 2);
+        
+        player1HealthBar = new HealthBar(player1.getCharacter().getHp());
+        player2HealthBar = new HealthBar(player2.getCharacter().getHp());
+
+        player1HealthBar.setLayoutX(HEALTH_BAR_SIDE_MARGIN);
+        player1HealthBar.setLayoutY(HEALTH_BAR_TOP_MARGIN);
+
+        player2HealthBar.layoutXProperty().bind(
+                widthProperty().subtract(
+                        player2HealthBar.prefWidth(-1) + HEALTH_BAR_SIDE_MARGIN
+                )
+        );
+        player2HealthBar.setLayoutY(HEALTH_BAR_TOP_MARGIN);
 
         getChildren().addAll(
+                player1HealthBar,
+                player2HealthBar,
                 player1.getSprite(),
                 player2.getSprite(),
                 playerLogic1.getAttackHitbox(),
@@ -75,6 +95,9 @@ public class Scene2 extends Pane {
 
                 playerLogic1.update(); // runs every frame
                 playerLogic2.update(); // runs every frame
+
+                player1HealthBar.setCurrentHp(player1.getCharacter().getHp());
+                player2HealthBar.setCurrentHp(player2.getCharacter().getHp());
             }
         };
 
