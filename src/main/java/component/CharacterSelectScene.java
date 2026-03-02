@@ -13,6 +13,10 @@ import javafx.scene.layout.VBox;
 import logic.entity.Character;
 import logic.gameLogic.SelectState;
 
+import logic.entity.characters.meleeCharacters.*;
+import logic.entity.characters.hybridCharacters.*;
+import logic.entity.characters.rangedCharacters.*;
+
 import java.net.URL;
 import java.util.List;
 
@@ -41,7 +45,7 @@ public class CharacterSelectScene extends VBox {
         for (int i = 0; i < 9; i++) {
             CharacterPane pane = new CharacterPane(i);
             pane.setOnMouseClicked(e ->
-                selectCharacter(pane)
+                    selectCharacter(pane)
             );
             characterRow.getChildren().add(pane);
         }
@@ -102,7 +106,7 @@ public class CharacterSelectScene extends VBox {
         if(selectedPane == null) return;
 
         String chosenName = selectedPane.getName();
-        Character chosenChar = selectedPane.getCharacter();
+        Character chosenChar = createNewCharacter(selectedPane.getName());
 
         if (selectState == SelectState.PLAYER1_SELECT) {
             playerSelection.setPlayer1(chosenName);
@@ -157,5 +161,20 @@ public class CharacterSelectScene extends VBox {
         }
 
         return new Image(imageUrl.toExternalForm());
+    }
+
+    private Character createNewCharacter(String name) {
+        switch (name) {
+            case "Katana": return new Katana();
+            case "Hammer": return new Hammer();
+            case "Pyro": return new Pyro();
+            case "Barista": return new Barista();
+            case "Exorcist": return new Exorcist();
+            case "Vampire": return new Vampire();
+            case "Archer": return new Archer();
+            case "Bubble": return new Bubble();
+            case "Mage": return new Mage();
+            default: return new Katana();
+        }
     }
 }
