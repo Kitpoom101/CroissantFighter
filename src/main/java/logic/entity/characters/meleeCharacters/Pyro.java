@@ -1,5 +1,6 @@
 package logic.entity.characters.meleeCharacters;
 
+import logic.entity.AttackData;
 import logic.entity.characterClass.MeleeClass;
 
 public class Pyro extends MeleeClass {
@@ -11,5 +12,10 @@ public class Pyro extends MeleeClass {
     public Pyro() {
         super();
         setName("Pyro");
+    }
+
+    @Override
+    public AttackData getAttackData() {
+        return new AttackData(90, 120);
     }
 }

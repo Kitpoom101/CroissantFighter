@@ -5,6 +5,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import logic.entity.AttackData;
 
 public class PlayerLogic {
 
@@ -79,35 +80,49 @@ public class PlayerLogic {
     }
 
     private void attack() {
-            attacking = true;
 
-            ImageView sprite = player.getSprite();
+        attacking = true;
 
-            double playerX = sprite.getLayoutX();
-            double playerY = sprite.getLayoutY();
+        AttackData data = player.getCharacter().getAttackData();
+        ImageView sprite = player.getSprite();
 
-            double spriteHeight = sprite.getBoundsInParent().getHeight();
+        double playerX = sprite.getLayoutX();
+        double playerY = sprite.getLayoutY();
 
-            // match sprite height
-            attackHitbox.setHeight(spriteHeight);
-            attackHitbox.setWidth(HITBOX_WIDTH);
+        // 🔥 ถ้าเป็น ranged
+        if (data == null) {
 
-            // START FROM PLAYER BOTTOM
-            attackHitbox.setLayoutY(playerY);
+            float startX = (float) (playerX + sprite.getBoundsInParent().getWidth() / 2);
+            float startY = (float) (playerY + sprite.getBoundsInParent().getHeight() / 2);
 
-            if(player.isFacingRight()) {
-                attackHitbox.setLayoutX(
-                        playerX + sprite.getBoundsInParent().getWidth()
-                );
-            } else {
-                attackHitbox.setLayoutX(
-                        playerX - HITBOX_WIDTH
-                );
-            }
+            player.getCharacter().attack(
+                    startX,
+                    startY,
+                    player.isFacingRight(),
+                    player
+            );
 
-            attackHitbox.setVisible(true);
+            return;
+        }
 
-            checkHit();
+        // 🔥 ถ้าเป็น melee ทำเหมือนเดิม
+        attackHitbox.setWidth(data.getWidth());
+        attackHitbox.setHeight(data.getHeight());
+
+        attackHitbox.setLayoutY(playerY);
+
+        if (player.isFacingRight()) {
+            attackHitbox.setLayoutX(
+                    playerX + sprite.getBoundsInParent().getWidth()
+            );
+        } else {
+            attackHitbox.setLayoutX(
+                    playerX - data.getWidth()
+            );
+        }
+
+        attackHitbox.setVisible(true);
+        checkHit();
     }
 
     private void checkHit() {

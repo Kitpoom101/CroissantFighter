@@ -1,6 +1,7 @@
 package logic.entity.characters.meleeCharacters;
 
 import javafx.scene.image.Image;
+import logic.entity.AttackData;
 import logic.entity.characterClass.MeleeClass;
 
 import java.util.Objects;
@@ -25,4 +26,10 @@ public class Katana extends MeleeClass {
                 )
         );
     }
+
+    @Override
+    public AttackData getAttackData() {
+        return new AttackData(60, 100);
+    }
+
 }
