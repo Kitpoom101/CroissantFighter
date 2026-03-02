@@ -4,6 +4,7 @@ import application.SceneHandler;
 import component.CharacterSelectScene;
 import javafx.animation.AnimationTimer;
 import javafx.beans.binding.Bindings;
+import javafx.animation.PauseTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -12,8 +13,17 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import logic.entity.BaseProjectileAttack;
 import logic.gameLogic.Player;
 import logic.gameLogic.PlayerLogic;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import javafx.scene.image.ImageView;
+import java.awt.*;
+import java.util.ArrayList;
 
 import static logic.gameLogic.Selection.getPlayer_1_Character;
 import static logic.gameLogic.Selection.getPlayer_2_Character;
@@ -25,8 +35,8 @@ public class Scene2 extends Pane {
     private static final long MATCH_DURATION_SECONDS = 180;
     private static final long MATCH_DURATION_NANOS = MATCH_DURATION_SECONDS * 1_000_000_000L;
 
-    private Player player1;
-    private Player player2;
+    public Player player1;
+    public Player player2;
     private PlayerLogic playerLogic1;
     private PlayerLogic playerLogic2;
     private HealthBar player1HealthBar;
@@ -35,7 +45,13 @@ public class Scene2 extends Pane {
     private AnimationTimer gameLoop;
     private boolean gameOver;
     private long matchStartNanos = -1L;
+    private List<BaseProjectileAttack> projectileList = new ArrayList<>();
 
+    private static Scene2 instance;
+
+    public static Scene2 getInstance() {
+        return instance;
+    }
 
     public Scene2() {
 
@@ -91,6 +107,8 @@ public class Scene2 extends Pane {
             }
         });
 
+            instance = this;
+
     }
 
     private void draw(Color backgroundColor) {
@@ -137,6 +155,32 @@ public class Scene2 extends Pane {
                 countdownLabel.setText(formatTime(remainingSeconds));
 
                 checkGameOver();
+
+                Iterator<BaseProjectileAttack> iterator = projectileList.iterator();
+
+                while (iterator.hasNext()) {
+                    BaseProjectileAttack p = iterator.next();
+                    p.update();
+
+                    Player target = (p.getOwner() == player1) ? player2 : player1;
+
+                    if (p.getSprite().getBoundsInParent()
+                            .intersects(target.getSprite().getBoundsInParent())) {
+
+
+                                target.getCharacter().takeDamage(p.getOwner().getCharacter().getAtk());
+
+
+                        getChildren().remove(p.getSprite());
+                        iterator.remove();
+                        continue;
+                    }
+
+                    if (p.isOutOfRange()) {
+                        getChildren().remove(p.getSprite());
+                        iterator.remove();
+                    }
+                }
             }
         };
 
@@ -196,5 +240,17 @@ public class Scene2 extends Pane {
 
         getChildren().add(popup);
         popup.toFront();
+    }
+
+    public void addProjectile(BaseProjectileAttack p) {
+        projectileList.add(p);   // 👈 สำคัญมาก
+        getChildren().add(p.getSprite());
+        p.getSprite().toFront();
+        System.out.println("Projectile ถูก add แล้ว");
+    }
+
+    public void removeProjectile(BaseProjectileAttack p) {
+        getChildren().remove(p.getSprite());
+        projectileList.remove(p);
     }
 }

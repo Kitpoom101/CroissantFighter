@@ -1,6 +1,10 @@
 package logic.entity.characters.hybridCharacters;
 
+import component.scene2.Scene2;
+import logic.entity.AttackData;
+import logic.entity.BaseProjectileAttack;
 import logic.entity.characterClass.HybridClass;
+import logic.gameLogic.Player;
 
 public class Barista extends HybridClass {
     public Barista(int hp, int atk, int def, int attackRange, float attackSpeed) {
@@ -12,4 +16,37 @@ public class Barista extends HybridClass {
         super();
         setName("Barista");
     }
+
+
+    @Override
+    public void attack(float startX, float startY, boolean facingRight, Player p) {
+
+        float dirX = facingRight ? 1 : -1;
+
+        BaseProjectileAttack coffeeShot =
+                new BaseProjectileAttack(
+                        this.atk,
+                        6f,
+                        this.attackRange * 100,
+                        startX,
+                        startY,
+                        dirX,
+                        0,
+                        p
+                );
+
+        Scene2.getInstance().addProjectile(coffeeShot);
+
+    }
+
+    private void spawnProjectile(BaseProjectileAttack projectile) {
+        Scene2.getInstance().addProjectile(projectile);
+    }
+
+    /*@Override
+    public AttackData getAttackData() {
+        return new AttackData(20, 20);
+    }*/
+
+
 }

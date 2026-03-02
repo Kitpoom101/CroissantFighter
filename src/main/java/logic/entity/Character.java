@@ -1,18 +1,16 @@
 package logic.entity;
 
-import javafx.scene.image.Image;
+import logic.gameLogic.Player;
 import logic.interfaces.Attackable;
-
-import java.util.Objects;
 
 public abstract class Character implements Attackable {
 
-    private String name;
-    private int hp;
-    private int atk;
-    private int def;
-    private int attackRange;
-    private float attackSpeed;
+    protected String name;
+    protected int hp;
+    protected int atk;
+    protected int def;
+    protected int attackRange;
+    protected float attackSpeed;
 
     public Character(int hp, int atk, int def, int attackRange, float attackSpeed) {
         this.setHp(hp);
@@ -35,7 +33,7 @@ public abstract class Character implements Attackable {
     public void moveRight() {}
     public void jump() {}
 
-    public void attack() {};
+    public abstract void attack(float startX, float startY, boolean facingRight, Player player);
     public void useSpecialSkill() {};
 
     public void takeDamage(int damage) {
@@ -95,4 +93,6 @@ public abstract class Character implements Attackable {
     public void setName(String name) {
         this.name = name;
     }
+
+    public abstract AttackData getAttackData();
 }
