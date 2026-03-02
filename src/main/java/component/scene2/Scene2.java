@@ -1,8 +1,8 @@
 package component.scene2;
 
+import javafx.animation.AnimationTimer;
 import javafx.geometry.Insets;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.Scene;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import logic.gameLogic.Player;
@@ -13,33 +13,57 @@ import static logic.gameLogic.Selection.getPlayer_2_Character;
 
 public class Scene2 extends Pane {
 
-    private Player player;
-    private PlayerLogic playerLogic;
+    private static final double HEALTH_BAR_TOP_MARGIN = 20;
+    private static final double HEALTH_BAR_SIDE_MARGIN = 20;
 
-    public Scene2(){
-        super();
+    private Player player1;
+    private Player player2;
+    private PlayerLogic playerLogic1;
+    private PlayerLogic playerLogic2;
+    private HealthBar player1HealthBar;
+    private HealthBar player2HealthBar;
 
-        player = new Player("/KatanaManEx.png");
-        playerLogic = new PlayerLogic(player);
 
-        getChildren().add(player.getSprite());
+    public Scene2() {
+
+        player1 = new Player(getPlayer_1_Character(), 1);
+        player2 = new Player(getPlayer_2_Character(), 2);
+
+        playerLogic1 = new PlayerLogic(player1, player2, 1);
+        playerLogic2 = new PlayerLogic(player2, player1, 2);
+
+        player1HealthBar = new HealthBar(player1.getCharacter().getHp());
+        player2HealthBar = new HealthBar(player2.getCharacter().getHp());
+
+        player1HealthBar.setLayoutX(HEALTH_BAR_SIDE_MARGIN);
+        player1HealthBar.setLayoutY(HEALTH_BAR_TOP_MARGIN);
+
+        player2HealthBar.layoutXProperty().bind(
+                widthProperty().subtract(
+                        player2HealthBar.prefWidth(-1) + HEALTH_BAR_SIDE_MARGIN
+                )
+        );
+        player2HealthBar.setLayoutY(HEALTH_BAR_TOP_MARGIN);
+
+        getChildren().addAll(
+                player1HealthBar,
+                player2HealthBar,
+                player1.getSprite(),
+                player2.getSprite(),
+                playerLogic1.getAttackHitbox(),
+                playerLogic2.getAttackHitbox()
+        );
 
         draw(Color.GREEN);
 
+        /* ✅ WAIT UNTIL SCENE EXISTS */
         sceneProperty().addListener((obs, oldScene, newScene) -> {
-
             if (newScene != null) {
-
-                newScene.setOnKeyPressed(e ->
-                        playerLogic.handleKeyPressed(e)
-                );
+                setupControls(newScene);
+                startGameLoop();
             }
         });
 
-        draw(Color.GREEN);
-
-        System.out.println(getPlayer_1_Character());
-        System.out.println(getPlayer_2_Character());
     }
 
     private void draw(Color backgroundColor) {
@@ -49,31 +73,33 @@ public class Scene2 extends Pane {
         this.setBackground(new Background(bgFillA));
     }
 
-    private void spawnPlayer1() {
 
-        Image image = new Image(
-                getClass().getResource("/" + getPlayer_1_Character() + ".png").toExternalForm()
-        );
+    private void setupControls(Scene scene) {
 
-        ImageView sprite = new ImageView(image);
+        scene.setOnKeyPressed(e -> {
+            playerLogic1.handleKeyPressed(e);
+            playerLogic2.handleKeyPressed(e);
+        });
 
-        sprite.setFitWidth(100);
-        sprite.setPreserveRatio(true);
-
-        this.getChildren().add(sprite);
+        scene.setOnKeyReleased(e -> {
+            playerLogic1.handleKeyReleased(e);
+            playerLogic2.handleKeyReleased(e);
+        });
     }
 
-    private void spawnPlayer2() {
+    private void startGameLoop() {
 
-        Image image = new Image(
-                getClass().getResource("/" + getPlayer_2_Character() + ".png").toExternalForm()
-        );
+        AnimationTimer gameLoop = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
 
-        ImageView sprite = new ImageView(image);
+                playerLogic1.update(); // runs every frame
+                playerLogic2.update(); // runs every frame
+                player1HealthBar.setCurrentHp(player1.getCharacter().getHp());
+                player2HealthBar.setCurrentHp(player2.getCharacter().getHp());
+            }
+        };
 
-        sprite.setFitWidth(100);
-        sprite.setPreserveRatio(true);
-
-        this.getChildren().add(sprite);
+        gameLoop.start();
     }
 }

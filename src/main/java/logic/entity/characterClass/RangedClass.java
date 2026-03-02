@@ -2,12 +2,12 @@ package logic.entity.characterClass;
 
 import logic.entity.Character;
 
-public class MeleeClass extends Character {
-    public MeleeClass() {
-        super(250, 20, 10, 1, 1.0F);
+public class RangedClass extends Character {
+    public RangedClass() {
+        super(100, 25, 5, 3, 2.0F);
     }
 
-    public MeleeClass(int hp, int atk, int def, int attackRange, float attackSpeed) {
+    public RangedClass(int hp, int atk, int def, int attackRange, float attackSpeed) {
         super(hp, atk, def, attackRange, attackSpeed);
     }
     @Override
