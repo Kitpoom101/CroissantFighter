@@ -79,8 +79,6 @@ public class PlayerLogic {
     }
 
     private void attack() {
-
-
             attacking = true;
 
             ImageView sprite = player.getSprite();
