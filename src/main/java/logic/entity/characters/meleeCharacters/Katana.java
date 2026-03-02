@@ -17,12 +17,4 @@ public class Katana extends MeleeClass {
 
     }
 
-    public Image loadSprite() {
-        return new Image(
-                Objects.requireNonNull(
-                        getClass()
-                                .getResourceAsStream("/Katana.png")
-                )
-        );
-    }
 }
