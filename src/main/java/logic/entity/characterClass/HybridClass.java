@@ -5,7 +5,7 @@ import logic.entity.Character;
 import logic.gameLogic.Player;
 import logic.interfaces.Attackable;
 
-public class HybridClass extends Character implements Attackable {
+public abstract class HybridClass extends Character implements Attackable {
     public HybridClass() {
         super(150, 15, 5, 2, 1.0F);
     }

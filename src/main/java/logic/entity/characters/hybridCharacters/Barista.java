@@ -39,6 +39,26 @@ public class Barista extends HybridClass implements SpawnAttack {
         spawnProjectile(coffeeShot);
     }
 
+    @Override
+    public void startAttack(Player self) {
+
+    }
+
+    @Override
+    public void updateAttack(Player self) {
+
+    }
+
+    @Override
+    public void setupAttackFrame(int totalFrame) {
+
+    }
+
+    @Override
+    public boolean isAttackFinished() {
+        return false;
+    }
+
     /*@Override
     public AttackData getAttackData() {
         return new AttackData(20, 20);

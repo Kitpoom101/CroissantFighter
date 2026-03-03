@@ -5,7 +5,7 @@ import logic.entity.Character;
 import logic.gameLogic.Player;
 import logic.interfaces.Attackable;
 
-public class MeleeClass extends Character implements Attackable {
+public abstract class MeleeClass extends Character implements Attackable {
     public MeleeClass() {
         super(250, 20, 10, 1, 1.0F);
     }

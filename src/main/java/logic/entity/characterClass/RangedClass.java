@@ -5,7 +5,7 @@ import logic.entity.Character;
 import logic.gameLogic.Player;
 import logic.interfaces.Attackable;
 
-public class RangedClass extends Character implements Attackable {
+public abstract class RangedClass extends Character implements Attackable {
     public RangedClass() {
         super(100, 25, 5, 3, 2.0F);
     }

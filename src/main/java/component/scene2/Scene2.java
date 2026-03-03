@@ -94,6 +94,8 @@ public class Scene2 extends Pane {
                 player1.getSprite(),
                 player2.getSprite(),
                 playerLogic1.getAttackHitbox(),
+                player1.getWeaponSprite(),
+                player2.getWeaponSprite(),
                 playerLogic2.getAttackHitbox()
         );
 

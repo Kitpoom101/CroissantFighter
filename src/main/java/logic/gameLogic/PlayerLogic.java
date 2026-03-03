@@ -6,6 +6,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import logic.entity.AttackData;
+import logic.entity.characterClass.RangedClass;
 import logic.entity.characters.meleeCharacters.Katana;
 
 public class PlayerLogic {
@@ -27,8 +28,6 @@ public class PlayerLogic {
     private boolean attacking = false;
     // ====== HITBOX ===== //
 
-    // weapon
-    private ImageView weaponSprite;
 
     // store movement
     private boolean moveLeft;
@@ -67,9 +66,6 @@ public class PlayerLogic {
         attackHitbox.setFill(Color.TRANSPARENT);
         attackHitbox.setVisible(false);
 
-        // for weapon //
-        weaponSprite = new ImageView();
-        weaponSprite.setVisible(false);
     }
 
     /* ---------- INPUT ---------- */
@@ -194,7 +190,32 @@ public class PlayerLogic {
             velocityX = 0;
 
         /* apply movement */
-        player.translate(velocityX, 0);
+        // only when walk state
+        if (player.getState() == PlayerState.WALK){
+            player.translate(velocityX, 0);
+        }
+
+
+
+
+
+        // ==== WEAPON SPRITE ===== //
+        ImageView body = player.getSprite();
+
+        // weapon sprite position
+        player.getWeaponSprite().setLayoutY(body.getLayoutY());
+
+        if(player.isFacingRight()){
+            player.getWeaponSprite().setScaleX(1);
+            player.getWeaponSprite().setLayoutX(
+                    body.getLayoutX() + body.getBoundsInParent().getWidth()
+            );
+        }else{
+            player.getWeaponSprite().setScaleX(-1);
+            player.getWeaponSprite().setLayoutX(
+                    body.getLayoutX() - player.getWeaponSprite().getImage().getWidth()
+            );
+        }
 
         // ==== ATTACK ANIMATION ===== //
         if(player.getState() == PlayerState.ATTACK){
@@ -207,14 +228,14 @@ public class PlayerLogic {
 //
 //                player.setState(PlayerState.WALK);
 //            }
-            if(player.getCharacter() instanceof Katana katana){
+            player.getWeaponSprite().setVisible(true);
+            player.getCharacter().updateAttack(player);
 
-                katana.updateAttack(player);
-
-                if(katana.isAttackFinished()){
-                    player.setState(PlayerState.WALK);
-                }
+            if(player.getCharacter().isAttackFinished()){
+                player.setState(PlayerState.WALK);
+                player.getWeaponSprite().setVisible(false);
             }
+
         }
     }
 }

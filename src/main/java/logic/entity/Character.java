@@ -1,10 +1,13 @@
 package logic.entity;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import logic.gameLogic.Player;
+import logic.interfaces.AttackAnimation;
 import logic.interfaces.Attackable;
 import logic.interfaces.Damageable;
 
-public abstract class Character implements Attackable, Damageable {
+public abstract class Character implements Attackable, Damageable, AttackAnimation {
 
     protected String name;
     protected int hp;
@@ -13,12 +16,26 @@ public abstract class Character implements Attackable, Damageable {
     protected int attackRange;
     protected float attackSpeed;
 
+    // weapon
+    private ImageView weaponSprite;
+
     public Character(int hp, int atk, int def, int attackRange, float attackSpeed) {
         this.setHp(hp);
         this.setAtk(atk);
         this.setDef(def);
         this.setAttackRange(attackRange);
         this.setAttackSpeed(attackSpeed);
+
+        weaponSprite = new ImageView();
+        weaponSprite.setVisible(false);
+
+        weaponSprite.setImage(
+                new Image(
+                        getClass()
+                                .getResource("/Missing.png")
+                                .toExternalForm()
+                )
+        );
     }
 
     public Character() {
@@ -93,6 +110,10 @@ public abstract class Character implements Attackable, Damageable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public ImageView getWeaponSprite(){
+        return weaponSprite;
     }
 
     public abstract AttackData getAttackData();

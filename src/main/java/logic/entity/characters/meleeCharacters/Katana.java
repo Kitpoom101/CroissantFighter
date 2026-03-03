@@ -1,6 +1,7 @@
 package logic.entity.characters.meleeCharacters;
 
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import logic.entity.AttackData;
 import logic.entity.characterClass.MeleeClass;
 import logic.gameLogic.Player;
@@ -41,7 +42,7 @@ public class Katana extends MeleeClass implements AttackAnimation {
 
     @Override
     public void setupAttackFrame(int totalFrame) {
-        attackFrames = new Image[totalFrame+1];
+        attackFrames = new Image[totalFrame];
 
         for (int i = 0; i < totalFrame; i++) {
             String path =
@@ -49,9 +50,6 @@ public class Katana extends MeleeClass implements AttackAnimation {
             attackFrames[i] = new Image(
                     getClass().getResource(path).toExternalForm());
         }
-
-        attackFrames[totalFrame] = new Image(
-                getClass().getResource("/Katana.png").toExternalForm());
     }
 
     @Override
@@ -60,7 +58,7 @@ public class Katana extends MeleeClass implements AttackAnimation {
         finished = false;
         lastFrameTime = System.nanoTime();
 
-        self.getSprite().setImage(attackFrames[0]);
+        self.getWeaponSprite().setImage(attackFrames[0]);
     }
 
     @Override
@@ -80,7 +78,7 @@ public class Katana extends MeleeClass implements AttackAnimation {
                 return;
             }
 
-            self.getSprite()
+            self.getWeaponSprite()
                     .setImage(attackFrames[frameIndex]);
         }
 
