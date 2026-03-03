@@ -191,9 +191,9 @@ public class PlayerLogic {
 
         /* apply movement */
         // only when walk state
-        if (player.getState() == PlayerState.WALK){
-            player.translate(velocityX, 0);
-        }
+        //if (player.getState() == PlayerState.WALK){
+        player.translate(velocityX, 0);
+
 
 
 
