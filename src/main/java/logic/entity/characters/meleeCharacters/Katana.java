@@ -1,11 +1,18 @@
 package logic.entity.characters.meleeCharacters;
 
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import logic.entity.AttackData;
 import logic.entity.characterClass.MeleeClass;
+import logic.gameLogic.Player;
+import logic.gameLogic.PlayerState;
+import logic.interfaces.AttackAnimation;
 
 import java.util.Objects;
 
-public class Katana extends MeleeClass {
+public class Katana extends MeleeClass implements AttackAnimation {
+
+
     public Katana(int hp, int atk, int def, int attackRange, float attackSpeed) {
         super(hp, atk, def, attackRange, attackSpeed);
         setName("Katana");
@@ -14,15 +21,27 @@ public class Katana extends MeleeClass {
     public Katana() {
         super();
         setName("Katana");
-
+        setTotalFrames(2);
+        setFRAME_DURATION(300_000_000);// nano-sec
+        setupAttackFrame(getTotalFrames());
     }
 
-    public Image loadSprite() {
-        return new Image(
-                Objects.requireNonNull(
-                        getClass()
-                                .getResourceAsStream("/Katana.png")
-                )
-        );
+    @Override
+    public AttackData getAttackData() {
+        return new AttackData(60, 100);
     }
+
+    @Override
+    public void setupAttackFrame(int totalFrame) {
+        attackFrames = new Image[totalFrame];
+
+        for (int i = 0; i < totalFrame; i++) {
+            String path =
+                    "/animations/katana/attack/frame" + (i + 1) + ".png";
+            attackFrames[i] = new Image(
+                    getClass().getResource(path).toExternalForm());
+        }
+    }
+
+
 }

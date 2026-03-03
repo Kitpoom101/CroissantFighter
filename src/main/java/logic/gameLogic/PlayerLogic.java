@@ -3,8 +3,12 @@ package logic.gameLogic;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import logic.entity.AttackData;
+import logic.entity.characterClass.RangedClass;
+import logic.entity.characters.meleeCharacters.Katana;
 
 public class PlayerLogic {
 
@@ -24,6 +28,7 @@ public class PlayerLogic {
     private final double HITBOX_WIDTH = 50;
     private boolean attacking = false;
     // ====== HITBOX ===== //
+
 
     // store movement
     private boolean moveLeft;
@@ -61,6 +66,7 @@ public class PlayerLogic {
         attackHitbox.setStroke(Color.RED);
         attackHitbox.setFill(Color.TRANSPARENT);
         attackHitbox.setVisible(false);
+
     }
 
     /* ---------- INPUT ---------- */
@@ -74,40 +80,58 @@ public class PlayerLogic {
         if(event.getCode() == rightKey)
             moveRight = true;
 
-        if(event.getCode() == attackKey)
+        if(event.getCode() == attackKey){
             attack();
+            player.setState(PlayerState.ATTACK);
+            player.getCharacter().startAttack(player);
+        }
+
     }
 
     private void attack() {
-            attacking = true;
 
-            ImageView sprite = player.getSprite();
+        attacking = true;
 
-            double playerX = sprite.getLayoutX();
-            double playerY = sprite.getLayoutY();
+        AttackData data = player.getCharacter().getAttackData();
+        ImageView sprite = player.getSprite();
 
-            double spriteHeight = sprite.getBoundsInParent().getHeight();
+        double playerX = sprite.getLayoutX();
+        double playerY = sprite.getLayoutY();
 
-            // match sprite height
-            attackHitbox.setHeight(spriteHeight);
-            attackHitbox.setWidth(HITBOX_WIDTH);
+        // 🔥 ถ้าเป็น ranged
+        if (data == null) {
 
-            // START FROM PLAYER BOTTOM
-            attackHitbox.setLayoutY(playerY);
+            float startX = (float) (playerX + sprite.getBoundsInParent().getWidth() / 2);
+            float startY = (float) (playerY + sprite.getBoundsInParent().getHeight() / 2);
 
-            if(player.isFacingRight()) {
-                attackHitbox.setLayoutX(
-                        playerX + sprite.getBoundsInParent().getWidth()
-                );
-            } else {
-                attackHitbox.setLayoutX(
-                        playerX - HITBOX_WIDTH
-                );
-            }
+            player.getCharacter().attack(
+                    startX,
+                    startY,
+                    player.isFacingRight(),
+                    player
+            );
 
-            attackHitbox.setVisible(true);
+            return;
+        }
 
-            checkHit();
+        // 🔥 ถ้าเป็น melee ทำเหมือนเดิม
+        attackHitbox.setWidth(data.getWidth());
+        attackHitbox.setHeight(data.getHeight());
+
+        attackHitbox.setLayoutY(playerY);
+
+        if (player.isFacingRight()) {
+            attackHitbox.setLayoutX(
+                    playerX + sprite.getBoundsInParent().getWidth()
+            );
+        } else {
+            attackHitbox.setLayoutX(
+                    playerX - data.getWidth()
+            );
+        }
+
+        attackHitbox.setVisible(true);
+        checkHit();
     }
 
     private void checkHit() {
@@ -133,6 +157,7 @@ public class PlayerLogic {
 
         if(event.getCode() == rightKey)
             moveRight = false;
+
     }
 
     /* CALLED EVERY FRAME */
@@ -164,7 +189,73 @@ public class PlayerLogic {
             velocityX = 0;
 
         /* apply movement */
+        // only when walk state
+        //if (player.getState() == PlayerState.WALK){
         player.translate(velocityX, 0);
+        clampToArenaBounds();
+
+
+        // ==== WEAPON SPRITE ===== //
+        ImageView body = player.getSprite();
+
+        // weapon sprite position
+        player.getWeaponSprite().setLayoutY(body.getLayoutY());
+
+        if(player.isFacingRight()){
+            player.getWeaponSprite().setScaleX(1);
+            player.getWeaponSprite().setLayoutX(
+                    body.getLayoutX() + body.getBoundsInParent().getWidth()
+            );
+        }else{
+            player.getWeaponSprite().setScaleX(-1);
+            player.getWeaponSprite().setLayoutX(
+                    body.getLayoutX() - player.getWeaponSprite().getImage().getWidth()
+            );
+        }
+
+        // ==== ATTACK ANIMATION ===== //
+        if(player.getState() == PlayerState.ATTACK){
+
+//            (Katana) player.getCharacter()
+//                    .updateAttack(player);
+//
+//            if(player.getCharacter()
+//                    .isAttackFinished()){
+//
+//                player.setState(PlayerState.WALK);
+//            }
+            player.getWeaponSprite().setVisible(true);
+            player.getCharacter().updateAttack(player);
+
+            if(player.getCharacter().isAttackFinished()){
+                player.setState(PlayerState.WALK);
+                player.getWeaponSprite().setVisible(false);
+            }
+
+        }
+    }
+
+    private void clampToArenaBounds() {
+        if (!(player.getSprite().getParent() instanceof Region arena)) {
+            return;
+        }
+
+        double arenaWidth = arena.getWidth() > 0 ? arena.getWidth() : arena.prefWidth(-1);
+        if (arenaWidth <= 0) {
+            return;
+        }
+
+        ImageView sprite = player.getSprite();
+        double spriteWidth = sprite.getBoundsInParent().getWidth();
+
+        double minX = 0;
+        double maxX = Math.max(minX, arenaWidth - spriteWidth);
+
+        if (sprite.getLayoutX() < minX) {
+            sprite.setLayoutX(minX);
+        } else if (sprite.getLayoutX() > maxX) {
+            sprite.setLayoutX(maxX);
+        }
     }
 }
 

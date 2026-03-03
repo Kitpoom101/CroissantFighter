@@ -1,18 +1,34 @@
 package logic.entity;
 
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import logic.gameLogic.Player;
+import logic.interfaces.AttackAnimation;
 import logic.interfaces.Attackable;
+import logic.interfaces.Damageable;
 
-import java.util.Objects;
+public abstract class Character implements Attackable, Damageable, AttackAnimation {
 
-public abstract class Character implements Attackable {
+    protected String name;
+    protected int hp;
+    protected int atk;
+    protected int def;
+    protected int attackRange;
+    protected float attackSpeed;
 
-    private String name;
-    private int hp;
-    private int atk;
-    private int def;
-    private int attackRange;
-    private float attackSpeed;
+    // weapon
+    private ImageView weaponSprite;
+
+    // animation
+    protected Image[] attackFrames;
+    protected int totalFrames;
+
+    protected int frameIndex = 0;
+
+    protected long lastFrameTime;
+    protected long FRAME_DURATION;
+
+    protected boolean finished = false;
 
     public Character(int hp, int atk, int def, int attackRange, float attackSpeed) {
         this.setHp(hp);
@@ -20,6 +36,17 @@ public abstract class Character implements Attackable {
         this.setDef(def);
         this.setAttackRange(attackRange);
         this.setAttackSpeed(attackSpeed);
+
+        weaponSprite = new ImageView();
+        weaponSprite.setVisible(false);
+
+        weaponSprite.setImage(
+                new Image(
+                        getClass()
+                                .getResource("/Missing.png")
+                                .toExternalForm()
+                )
+        );
     }
 
     public Character() {
@@ -35,7 +62,7 @@ public abstract class Character implements Attackable {
     public void moveRight() {}
     public void jump() {}
 
-    public void attack() {};
+    public abstract void attack(float startX, float startY, boolean facingRight, Player player);
     public void useSpecialSkill() {};
 
     public void takeDamage(int damage) {
@@ -94,5 +121,28 @@ public abstract class Character implements Attackable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public ImageView getWeaponSprite(){
+        return weaponSprite;
+    }
+
+    public abstract AttackData getAttackData();
+
+    public void setTotalFrames(int totalFrames) {
+        this.totalFrames = totalFrames;
+    }
+
+    public void setFRAME_DURATION(long FRAME_DURATION) {
+        this.FRAME_DURATION = FRAME_DURATION;
+    }
+
+    public int getTotalFrames() {
+        return totalFrames;
+    }
+
+    @Override
+    public boolean isAttackFinished() {
+        return finished;
     }
 }

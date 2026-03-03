@@ -6,8 +6,11 @@ import logic.entity.Character;
 
 public class Player {
 
+    // character
     private Character character;
     private ImageView sprite;
+    // weapon
+    private ImageView weaponSprite;
 
     private PlayerState state = PlayerState.WALK;
 
@@ -31,6 +34,9 @@ public class Player {
             sprite.setLayoutX(600);
             sprite.setLayoutY(400);
         }
+
+        // for weapon //
+        weaponSprite = character.getWeaponSprite();
     }
 
 
@@ -70,5 +76,9 @@ public class Player {
 
     public void setCharacter(Character character) {
         this.character = character;
+    }
+
+    public ImageView getWeaponSprite() {
+        return weaponSprite;
     }
 }

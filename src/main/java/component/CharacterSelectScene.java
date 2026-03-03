@@ -45,7 +45,7 @@ public class CharacterSelectScene extends VBox {
         for (int i = 0; i < 9; i++) {
             CharacterPane pane = new CharacterPane(i);
             pane.setOnMouseClicked(e ->
-                    selectCharacter(pane)
+                selectCharacter(pane)
             );
             characterRow.getChildren().add(pane);
         }

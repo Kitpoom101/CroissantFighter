@@ -1,6 +1,7 @@
 package logic.entity.characters.hybridCharacters;
 
 import logic.entity.characterClass.HybridClass;
+import logic.gameLogic.Player;
 
 public class Exorcist extends HybridClass {
     public Exorcist(int hp, int atk, int def, int attackRange, float attackSpeed) {
@@ -11,5 +12,25 @@ public class Exorcist extends HybridClass {
     public Exorcist() {
         super();
         setName("Exorcist");
+    }
+
+    @Override
+    public void startAttack(Player self) {
+
+    }
+
+    @Override
+    public void updateAttack(Player self) {
+
+    }
+
+    @Override
+    public void setupAttackFrame(int totalFrame) {
+
+    }
+
+    @Override
+    public boolean isAttackFinished() {
+        return false;
     }
 }
