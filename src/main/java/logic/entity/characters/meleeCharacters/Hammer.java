@@ -15,6 +15,7 @@ public class Hammer extends MeleeClass {
     public Hammer() {
         super();
         setName("Hammer");
+        setAtk(60);
         setTotalFrames(2);
         setFRAME_DURATION(400_000_000);
         setupAttackFrame(getTotalFrames());
@@ -22,7 +23,7 @@ public class Hammer extends MeleeClass {
 
     @Override
     public AttackData getAttackData() {
-        return new AttackData(90, 120);
+        return new AttackData(100, 120);
     }
 
 

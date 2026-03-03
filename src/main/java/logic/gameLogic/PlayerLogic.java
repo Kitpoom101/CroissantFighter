@@ -8,6 +8,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import logic.entity.AttackData;
+import logic.entity.characterClass.MeleeClass;
 import logic.entity.characterClass.RangedClass;
 import logic.entity.characters.meleeCharacters.Katana;
 
@@ -79,10 +80,15 @@ public class PlayerLogic {
         if(event.getCode() == rightKey)
             moveRight = true;
 
-        if(event.getCode() == attackKey && player.getCharacter().getAttackState() == AttackState.NotAttacking){
-            player.setState(PlayerState.ATTACK);
-            player.getCharacter().setAttackState(AttackState.AllowAttack);
-            player.getCharacter().startAttack(player);
+        if(event.getCode() == attackKey){
+            if (player.getCharacter().getAttackState() == AttackState.NotAttacking){
+                player.setState(PlayerState.ATTACK);
+                player.getCharacter().setAttackState(AttackState.AllowAttack);
+                player.getCharacter().startAttack(player);
+            } else if (!(player.getCharacter() instanceof MeleeClass)) {
+                player.setState(PlayerState.ATTACK);
+                attack();
+            }
         }
 
     }
@@ -193,25 +199,28 @@ public class PlayerLogic {
 
 
         // ==== WEAPON SPRITE ===== //
-        ImageView body = player.getSprite();
+        if (player.getCharacter() instanceof MeleeClass){
+            ImageView body = player.getSprite();
 
-        // weapon sprite position
-        player.getWeaponSprite().setLayoutY(body.getLayoutY());
+            // weapon sprite position
+            player.getWeaponSprite().setLayoutY(body.getLayoutY());
 
-        if(player.isFacingRight()){
-            player.getWeaponSprite().setScaleX(1);
-            player.getWeaponSprite().setLayoutX(
-                    body.getLayoutX() + body.getBoundsInParent().getWidth()
-            );
-        }else{
-            player.getWeaponSprite().setScaleX(-1);
-            player.getWeaponSprite().setLayoutX(
-                    body.getLayoutX() - player.getWeaponSprite().getImage().getWidth()
-            );
+            if(player.isFacingRight()){
+                player.getWeaponSprite().setScaleX(1);
+                player.getWeaponSprite().setLayoutX(
+                        body.getLayoutX() + body.getBoundsInParent().getWidth()
+                );
+            }else{
+                player.getWeaponSprite().setScaleX(-1);
+                player.getWeaponSprite().setLayoutX(
+                        body.getLayoutX() - player.getWeaponSprite().getImage().getWidth()
+                );
+            }
         }
 
         // ==== ATTACK ANIMATION ===== //
-        if(player.getState() == PlayerState.ATTACK){
+        // Only melee
+        if(player.getState() == PlayerState.ATTACK && player.getCharacter() instanceof MeleeClass){
 
             player.getWeaponSprite().setVisible(true);
             player.getCharacter().updateAttack(player);

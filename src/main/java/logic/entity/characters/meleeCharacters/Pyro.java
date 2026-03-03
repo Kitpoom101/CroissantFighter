@@ -22,7 +22,7 @@ public class Pyro extends MeleeClass {
 
     @Override
     public AttackData getAttackData() {
-        return new AttackData(90, 120);
+        return new AttackData(150, 120);
     }
 
 
