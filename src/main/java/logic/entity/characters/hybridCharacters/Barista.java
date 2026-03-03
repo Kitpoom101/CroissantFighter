@@ -5,8 +5,9 @@ import logic.entity.AttackData;
 import logic.entity.BaseProjectileAttack;
 import logic.entity.characterClass.HybridClass;
 import logic.gameLogic.Player;
+import logic.interfaces.SpawnAttack;
 
-public class Barista extends HybridClass {
+public class Barista extends HybridClass implements SpawnAttack {
     public Barista(int hp, int atk, int def, int attackRange, float attackSpeed) {
         super(hp, atk, def, attackRange, attackSpeed);
         setName("Barista");
@@ -35,12 +36,7 @@ public class Barista extends HybridClass {
                         p
                 );
 
-        Scene2.getInstance().addProjectile(coffeeShot);
-
-    }
-
-    private void spawnProjectile(BaseProjectileAttack projectile) {
-        Scene2.getInstance().addProjectile(projectile);
+        spawnProjectile(coffeeShot);
     }
 
     /*@Override

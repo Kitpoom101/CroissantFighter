@@ -6,6 +6,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import logic.entity.AttackData;
+import logic.entity.characters.meleeCharacters.Katana;
 
 public class PlayerLogic {
 
@@ -25,6 +26,9 @@ public class PlayerLogic {
     private final double HITBOX_WIDTH = 50;
     private boolean attacking = false;
     // ====== HITBOX ===== //
+
+    // weapon
+    private ImageView weaponSprite;
 
     // store movement
     private boolean moveLeft;
@@ -62,6 +66,10 @@ public class PlayerLogic {
         attackHitbox.setStroke(Color.RED);
         attackHitbox.setFill(Color.TRANSPARENT);
         attackHitbox.setVisible(false);
+
+        // for weapon //
+        weaponSprite = new ImageView();
+        weaponSprite.setVisible(false);
     }
 
     /* ---------- INPUT ---------- */
@@ -75,8 +83,14 @@ public class PlayerLogic {
         if(event.getCode() == rightKey)
             moveRight = true;
 
-        if(event.getCode() == attackKey)
+        if(event.getCode() == attackKey){
             attack();
+            player.setState(PlayerState.ATTACK);
+            if (player.getCharacter() instanceof Katana){
+                ((Katana) player.getCharacter()).startAttack(player);
+            }
+        }
+
     }
 
     private void attack() {
@@ -148,6 +162,7 @@ public class PlayerLogic {
 
         if(event.getCode() == rightKey)
             moveRight = false;
+
     }
 
     /* CALLED EVERY FRAME */
@@ -180,6 +195,27 @@ public class PlayerLogic {
 
         /* apply movement */
         player.translate(velocityX, 0);
+
+        // ==== ATTACK ANIMATION ===== //
+        if(player.getState() == PlayerState.ATTACK){
+
+//            (Katana) player.getCharacter()
+//                    .updateAttack(player);
+//
+//            if(player.getCharacter()
+//                    .isAttackFinished()){
+//
+//                player.setState(PlayerState.WALK);
+//            }
+            if(player.getCharacter() instanceof Katana katana){
+
+                katana.updateAttack(player);
+
+                if(katana.isAttackFinished()){
+                    player.setState(PlayerState.WALK);
+                }
+            }
+        }
     }
 }
 

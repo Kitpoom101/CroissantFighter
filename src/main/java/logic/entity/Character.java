@@ -2,8 +2,9 @@ package logic.entity;
 
 import logic.gameLogic.Player;
 import logic.interfaces.Attackable;
+import logic.interfaces.Damageable;
 
-public abstract class Character implements Attackable {
+public abstract class Character implements Attackable, Damageable {
 
     protected String name;
     protected int hp;
