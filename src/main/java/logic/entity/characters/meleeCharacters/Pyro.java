@@ -3,6 +3,7 @@ package logic.entity.characters.meleeCharacters;
 import javafx.scene.image.Image;
 import logic.entity.AttackData;
 import logic.entity.characterClass.MeleeClass;
+import logic.gameLogic.AttackState;
 import logic.gameLogic.Player;
 
 public class Pyro extends MeleeClass {
@@ -37,4 +38,11 @@ public class Pyro extends MeleeClass {
         }
     }
 
+    @Override
+    public void updateAttack(Player self) {
+        super.updateAttack(self);
+        if(frameIndex == 0 && getAttackState() == AttackState.AllowAttack ){
+            setAttackState(AttackState.WillAttack);
+        }
+    }
 }

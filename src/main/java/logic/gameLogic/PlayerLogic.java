@@ -1,5 +1,6 @@
 package logic.gameLogic;
 
+import component.scene2.Scene2;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -79,9 +80,9 @@ public class PlayerLogic {
         if(event.getCode() == rightKey)
             moveRight = true;
 
-        if(event.getCode() == attackKey){
-            attack();
+        if(event.getCode() == attackKey && player.getCharacter().getAttackState() == AttackState.NotAttacking){
             player.setState(PlayerState.ATTACK);
+            player.getCharacter().setAttackState(AttackState.AllowAttack);
             player.getCharacter().startAttack(player);
         }
 
@@ -214,19 +215,16 @@ public class PlayerLogic {
         // ==== ATTACK ANIMATION ===== //
         if(player.getState() == PlayerState.ATTACK){
 
-//            (Katana) player.getCharacter()
-//                    .updateAttack(player);
-//
-//            if(player.getCharacter()
-//                    .isAttackFinished()){
-//
-//                player.setState(PlayerState.WALK);
-//            }
             player.getWeaponSprite().setVisible(true);
             player.getCharacter().updateAttack(player);
+            if(player.getCharacter().getAttackState() == AttackState.WillAttack){
+                attack();
+                player.getCharacter().setAttackState(AttackState.NotAttacking);
+            }
 
             if(player.getCharacter().isAttackFinished()){
                 player.setState(PlayerState.WALK);
+                player.getCharacter().setAttackState(AttackState.NotAttacking);
                 player.getWeaponSprite().setVisible(false);
             }
 

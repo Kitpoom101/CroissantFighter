@@ -1,14 +1,11 @@
 package logic.entity.characters.meleeCharacters;
 
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import logic.entity.AttackData;
 import logic.entity.characterClass.MeleeClass;
+import logic.gameLogic.AttackState;
 import logic.gameLogic.Player;
-import logic.gameLogic.PlayerState;
 import logic.interfaces.AttackAnimation;
-
-import java.util.Objects;
 
 public class Katana extends MeleeClass implements AttackAnimation {
 
@@ -43,5 +40,11 @@ public class Katana extends MeleeClass implements AttackAnimation {
         }
     }
 
-
+    @Override
+    public void updateAttack(Player self) {
+        super.updateAttack(self);
+        if(frameIndex == 1 && getAttackState() == AttackState.AllowAttack ){
+            setAttackState(AttackState.WillAttack);
+        }
+    }
 }

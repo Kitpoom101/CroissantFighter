@@ -2,6 +2,7 @@ package logic.entity.characterClass;
 
 import logic.entity.AttackData;
 import logic.entity.Character;
+import logic.gameLogic.AttackState;
 import logic.gameLogic.Player;
 import logic.gameLogic.PlayerState;
 import logic.interfaces.Attackable;
@@ -35,6 +36,7 @@ public abstract class MeleeClass extends Character implements Attackable {
         frameIndex = 0;
         finished = false;
         lastFrameTime = System.nanoTime();
+        setAttackState(AttackState.AllowAttack);
         if (attackFrames.length > 0) self.getWeaponSprite().setImage(attackFrames[0]);
     }
 
@@ -52,6 +54,7 @@ public abstract class MeleeClass extends Character implements Attackable {
             if(frameIndex >= attackFrames.length){
                 finished = true;
                 self.setState(PlayerState.WALK);
+                setAttackState(AttackState.AllowAttack);
                 return;
             }
 
