@@ -12,17 +12,6 @@ import java.util.Objects;
 
 public class Katana extends MeleeClass implements AttackAnimation {
 
-    private Image[] attackFrames;
-    private final int totalFrames = 2;
-
-    private int frameIndex = 0;
-    private int frameTimer = 0;
-
-    private long lastFrameTime;
-    private final long FRAME_DURATION = 320_000_000;
-
-    private final int FRAME_DELAY = 5; // speed
-    private boolean finished = false;
 
     public Katana(int hp, int atk, int def, int attackRange, float attackSpeed) {
         super(hp, atk, def, attackRange, attackSpeed);
@@ -32,7 +21,9 @@ public class Katana extends MeleeClass implements AttackAnimation {
     public Katana() {
         super();
         setName("Katana");
-        setupAttackFrame(totalFrames);
+        setTotalFrames(2);
+        setFRAME_DURATION(300_000_000);// nano-sec
+        setupAttackFrame(getTotalFrames());
     }
 
     @Override
@@ -52,43 +43,5 @@ public class Katana extends MeleeClass implements AttackAnimation {
         }
     }
 
-    @Override
-    public void startAttack(Player self) {
-        frameIndex = 0;
-        finished = false;
-        lastFrameTime = System.nanoTime();
 
-        self.getWeaponSprite().setImage(attackFrames[0]);
-    }
-
-    @Override
-    public void updateAttack(Player self) {
-
-        long now = System.nanoTime();
-
-        // change frame every few ticks
-        if(now - lastFrameTime >= FRAME_DURATION){
-
-            lastFrameTime = now;
-            frameIndex++;
-
-            if(frameIndex >= attackFrames.length){
-                finished = true;
-                self.setState(PlayerState.WALK);
-                return;
-            }
-
-            self.getWeaponSprite()
-                    .setImage(attackFrames[frameIndex]);
-        }
-
-        // ⭐ HIT FRAME (middle frame)
-//        if(frameIndex == 1){
-//            dealDamage(self, enemy);
-//        }
-    }
-
-    public boolean isAttackFinished(){
-        return this.finished;
-    }
 }

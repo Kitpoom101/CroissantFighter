@@ -9,4 +9,8 @@ public interface AttackAnimation {
     void updateAttack(Player self);
     void setupAttackFrame(int totalFrame);
     boolean isAttackFinished();
+    void setFRAME_DURATION(long FRAME_DURATION);
+    void setTotalFrames(int totalFrames);
+
+    // Must set frame duration amd total frames for animation to work properly
 }

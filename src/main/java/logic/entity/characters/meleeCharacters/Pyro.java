@@ -1,5 +1,6 @@
 package logic.entity.characters.meleeCharacters;
 
+import javafx.scene.image.Image;
 import logic.entity.AttackData;
 import logic.entity.characterClass.MeleeClass;
 import logic.gameLogic.Player;
@@ -12,7 +13,10 @@ public class Pyro extends MeleeClass {
 
     public Pyro() {
         super();
+        setTotalFrames(1);
+        setFRAME_DURATION(100_000_000);
         setName("Pyro");
+        setupAttackFrame(getTotalFrames());
     }
 
     @Override
@@ -20,23 +24,17 @@ public class Pyro extends MeleeClass {
         return new AttackData(90, 120);
     }
 
-    @Override
-    public void startAttack(Player self) {
-
-    }
-
-    @Override
-    public void updateAttack(Player self) {
-
-    }
 
     @Override
     public void setupAttackFrame(int totalFrame) {
+        attackFrames = new Image[totalFrame];
 
+        for (int i = 0; i < totalFrame; i++) {
+            String path =
+                    "/animations/pyro/attack/frame" + (i + 1) + ".png";
+            attackFrames[i] = new Image(
+                    getClass().getResource(path).toExternalForm());
+        }
     }
 
-    @Override
-    public boolean isAttackFinished() {
-        return false;
-    }
 }

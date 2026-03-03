@@ -82,9 +82,7 @@ public class PlayerLogic {
         if(event.getCode() == attackKey){
             attack();
             player.setState(PlayerState.ATTACK);
-            if (player.getCharacter() instanceof Katana){
-                ((Katana) player.getCharacter()).startAttack(player);
-            }
+            player.getCharacter().startAttack(player);
         }
 
     }
@@ -193,10 +191,6 @@ public class PlayerLogic {
         // only when walk state
         //if (player.getState() == PlayerState.WALK){
         player.translate(velocityX, 0);
-
-
-
-
 
 
         // ==== WEAPON SPRITE ===== //

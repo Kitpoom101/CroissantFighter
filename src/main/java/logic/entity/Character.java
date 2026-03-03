@@ -19,6 +19,17 @@ public abstract class Character implements Attackable, Damageable, AttackAnimati
     // weapon
     private ImageView weaponSprite;
 
+    // animation
+    protected Image[] attackFrames;
+    protected int totalFrames;
+
+    protected int frameIndex = 0;
+
+    protected long lastFrameTime;
+    protected long FRAME_DURATION;
+
+    protected boolean finished = false;
+
     public Character(int hp, int atk, int def, int attackRange, float attackSpeed) {
         this.setHp(hp);
         this.setAtk(atk);
@@ -117,4 +128,21 @@ public abstract class Character implements Attackable, Damageable, AttackAnimati
     }
 
     public abstract AttackData getAttackData();
+
+    public void setTotalFrames(int totalFrames) {
+        this.totalFrames = totalFrames;
+    }
+
+    public void setFRAME_DURATION(long FRAME_DURATION) {
+        this.FRAME_DURATION = FRAME_DURATION;
+    }
+
+    public int getTotalFrames() {
+        return totalFrames;
+    }
+
+    @Override
+    public boolean isAttackFinished() {
+        return finished;
+    }
 }
