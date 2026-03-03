@@ -32,7 +32,6 @@ public abstract class Character implements Attackable, Damageable, AttackAnimati
     protected boolean finished = false;
     protected AttackState attackState = AttackState.NotAttacking;
 
-
     public Character(int hp, int atk, int def, int attackRange, float attackSpeed) {
         this.setHp(hp);
         this.setAtk(atk);

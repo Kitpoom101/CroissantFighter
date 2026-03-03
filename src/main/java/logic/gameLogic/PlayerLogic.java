@@ -4,6 +4,7 @@ import component.scene2.Scene2;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import logic.entity.AttackData;
@@ -28,7 +29,6 @@ public class PlayerLogic {
     private final double HITBOX_WIDTH = 50;
     private boolean attacking = false;
     // ====== HITBOX ===== //
-
 
     // store movement
     private boolean moveLeft;
@@ -66,7 +66,6 @@ public class PlayerLogic {
         attackHitbox.setStroke(Color.RED);
         attackHitbox.setFill(Color.TRANSPARENT);
         attackHitbox.setVisible(false);
-
     }
 
     /* ---------- INPUT ---------- */
@@ -89,8 +88,7 @@ public class PlayerLogic {
     }
 
     private void attack() {
-
-        attacking = true;
+            attacking = true;
 
         AttackData data = player.getCharacter().getAttackData();
         ImageView sprite = player.getSprite();
@@ -157,7 +155,6 @@ public class PlayerLogic {
 
         if(event.getCode() == rightKey)
             moveRight = false;
-
     }
 
     /* CALLED EVERY FRAME */
@@ -192,6 +189,7 @@ public class PlayerLogic {
         // only when walk state
         //if (player.getState() == PlayerState.WALK){
         player.translate(velocityX, 0);
+        clampToArenaBounds();
 
 
         // ==== WEAPON SPRITE ===== //
@@ -228,6 +226,29 @@ public class PlayerLogic {
                 player.getWeaponSprite().setVisible(false);
             }
 
+        }
+    }
+
+    private void clampToArenaBounds() {
+        if (!(player.getSprite().getParent() instanceof Region arena)) {
+            return;
+        }
+
+        double arenaWidth = arena.getWidth() > 0 ? arena.getWidth() : arena.prefWidth(-1);
+        if (arenaWidth <= 0) {
+            return;
+        }
+
+        ImageView sprite = player.getSprite();
+        double spriteWidth = sprite.getBoundsInParent().getWidth();
+
+        double minX = 0;
+        double maxX = Math.max(minX, arenaWidth - spriteWidth);
+
+        if (sprite.getLayoutX() < minX) {
+            sprite.setLayoutX(minX);
+        } else if (sprite.getLayoutX() > maxX) {
+            sprite.setLayoutX(maxX);
         }
     }
 }
