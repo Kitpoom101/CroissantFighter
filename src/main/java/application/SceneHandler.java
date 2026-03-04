@@ -18,6 +18,9 @@ public class SceneHandler {
     // swap screen
     public static void switchRoot(Parent newRoot) {
         scene.setRoot(newRoot);
+
+        newRoot.applyCss();
+        newRoot.layout();
     }
 
     public static Scene getScene() {

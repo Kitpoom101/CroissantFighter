@@ -17,14 +17,15 @@ public class Player {
     public Player(Character character, int i) {
 
         Image image = new Image(
-                getClass().getResource("/" + character.getName() + ".png").toExternalForm()
+                getClass().getResource("/animations/BaseIdleGif/Idle.gif").toExternalForm()
         );
 
         setCharacter(character);
 
         sprite = new ImageView(image);
 
-        sprite.setFitWidth(120);
+        sprite.setFitWidth(150);
+        sprite.setFitHeight(150);
         sprite.setPreserveRatio(true);
 
         if(i == 1){

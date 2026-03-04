@@ -9,17 +9,11 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        VBox root = new VBox();
-        root.setPrefHeight(600);
-        root.setPrefWidth(1000);
+        CharacterSelectScene characterSelectScene =
+                new CharacterSelectScene();
 
-        CharacterSelectScene characterSelectPane = new CharacterSelectScene();
+        SceneHandler.init(primaryStage, characterSelectScene);
 
-        root.getChildren().addAll(
-                characterSelectPane
-        );
-
-        SceneHandler.init(primaryStage, root);
         primaryStage.setTitle("CroissantFighter");
         primaryStage.show();
     }
