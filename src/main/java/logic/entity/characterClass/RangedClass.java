@@ -8,6 +8,8 @@ import logic.interfaces.Attackable;
 public abstract class RangedClass extends Character implements Attackable {
     public RangedClass() {
         super(100, 25, 5, 3, 2.0F);
+        setBuff(10);
+        setOrigin(getAttackRange());
     }
 
     @Override
@@ -18,11 +20,20 @@ public abstract class RangedClass extends Character implements Attackable {
 
     public RangedClass(int hp, int atk, int def, int attackRange, float attackSpeed) {
         super(hp, atk, def, attackRange, attackSpeed);
+
     }
 
     @Override
     public void useSpecialSkill() {
+        setAttackRange(getAttackRange() + getBuff());
     }
+
+    @Override
+    public void resetBuff(){
+        setAttackRange(getOrigin());
+    }
+
+
 
     @Override
     public AttackData getAttackData() {

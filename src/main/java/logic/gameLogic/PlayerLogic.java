@@ -7,10 +7,15 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import logic.entity.AttackData;
+import logic.entity.characterClass.HybridClass;
 import logic.entity.characterClass.MeleeClass;
 import logic.entity.characterClass.RangedClass;
-import logic.entity.characters.meleeCharacters.Katana;
+import javafx.animation.FadeTransition;
+import javafx.animation.PauseTransition;
+import javafx.animation.SequentialTransition;
+import javafx.util.Duration;
 
 public class PlayerLogic {
 
@@ -30,6 +35,8 @@ public class PlayerLogic {
 
     private final double HITBOX_WIDTH = 50;
     private boolean attacking = false;
+    private long hitboxStartTime = 0;
+    private final long HITBOX_DURATION = 500_000_000L; // 0.5 sec in nanoseconds
     // ====== HITBOX ===== //
 
     // store movement
@@ -38,12 +45,19 @@ public class PlayerLogic {
 
     private final double speed = 5;
 
+    // ===== Skill ===== //
+    private int originalAtk;
+    private int originalDef;
+    private boolean skillActive = false;
+
+    private Text buffText;
+
     /* ===== MOVEMENT PHYSICS ===== */
 
     private double velocityX = 0;
 
     private final double ACCELERATION = 0.4;
-    private final double MAX_SPEED = 5;
+    private final double MAX_SPEED = 3;
     private final double FRICTION = 0.85;
 
     public PlayerLogic(Player player, Player enemy, int i) {
@@ -70,6 +84,11 @@ public class PlayerLogic {
         attackHitbox.setStroke(Color.RED);
         attackHitbox.setFill(Color.TRANSPARENT);
         attackHitbox.setVisible(false);
+
+        // for buff //
+        buffText = new Text("");
+        buffText.setStyle("-fx-font-size: 24px; -fx-fill: black;");
+        buffText.setOpacity(0);
     }
 
     /* ---------- INPUT ---------- */
@@ -94,10 +113,110 @@ public class PlayerLogic {
             }
         }
 
+        if(event.getCode() == specialAttackKey){
+            if (player.getCharacter().getSkillState() == SkillState.CanUseSkill){
+                player.getCharacter().setSkillState(SkillState.CanUseSkill);
+                skill();
+            }
+        }
+
+    }
+
+    private void skill() {
+
+        if(skillActive) return;
+
+        skillActive = true;
+
+        var character = player.getCharacter();
+
+        // ===== APPLY BUFF ===== //
+        character.useSpecialSkill();
+
+        player.getCharacter().setSkillState(SkillState.UsedSkill);
+
+        if(character instanceof MeleeClass){
+            showBuffText("DEF UP BY " + character.getBuff() + " !!");
+        } else if (character instanceof RangedClass) {
+            showBuffText("RANGE UP BY " + character.getBuff() + " !!");
+        } else if (character instanceof HybridClass){
+            showBuffText("ATTACK UP BY " + character.getBuff() + " !!");
+        } else {
+            showBuffText("How?");
+        }
+
+
+        // ===== SKILL DURATION =====
+        PauseTransition skillDuration =
+                new PauseTransition(Duration.seconds(5));
+
+        skillDuration.setOnFinished(e -> {
+
+            // restore stats
+            character.resetBuff();
+
+            skillActive = false;
+
+            player.getCharacter()
+                    .setSkillState(SkillState.CooldownSkill);
+
+            showBuffText("Buff Ended");
+        });
+
+        skillDuration.play();
+        startSkillCooldown();
+    }
+
+    private void startSkillCooldown(){
+
+        player.getCharacter()
+                .setSkillState(SkillState.CooldownSkill);
+
+        PauseTransition cooldown =
+                new PauseTransition(Duration.seconds(8));
+
+        cooldown.setOnFinished(e ->
+                player.getCharacter()
+                        .setSkillState(SkillState.CanUseSkill)
+        );
+
+        cooldown.play();
+    }
+
+    private void showBuffText(String message){
+
+        buffText.setText(message);
+
+        ImageView sprite = player.getSprite();
+
+        buffText.setLayoutX(sprite.getLayoutX());
+        buffText.setLayoutY(sprite.getLayoutY() - 40);
+
+        FadeTransition fadeIn =
+                new FadeTransition(Duration.seconds(0.3), buffText);
+        fadeIn.setFromValue(0);
+        fadeIn.setToValue(1);
+
+        PauseTransition stay =
+                new PauseTransition(Duration.seconds(1));
+
+        FadeTransition fadeOut =
+                new FadeTransition(Duration.seconds(0.3), buffText);
+        fadeOut.setFromValue(1);
+        fadeOut.setToValue(0);
+
+        SequentialTransition sequence =
+                new SequentialTransition(fadeIn, stay, fadeOut);
+
+        sequence.play();
+    }
+
+    public Text getBuffText() {
+        return buffText;
     }
 
     private void attack() {
-            attacking = true;
+        attacking = true;
 
         AttackData data = player.getCharacter().getAttackData();
         ImageView sprite = player.getSprite();
@@ -138,6 +257,8 @@ public class PlayerLogic {
         }
 
         attackHitbox.setVisible(true);
+        // store hitbox time
+        hitboxStartTime = System.nanoTime();
         checkHit();
     }
 
@@ -198,10 +319,50 @@ public class PlayerLogic {
         // only when walk state
         //if (player.getState() == PlayerState.WALK){
         player.translate(velocityX, 0);
+        // ===== PREVENT PLAYER MOVEMENT ===== //
         clampToArenaBounds();
 
 
-        // ==== WEAPON SPRITE ===== //
+        // ===== WEAPON SPRITE FOLLOW ===== //
+        weaponSpriteFollow();
+
+        // ===== ATTACK ANIMATION ===== //
+        // Only melee
+        attackAnimation();
+
+        // ===== UPDATE HITBOX ===== //
+        updateHitboxTimer();
+    }
+
+    private void updateHitboxTimer() {
+
+        if(!attackHitbox.isVisible()) return;
+
+        long now = System.nanoTime();
+
+        if(now - hitboxStartTime >= HITBOX_DURATION){
+            attackHitbox.setVisible(false);
+        }
+    }
+
+    private void attackAnimation(){
+        if(player.getState() == PlayerState.ATTACK && player.getCharacter() instanceof MeleeClass){
+            player.getWeaponSprite().setVisible(true);
+            player.getCharacter().updateAttack(player);
+            if(player.getCharacter().getAttackState() == AttackState.WillAttack){
+                attack();
+                player.getCharacter().setAttackState(AttackState.NotAttacking);
+            }
+
+            if(player.getCharacter().isAttackFinished()){
+                player.setState(PlayerState.WALK);
+                player.getCharacter().setAttackState(AttackState.NotAttacking);
+                player.getWeaponSprite().setVisible(false);
+            }
+        }
+    }
+
+    private void weaponSpriteFollow() {
         if (player.getCharacter() instanceof MeleeClass){
             ImageView body = player.getSprite();
 
@@ -219,25 +380,6 @@ public class PlayerLogic {
                         body.getLayoutX() - player.getWeaponSprite().getImage().getWidth()
                 );
             }
-        }
-
-        // ==== ATTACK ANIMATION ===== //
-        // Only melee
-        if(player.getState() == PlayerState.ATTACK && player.getCharacter() instanceof MeleeClass){
-
-            player.getWeaponSprite().setVisible(true);
-            player.getCharacter().updateAttack(player);
-            if(player.getCharacter().getAttackState() == AttackState.WillAttack){
-                attack();
-                player.getCharacter().setAttackState(AttackState.NotAttacking);
-            }
-
-            if(player.getCharacter().isAttackFinished()){
-                player.setState(PlayerState.WALK);
-                player.getCharacter().setAttackState(AttackState.NotAttacking);
-                player.getWeaponSprite().setVisible(false);
-            }
-
         }
     }
 
