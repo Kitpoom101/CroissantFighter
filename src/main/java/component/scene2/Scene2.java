@@ -103,8 +103,8 @@ public class Scene2 extends Pane {
                 player1HealthBar,
                 player2HealthBar,
                 countdownLabel,
-                player1.getSprite(),
-                player2.getSprite(),
+                player1.getPlayerRoot(),
+                player2.getPlayerRoot(),
                 playerLogic1.getAttackHitbox(),
                 playerLogic1.getBuffText(),
                 player1.getWeaponSprite(),
@@ -229,7 +229,9 @@ public class Scene2 extends Pane {
 
                     // If projectile collides with target sprite, apply damage and remove projectile.
                     if (p.getSprite().getBoundsInParent()
-                            .intersects(target.getSprite().getBoundsInParent())) {
+                            .intersects(target.getHitbox()
+                                    .localToScene(target.getHitbox().getBoundsInLocal())
+                            )) {
 
                         target.getCharacter().takeDamage(p.getOwner().getCharacter().getAtk());
 
