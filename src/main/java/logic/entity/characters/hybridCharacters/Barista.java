@@ -1,6 +1,7 @@
 package logic.entity.characters.hybridCharacters;
 
 import component.scene2.Scene2;
+import javafx.scene.image.Image;
 import logic.entity.AttackData;
 import logic.entity.BaseProjectileAttack;
 import logic.entity.characterClass.HybridClass;
@@ -33,7 +34,11 @@ public class Barista extends HybridClass implements SpawnAttack {
                         startY,
                         dirX,
                         0,
-                        p
+                        p,
+                        new Image(
+                                getClass().getResource("/projectilebaseattack.png").toExternalForm()
+                        ),
+                        1
                 );
 
         spawnProjectile(coffeeShot);

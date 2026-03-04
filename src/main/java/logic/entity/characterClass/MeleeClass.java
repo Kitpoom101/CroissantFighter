@@ -46,7 +46,7 @@ public abstract class MeleeClass extends Character implements Attackable {
         frameIndex = 0;
         finished = false;
         lastFrameTime = System.nanoTime();
-        setAttackState(AttackState.AllowAttack);
+        setAttackState(AttackState.Attacking);
         if (attackFrames.length > 0) self.getWeaponSprite().setImage(attackFrames[0]);
     }
 

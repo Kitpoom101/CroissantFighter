@@ -1,6 +1,7 @@
 package logic.gameLogic;
 
 import component.scene2.Scene2;
+import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -33,11 +34,14 @@ public class PlayerLogic {
     // ====== HITBOX ===== //
     private Rectangle attackHitbox;
 
-    private final double HITBOX_WIDTH = 50;
     private boolean attacking = false;
     private long hitboxStartTime = 0;
     private final long HITBOX_DURATION = 500_000_000L; // 0.5 sec in nanoseconds
     // ====== HITBOX ===== //
+
+    // Attack
+    private long lastAttackTime = 0;
+    private boolean attackHeld = false;
 
     // store movement
     private boolean moveLeft;
@@ -46,8 +50,6 @@ public class PlayerLogic {
     private final double speed = 5;
 
     // ===== Skill ===== //
-    private int originalAtk;
-    private int originalDef;
     private boolean skillActive = false;
 
     private Text buffText;
@@ -75,7 +77,7 @@ public class PlayerLogic {
             leftKey = KeyCode.J;
             rightKey = KeyCode.L;
             attackKey = KeyCode.I;
-            specialAttackKey = KeyCode.P;
+            specialAttackKey = KeyCode.O;
         }
 
         // for hit box //
@@ -103,9 +105,13 @@ public class PlayerLogic {
             moveRight = true;
 
         if(event.getCode() == attackKey){
+            if(attackHeld) return; // ✅ prevent repeat
+
+            attackHeld = true;
+
             if (player.getCharacter().getAttackState() == AttackState.NotAttacking){
                 player.setState(PlayerState.ATTACK);
-                player.getCharacter().setAttackState(AttackState.AllowAttack);
+                player.getCharacter().setAttackState(AttackState.Attacking);
                 player.getCharacter().startAttack(player);
             } else if (!(player.getCharacter() instanceof MeleeClass)) {
                 player.setState(PlayerState.ATTACK);
@@ -119,7 +125,20 @@ public class PlayerLogic {
                 skill();
             }
         }
+    }
 
+    /* KEY RELEASED */
+    public void handleKeyReleased(KeyEvent event) {
+
+        if(event.getCode() == leftKey)
+            moveLeft = false;
+
+        if(event.getCode() == rightKey)
+            moveRight = false;
+
+        if(event.getCode() == attackKey){
+            attackHeld = false;
+        }
     }
 
     private void skill() {
@@ -187,7 +206,7 @@ public class PlayerLogic {
 
         buffText.setText(message);
 
-        ImageView sprite = player.getSprite();
+        Group sprite = player.getPlayerRoot();
 
         buffText.setLayoutX(sprite.getLayoutX());
         buffText.setLayoutY(sprite.getLayoutY() - 40);
@@ -219,7 +238,7 @@ public class PlayerLogic {
         attacking = true;
 
         AttackData data = player.getCharacter().getAttackData();
-        ImageView sprite = player.getSprite();
+        Group sprite = player.getPlayerRoot();
 
         double playerX = sprite.getLayoutX();
         double playerY = sprite.getLayoutY();
@@ -265,7 +284,9 @@ public class PlayerLogic {
     private void checkHit() {
 
         if (attackHitbox.getBoundsInParent()
-                .intersects(enemy.getSprite().getBoundsInParent())) {
+                .intersects(enemy.getHitbox()
+                        .localToScene(enemy.getHitbox().getBoundsInLocal())
+                )) {
 
             System.out.println("HIT!");
 
@@ -275,16 +296,6 @@ public class PlayerLogic {
 
     public Rectangle getAttackHitbox() {
         return attackHitbox;
-    }
-
-    /* KEY RELEASED */
-    public void handleKeyReleased(KeyEvent event) {
-
-        if(event.getCode() == leftKey)
-            moveLeft = false;
-
-        if(event.getCode() == rightKey)
-            moveRight = false;
     }
 
     /* CALLED EVERY FRAME */
@@ -329,6 +340,7 @@ public class PlayerLogic {
         // ===== ATTACK ANIMATION ===== //
         // Only melee
         attackAnimation();
+        handleAttackSpeed();
 
         // ===== UPDATE HITBOX ===== //
         updateHitboxTimer();
@@ -351,20 +363,40 @@ public class PlayerLogic {
             player.getCharacter().updateAttack(player);
             if(player.getCharacter().getAttackState() == AttackState.WillAttack){
                 attack();
-                player.getCharacter().setAttackState(AttackState.NotAttacking);
+                lastAttackTime = System.nanoTime();
+                player.getCharacter().setAttackState(AttackState.AttackCooldown);
             }
 
             if(player.getCharacter().isAttackFinished()){
                 player.setState(PlayerState.WALK);
-                player.getCharacter().setAttackState(AttackState.NotAttacking);
                 player.getWeaponSprite().setVisible(false);
             }
         }
     }
 
+    private void handleAttackSpeed() {
+
+        if(player.getCharacter().getAttackState() != AttackState.AttackCooldown)
+            return;
+
+        long now = System.nanoTime();
+
+        if(now - lastAttackTime >= getAttackInterval()){
+            player.getCharacter()
+                    .setAttackState(AttackState.NotAttacking);
+        }
+    }
+
+    private long getAttackInterval() {
+        float attackSpeed =
+                player.getCharacter().getAttackSpeed();
+
+        return (long)(1_000_000_000L / attackSpeed);
+    }
+
     private void weaponSpriteFollow() {
         if (player.getCharacter() instanceof MeleeClass){
-            ImageView body = player.getSprite();
+            Group body = player.getPlayerRoot();
 
             // weapon sprite position
             player.getWeaponSprite().setLayoutY(body.getLayoutY());
@@ -384,7 +416,7 @@ public class PlayerLogic {
     }
 
     private void clampToArenaBounds() {
-        if (!(player.getSprite().getParent() instanceof Region arena)) {
+        if (!(player.getPlayerRoot().getParent() instanceof Region arena)) {
             return;
         }
 
@@ -393,7 +425,7 @@ public class PlayerLogic {
             return;
         }
 
-        ImageView sprite = player.getSprite();
+        Group sprite = player.getPlayerRoot();
         double spriteWidth = sprite.getBoundsInParent().getWidth();
 
         double minX = 0;
@@ -406,4 +438,3 @@ public class PlayerLogic {
         }
     }
 }
-

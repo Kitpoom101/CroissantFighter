@@ -1,7 +1,11 @@
 package logic.gameLogic;
 
+import javafx.scene.Group;
+import javafx.scene.effect.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import logic.entity.Character;
 
 public class Player {
@@ -14,6 +18,9 @@ public class Player {
 
     private PlayerState state = PlayerState.WALK;
 
+    private Group playerRoot;
+    private Rectangle hitbox;
+
     public Player(Character character, int i) {
 
         Image image = new Image(
@@ -22,18 +29,37 @@ public class Player {
 
         setCharacter(character);
 
-        sprite = new ImageView(image);
+        playerRoot = new Group();
 
+        sprite = new ImageView(image);
         sprite.setFitWidth(150);
         sprite.setFitHeight(150);
         sprite.setPreserveRatio(true);
 
+        // REAL collision box
+        hitbox = new Rectangle(100,120);
+        hitbox.setFill(Color.color(1, 0, 0, 0.3));
+        hitbox.setStroke(Color.RED);
+
+        hitbox.setLayoutX(25);
+        hitbox.setLayoutY(20);
+
+        playerRoot.getChildren().addAll(sprite, hitbox);
+
+        DropShadow glow = new DropShadow();
+        glow.setColor(Color.BLUE);
+        glow.setRadius(15);
+
+        sprite.setEffect(glow);
+
         if(i == 1){
-            sprite.setLayoutX(300);
-            sprite.setLayoutY(400);
+            playerRoot.setLayoutX(300);
+            playerRoot.setLayoutY(400);
+            glow.setColor(Color.BLUE);
         }else{
-            sprite.setLayoutX(600);
-            sprite.setLayoutY(400);
+            playerRoot.setLayoutX(600);
+            playerRoot.setLayoutY(400);
+            glow.setColor(Color.RED);
         }
 
         // for weapon //
@@ -55,8 +81,8 @@ public class Player {
     }
 
     public void translate(double dx, double dy) {
-        sprite.setLayoutX(sprite.getLayoutX() + dx);
-        sprite.setLayoutY(sprite.getLayoutY() + dy);
+        playerRoot.setLayoutX(playerRoot.getLayoutX() + dx);
+        playerRoot.setLayoutY(playerRoot.getLayoutY() + dy);
     }
 
     public void faceLeft() {
@@ -81,5 +107,13 @@ public class Player {
 
     public ImageView getWeaponSprite() {
         return weaponSprite;
+    }
+
+    public Group getPlayerRoot() {
+        return playerRoot;
+    }
+
+    public Rectangle getHitbox(){
+        return hitbox;
     }
 }
