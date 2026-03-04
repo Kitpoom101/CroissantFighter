@@ -19,7 +19,7 @@ import java.net.URL;
 import static logic.gameLogic.Selection.setPlayer_1_Character;
 import static logic.gameLogic.Selection.setPlayer_2_Character;
 
-public class CharacterSelectScene extends VBox {
+public class CharacterSelectScene extends StackPane {
     private CharacterPane selectedPane;
     private final PlayerSelection playerSelection;
     private final ImageView player1PreviewImage;
@@ -27,6 +27,8 @@ public class CharacterSelectScene extends VBox {
     private SelectState selectState = SelectState.PLAYER1_SELECT;
 
     public CharacterSelectScene(){
+        VBox ui = new VBox();
+
         playerSelection = new PlayerSelection();
         player1PreviewImage = createPreviewImageView();
         player2PreviewImage = createPreviewImageView();
@@ -73,32 +75,42 @@ public class CharacterSelectScene extends VBox {
         VBox.setVgrow(previewRow, Priority.ALWAYS);
         previewRow.getChildren().addAll(player1PreviewPane, player2PreviewPane);
 
-        setSpacing(14);
-        setAlignment(Pos.TOP_CENTER);
-        setPadding(new Insets(12, 16, 12, 16));
-        setFillWidth(true);
-        setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+        ui.setSpacing(14);
+        ui.setAlignment(Pos.TOP_CENTER);
+        ui.setPadding(new Insets(12, 16, 12, 16));
+        ui.setFillWidth(true);
+        ui.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         playerSelection.setMaxWidth(Double.MAX_VALUE);
 
-        getChildren().addAll(
+        ui.getChildren().addAll(
                 playerSelection,
                 characterRow,
                 actionRow,
                 previewRow
         );
 
+        getChildren().add(ui);
+
         setImageBackground();
     }
 
     private void setImageBackground(){
         Image image = new Image(getClass().getResource("/CroissantShop.png").toExternalForm());
+        BackgroundSize size = new BackgroundSize(
+                100, 100,
+                true, true,
+                false, true   // COVER = true
+        );
+
         BackgroundImage bg = new BackgroundImage(
                 image,
                 BackgroundRepeat.NO_REPEAT,
                 BackgroundRepeat.NO_REPEAT,
                 BackgroundPosition.CENTER,
-                new BackgroundSize(100, 100, true, true, false, true)
+                size
         );
+
         this.setBackground(new Background(bg));
     }
 
@@ -163,9 +175,8 @@ public class CharacterSelectScene extends VBox {
 
     private ImageView createPreviewImageView() {
         ImageView imageView = new ImageView();
-        imageView.setFitWidth(320);
-        imageView.setFitHeight(320);
-        imageView.setPreserveRatio(true);
+        imageView.setFitWidth(230);
+        imageView.setFitHeight(230);
         return imageView;
     }
 
