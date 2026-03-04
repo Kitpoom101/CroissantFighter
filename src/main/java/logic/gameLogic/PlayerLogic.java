@@ -1,6 +1,7 @@
 package logic.gameLogic;
 
 import component.scene2.Scene2;
+import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -205,7 +206,7 @@ public class PlayerLogic {
 
         buffText.setText(message);
 
-        ImageView sprite = player.getSprite();
+        Group sprite = player.getPlayerRoot();
 
         buffText.setLayoutX(sprite.getLayoutX());
         buffText.setLayoutY(sprite.getLayoutY() - 40);
@@ -237,7 +238,7 @@ public class PlayerLogic {
         attacking = true;
 
         AttackData data = player.getCharacter().getAttackData();
-        ImageView sprite = player.getSprite();
+        Group sprite = player.getPlayerRoot();
 
         double playerX = sprite.getLayoutX();
         double playerY = sprite.getLayoutY();
@@ -283,7 +284,9 @@ public class PlayerLogic {
     private void checkHit() {
 
         if (attackHitbox.getBoundsInParent()
-                .intersects(enemy.getSprite().getBoundsInParent())) {
+                .intersects(enemy.getHitbox()
+                        .localToScene(enemy.getHitbox().getBoundsInLocal())
+                )) {
 
             System.out.println("HIT!");
 
@@ -393,7 +396,7 @@ public class PlayerLogic {
 
     private void weaponSpriteFollow() {
         if (player.getCharacter() instanceof MeleeClass){
-            ImageView body = player.getSprite();
+            Group body = player.getPlayerRoot();
 
             // weapon sprite position
             player.getWeaponSprite().setLayoutY(body.getLayoutY());
@@ -413,7 +416,7 @@ public class PlayerLogic {
     }
 
     private void clampToArenaBounds() {
-        if (!(player.getSprite().getParent() instanceof Region arena)) {
+        if (!(player.getPlayerRoot().getParent() instanceof Region arena)) {
             return;
         }
 
@@ -422,7 +425,7 @@ public class PlayerLogic {
             return;
         }
 
-        ImageView sprite = player.getSprite();
+        Group sprite = player.getPlayerRoot();
         double spriteWidth = sprite.getBoundsInParent().getWidth();
 
         double minX = 0;
