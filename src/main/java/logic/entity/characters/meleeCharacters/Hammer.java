@@ -3,6 +3,7 @@ package logic.entity.characters.meleeCharacters;
 import javafx.scene.image.Image;
 import logic.entity.AttackData;
 import logic.entity.characterClass.MeleeClass;
+import logic.gameLogic.AttackState;
 import logic.gameLogic.Player;
 
 public class Hammer extends MeleeClass {
@@ -14,6 +15,7 @@ public class Hammer extends MeleeClass {
     public Hammer() {
         super();
         setName("Hammer");
+        setAtk(60);
         setTotalFrames(2);
         setFRAME_DURATION(400_000_000);
         setupAttackFrame(getTotalFrames());
@@ -21,7 +23,7 @@ public class Hammer extends MeleeClass {
 
     @Override
     public AttackData getAttackData() {
-        return new AttackData(90, 120);
+        return new AttackData(100, 120);
     }
 
 
@@ -34,6 +36,14 @@ public class Hammer extends MeleeClass {
                     "/animations/hammer/attack/frame" + (i + 1) + ".png";
             attackFrames[i] = new Image(
                     getClass().getResource(path).toExternalForm());
+        }
+    }
+
+    @Override
+    public void updateAttack(Player self) {
+        super.updateAttack(self);
+        if(frameIndex == 1 && getAttackState() == AttackState.AllowAttack ){
+            setAttackState(AttackState.WillAttack);
         }
     }
 }

@@ -2,6 +2,7 @@ package logic.entity;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import logic.gameLogic.AttackState;
 import logic.gameLogic.Player;
 import logic.interfaces.AttackAnimation;
 import logic.interfaces.Attackable;
@@ -29,6 +30,7 @@ public abstract class Character implements Attackable, Damageable, AttackAnimati
     protected long FRAME_DURATION;
 
     protected boolean finished = false;
+    protected AttackState attackState = AttackState.NotAttacking;
 
     public Character(int hp, int atk, int def, int attackRange, float attackSpeed) {
         this.setHp(hp);
@@ -144,5 +146,13 @@ public abstract class Character implements Attackable, Damageable, AttackAnimati
     @Override
     public boolean isAttackFinished() {
         return finished;
+    }
+
+    public AttackState getAttackState() {
+        return attackState;
+    }
+
+    public void setAttackState(AttackState attackState) {
+        this.attackState = attackState;
     }
 }

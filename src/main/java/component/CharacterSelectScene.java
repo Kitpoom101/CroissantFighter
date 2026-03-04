@@ -2,14 +2,12 @@ package component;
 
 import application.SceneHandler;
 import component.scene2.Scene2;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import logic.entity.Character;
 import logic.gameLogic.SelectState;
 
@@ -18,8 +16,6 @@ import logic.entity.characters.hybridCharacters.*;
 import logic.entity.characters.rangedCharacters.*;
 
 import java.net.URL;
-import java.util.List;
-
 import static logic.gameLogic.Selection.setPlayer_1_Character;
 import static logic.gameLogic.Selection.setPlayer_2_Character;
 
@@ -38,9 +34,9 @@ public class CharacterSelectScene extends VBox {
         HBox characterRow = new HBox(5);
         characterRow.setAlignment(Pos.CENTER);
 
-        characterRow.setPrefWidth(500);
+        characterRow.setPrefWidth(600);
         characterRow.setAlignment(Pos.CENTER);
-        characterRow.setSpacing(5);
+        characterRow.setSpacing(10);
 
         for (int i = 0; i < 9; i++) {
             CharacterPane pane = new CharacterPane(i);
@@ -73,11 +69,16 @@ public class CharacterSelectScene extends VBox {
         HBox previewRow = new HBox(20);
         previewRow.setAlignment(Pos.CENTER);
         previewRow.setFillHeight(true);
-        previewRow.setPrefWidth(900);
+        previewRow.setMaxWidth(Double.MAX_VALUE);
+        VBox.setVgrow(previewRow, Priority.ALWAYS);
         previewRow.getChildren().addAll(player1PreviewPane, player2PreviewPane);
 
-        setSpacing(20);
-        setAlignment(Pos.CENTER);
+        setSpacing(14);
+        setAlignment(Pos.TOP_CENTER);
+        setPadding(new Insets(12, 16, 12, 16));
+        setFillWidth(true);
+        setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        playerSelection.setMaxWidth(Double.MAX_VALUE);
 
         getChildren().addAll(
                 playerSelection,
@@ -85,6 +86,20 @@ public class CharacterSelectScene extends VBox {
                 actionRow,
                 previewRow
         );
+
+        setImageBackground();
+    }
+
+    private void setImageBackground(){
+        Image image = new Image(getClass().getResource("/CroissantShop.png").toExternalForm());
+        BackgroundImage bg = new BackgroundImage(
+                image,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundPosition.CENTER,
+                new BackgroundSize(100, 100, true, true, false, true)
+        );
+        this.setBackground(new Background(bg));
     }
 
     private void selectCharacter(CharacterPane pane){

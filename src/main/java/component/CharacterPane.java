@@ -26,6 +26,9 @@ public class CharacterPane extends StackPane {
     private final String[] allSprite = {"/Katana.png", "/Hammer.png", "/Pyro.png", "/Barista.png"};
     private final String[] names = {"Katana"};
     private Character character;
+    private final Image charBG = new Image(ClassLoader.getSystemResource("CharPaneBg.png").toString());
+    private final Image charBGSelect = new Image(ClassLoader.getSystemResource("CharPaneSelect.png").toString());
+
     private ArrayList<Character> characterList = new ArrayList<>();
     {
         characterList.add(new Katana());
@@ -46,7 +49,7 @@ public class CharacterPane extends StackPane {
         setCharacter(charNum);
 
         setPrefSize(100, 100);
-        draw(Color.GREEN);
+        setImageBackground(charBG);
 
         ImageView view = new ImageView(spriteLoader(charNum));
         view.setFitWidth(80);   // smaller than 100
@@ -72,6 +75,10 @@ public class CharacterPane extends StackPane {
         this.setBackground(new Background(bgFillA));
     }
 
+    private void setImageBackground(Image image){
+        this.setBackground(new Background(new BackgroundImage(image, null ,null ,null, new BackgroundSize(this.getPrefWidth(), this.getPrefHeight(), false, false, false, false))));
+    }
+
     private Image spriteLoader(int i){
         String path = i < allSprite.length
                 ? allSprite[i] : "/Missing.png";
@@ -85,9 +92,9 @@ public class CharacterPane extends StackPane {
 
     public void setSelected(boolean value){
         if(value){
-            setStyle("-fx-border-color: gold; -fx-border-width: 3;");
+            setImageBackground(charBGSelect);
         } else {
-            setStyle("");
+            setImageBackground(charBG);
         }
     }
 
