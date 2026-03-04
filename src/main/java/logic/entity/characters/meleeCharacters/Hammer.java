@@ -17,7 +17,7 @@ public class Hammer extends MeleeClass {
         setName("Hammer");
         setAtk(60);
         setTotalFrames(2);
-        setAttackSpeed(0.65F);
+        setAttackSpeed(0.3F);
         setFRAME_DURATION(400_000_000);
         setupAttackFrame(getTotalFrames());
     }
@@ -43,7 +43,7 @@ public class Hammer extends MeleeClass {
     @Override
     public void updateAttack(Player self) {
         super.updateAttack(self);
-        if(frameIndex == 1 && getAttackState() == AttackState.AllowAttack ){
+        if(frameIndex == 1 && getAttackState() == AttackState.Attacking ){
             setAttackState(AttackState.WillAttack);
         }
     }

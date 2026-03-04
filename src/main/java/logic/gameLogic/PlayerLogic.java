@@ -38,8 +38,9 @@ public class PlayerLogic {
     private final long HITBOX_DURATION = 500_000_000L; // 0.5 sec in nanoseconds
     // ====== HITBOX ===== //
 
-    // Attack speed
+    // Attack
     private long lastAttackTime = 0;
+    private boolean attackHeld = false;
 
     // store movement
     private boolean moveLeft;
@@ -103,9 +104,13 @@ public class PlayerLogic {
             moveRight = true;
 
         if(event.getCode() == attackKey){
+            if(attackHeld) return; // ✅ prevent repeat
+
+            attackHeld = true;
+
             if (player.getCharacter().getAttackState() == AttackState.NotAttacking){
                 player.setState(PlayerState.ATTACK);
-                player.getCharacter().setAttackState(AttackState.AllowAttack);
+                player.getCharacter().setAttackState(AttackState.Attacking);
                 player.getCharacter().startAttack(player);
             } else if (!(player.getCharacter() instanceof MeleeClass)) {
                 player.setState(PlayerState.ATTACK);
@@ -130,6 +135,9 @@ public class PlayerLogic {
         if(event.getCode() == rightKey)
             moveRight = false;
 
+        if(event.getCode() == attackKey){
+            attackHeld = false;
+        }
     }
 
     private void skill() {
@@ -352,6 +360,7 @@ public class PlayerLogic {
             player.getCharacter().updateAttack(player);
             if(player.getCharacter().getAttackState() == AttackState.WillAttack){
                 attack();
+                lastAttackTime = System.nanoTime();
                 player.getCharacter().setAttackState(AttackState.AttackCooldown);
             }
 
@@ -364,18 +373,14 @@ public class PlayerLogic {
 
     private void handleAttackSpeed() {
 
+        if(player.getCharacter().getAttackState() != AttackState.AttackCooldown)
+            return;
+
         long now = System.nanoTime();
 
-        if(player.getCharacter().getAttackState() == AttackState.AttackCooldown){
-
-            if(now - lastAttackTime >= getAttackInterval()){
-
-                // allow next attack
-                player.getCharacter()
-                        .setAttackState(AttackState.NotAttacking);
-
-                lastAttackTime = now;
-            }
+        if(now - lastAttackTime >= getAttackInterval()){
+            player.getCharacter()
+                    .setAttackState(AttackState.NotAttacking);
         }
     }
 
