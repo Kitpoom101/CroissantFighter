@@ -233,8 +233,12 @@ public class Scene2 extends Pane {
                                     .localToScene(target.getHitbox().getBoundsInLocal())
                             )) {
 
-                        target.getCharacter().takeDamage(p.getOwner().getCharacter().getAtk());
+                        int damage = p.getDamage();
+                        target.getCharacter().takeDamage(damage);
 
+                        if (damage - target.getCharacter().getDef() > 0) {
+                            showDamageText(target, damage - target.getCharacter().getDef());
+                        }
                         // Remove projectile visual from scene and list from simulation.
                         getChildren().remove(p.getSprite());
                         iterator.remove();
@@ -333,11 +337,54 @@ public class Scene2 extends Pane {
         // Ensure projectile appears above most scene nodes.
         p.getSprite().toFront();
         System.out.println("Projectile added");
+        System.out.println(p.getDamage());
     }
 
     // Removes projectile from scene and simulation list.
     public void removeProjectile(BaseProjectileAttack p) {
         getChildren().remove(p.getSprite());
         projectileList.remove(p);
+    }
+
+    private void showDamageText(Player target, int damage) {
+        Label damageLabel = new Label("-" + damage);
+        damageLabel.setTextFill(Color.DARKRED);
+        damageLabel.setFont(Font.font("Monospaced", 20));
+        damageLabel.setStyle("-fx-font-weight: bold;");
+
+        // Position above the player's hitbox
+        double x = target.getHitbox().localToScene(
+                target.getHitbox().getBoundsInLocal()
+        ).getMinX();
+
+        double y = target.getHitbox().localToScene(
+                target.getHitbox().getBoundsInLocal()
+        ).getMinY();
+
+        damageLabel.setLayoutX(x + 20); // slight horizontal offset
+        damageLabel.setLayoutY(y - 10); // slightly above head
+
+        getChildren().add(damageLabel);
+        damageLabel.toFront();
+
+        // Floating + fade animation
+        javafx.animation.FadeTransition fade = new javafx.animation.FadeTransition(
+                javafx.util.Duration.seconds(0.8),
+                damageLabel
+        );
+        fade.setFromValue(1.0);
+        fade.setToValue(0.0);
+
+        javafx.animation.TranslateTransition move = new javafx.animation.TranslateTransition(
+                javafx.util.Duration.seconds(0.8),
+                damageLabel
+        );
+        move.setByY(-30); // float upward
+
+        javafx.animation.ParallelTransition animation =
+                new javafx.animation.ParallelTransition(fade, move);
+
+        animation.setOnFinished(e -> getChildren().remove(damageLabel));
+        animation.play();
     }
 }

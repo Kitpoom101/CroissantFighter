@@ -51,7 +51,7 @@ public class Bubble extends RangedClass implements SpawnAttack {
 
             BaseProjectileAttack bubble =
                     new BaseProjectileAttack(
-                            (int) (this.atk * 0.1 * i),
+                            (int) (this.atk * i * 0.67),
                             6f * i * 0.1f,
                             (int) (this.attackRange * 100 * i),
                             startX + 100,

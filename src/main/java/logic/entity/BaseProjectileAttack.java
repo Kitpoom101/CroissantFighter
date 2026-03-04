@@ -75,4 +75,8 @@ public class BaseProjectileAttack {
     public ImageView getSprite() {
         return sprite;
     }
+
+    public int getDamage() {
+        return damage;
+    }
 }
