@@ -23,6 +23,7 @@ public class PlayerLogic {
     private KeyCode leftKey;
     private KeyCode rightKey;
     private KeyCode attackKey;
+    private KeyCode specialAttackKey;
 
     // ====== HITBOX ===== //
     private Rectangle attackHitbox;
@@ -54,11 +55,13 @@ public class PlayerLogic {
             leftKey = KeyCode.A;
             rightKey = KeyCode.D;
             attackKey = KeyCode.E;
+            specialAttackKey = KeyCode.Q;
         }
         else if(playerNum == 2){
-            leftKey = KeyCode.LEFT;
-            rightKey = KeyCode.RIGHT;
-            attackKey = KeyCode.L;
+            leftKey = KeyCode.J;
+            rightKey = KeyCode.L;
+            attackKey = KeyCode.I;
+            specialAttackKey = KeyCode.P;
         }
 
         // for hit box //
