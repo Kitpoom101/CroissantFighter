@@ -6,10 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import logic.entity.Character;
 import logic.gameLogic.SelectState;
 
@@ -30,6 +27,9 @@ public class CharacterSelectScene extends VBox {
     private final ImageView player2PreviewImage;
     private SelectState selectState = SelectState.PLAYER1_SELECT;
 
+    private final Image scene1Bg = new Image(ClassLoader.getSystemResource("CroissantShop.png").toString());
+
+
     public CharacterSelectScene(){
         playerSelection = new PlayerSelection();
         player1PreviewImage = createPreviewImageView();
@@ -38,9 +38,9 @@ public class CharacterSelectScene extends VBox {
         HBox characterRow = new HBox(5);
         characterRow.setAlignment(Pos.CENTER);
 
-        characterRow.setPrefWidth(500);
+        characterRow.setPrefWidth(600);
         characterRow.setAlignment(Pos.CENTER);
-        characterRow.setSpacing(5);
+        characterRow.setSpacing(10);
 
         for (int i = 0; i < 9; i++) {
             CharacterPane pane = new CharacterPane(i);
@@ -85,6 +85,12 @@ public class CharacterSelectScene extends VBox {
                 actionRow,
                 previewRow
         );
+
+        setImageBackground(scene1Bg);
+    }
+
+    private void setImageBackground(Image image){
+        this.setBackground(new Background(new BackgroundImage(image, null ,null ,null, new BackgroundSize(this.getPrefWidth(), this.getPrefHeight(), false, false, false, false))));
     }
 
     private void selectCharacter(CharacterPane pane){
