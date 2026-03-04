@@ -2,6 +2,7 @@ package component;
 
 import application.SceneHandler;
 import component.scene2.Scene2;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
@@ -15,8 +16,6 @@ import logic.entity.characters.hybridCharacters.*;
 import logic.entity.characters.rangedCharacters.*;
 
 import java.net.URL;
-import java.util.List;
-
 import static logic.gameLogic.Selection.setPlayer_1_Character;
 import static logic.gameLogic.Selection.setPlayer_2_Character;
 
@@ -26,9 +25,6 @@ public class CharacterSelectScene extends VBox {
     private final ImageView player1PreviewImage;
     private final ImageView player2PreviewImage;
     private SelectState selectState = SelectState.PLAYER1_SELECT;
-
-    private final Image scene1Bg = new Image(ClassLoader.getSystemResource("CroissantShop.png").toString());
-
 
     public CharacterSelectScene(){
         playerSelection = new PlayerSelection();
@@ -73,11 +69,16 @@ public class CharacterSelectScene extends VBox {
         HBox previewRow = new HBox(20);
         previewRow.setAlignment(Pos.CENTER);
         previewRow.setFillHeight(true);
-        previewRow.setPrefWidth(900);
+        previewRow.setMaxWidth(Double.MAX_VALUE);
+        VBox.setVgrow(previewRow, Priority.ALWAYS);
         previewRow.getChildren().addAll(player1PreviewPane, player2PreviewPane);
 
-        setSpacing(20);
-        setAlignment(Pos.CENTER);
+        setSpacing(14);
+        setAlignment(Pos.TOP_CENTER);
+        setPadding(new Insets(12, 16, 12, 16));
+        setFillWidth(true);
+        setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        playerSelection.setMaxWidth(Double.MAX_VALUE);
 
         getChildren().addAll(
                 playerSelection,
@@ -86,11 +87,19 @@ public class CharacterSelectScene extends VBox {
                 previewRow
         );
 
-        setImageBackground(scene1Bg);
+        setImageBackground();
     }
 
-    private void setImageBackground(Image image){
-        this.setBackground(new Background(new BackgroundImage(image, null ,null ,null, new BackgroundSize(this.getPrefWidth(), this.getPrefHeight(), false, false, false, false))));
+    private void setImageBackground(){
+        Image image = new Image(getClass().getResource("/CroissantShop.png").toExternalForm());
+        BackgroundImage bg = new BackgroundImage(
+                image,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundPosition.CENTER,
+                new BackgroundSize(100, 100, true, true, false, true)
+        );
+        this.setBackground(new Background(bg));
     }
 
     private void selectCharacter(CharacterPane pane){
