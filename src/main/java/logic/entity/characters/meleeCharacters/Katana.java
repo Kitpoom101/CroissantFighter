@@ -20,6 +20,7 @@ public class Katana extends MeleeClass implements AttackAnimation {
         setName("Katana");
         setTotalFrames(2);
         setAtk(50);
+        setAttackSpeed(2.0F);
         setFRAME_DURATION(100_000_000);// nano-sec
         setupAttackFrame(getTotalFrames());
     }

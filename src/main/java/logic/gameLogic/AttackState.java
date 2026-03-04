@@ -4,4 +4,5 @@ public enum AttackState {
     NotAttacking,
     AllowAttack,
     WillAttack,
+    AttackCooldown
 }

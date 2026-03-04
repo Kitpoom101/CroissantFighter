@@ -33,11 +33,13 @@ public class PlayerLogic {
     // ====== HITBOX ===== //
     private Rectangle attackHitbox;
 
-    private final double HITBOX_WIDTH = 50;
     private boolean attacking = false;
     private long hitboxStartTime = 0;
     private final long HITBOX_DURATION = 500_000_000L; // 0.5 sec in nanoseconds
     // ====== HITBOX ===== //
+
+    // Attack speed
+    private long lastAttackTime = 0;
 
     // store movement
     private boolean moveLeft;
@@ -46,8 +48,6 @@ public class PlayerLogic {
     private final double speed = 5;
 
     // ===== Skill ===== //
-    private int originalAtk;
-    private int originalDef;
     private boolean skillActive = false;
 
     private Text buffText;
@@ -75,7 +75,7 @@ public class PlayerLogic {
             leftKey = KeyCode.J;
             rightKey = KeyCode.L;
             attackKey = KeyCode.I;
-            specialAttackKey = KeyCode.P;
+            specialAttackKey = KeyCode.O;
         }
 
         // for hit box //
@@ -119,6 +119,16 @@ public class PlayerLogic {
                 skill();
             }
         }
+    }
+
+    /* KEY RELEASED */
+    public void handleKeyReleased(KeyEvent event) {
+
+        if(event.getCode() == leftKey)
+            moveLeft = false;
+
+        if(event.getCode() == rightKey)
+            moveRight = false;
 
     }
 
@@ -277,16 +287,6 @@ public class PlayerLogic {
         return attackHitbox;
     }
 
-    /* KEY RELEASED */
-    public void handleKeyReleased(KeyEvent event) {
-
-        if(event.getCode() == leftKey)
-            moveLeft = false;
-
-        if(event.getCode() == rightKey)
-            moveRight = false;
-    }
-
     /* CALLED EVERY FRAME */
     public void update() {
 
@@ -329,6 +329,7 @@ public class PlayerLogic {
         // ===== ATTACK ANIMATION ===== //
         // Only melee
         attackAnimation();
+        handleAttackSpeed();
 
         // ===== UPDATE HITBOX ===== //
         updateHitboxTimer();
@@ -351,15 +352,38 @@ public class PlayerLogic {
             player.getCharacter().updateAttack(player);
             if(player.getCharacter().getAttackState() == AttackState.WillAttack){
                 attack();
-                player.getCharacter().setAttackState(AttackState.NotAttacking);
+                player.getCharacter().setAttackState(AttackState.AttackCooldown);
             }
 
             if(player.getCharacter().isAttackFinished()){
                 player.setState(PlayerState.WALK);
-                player.getCharacter().setAttackState(AttackState.NotAttacking);
                 player.getWeaponSprite().setVisible(false);
             }
         }
+    }
+
+    private void handleAttackSpeed() {
+
+        long now = System.nanoTime();
+
+        if(player.getCharacter().getAttackState() == AttackState.AttackCooldown){
+
+            if(now - lastAttackTime >= getAttackInterval()){
+
+                // allow next attack
+                player.getCharacter()
+                        .setAttackState(AttackState.NotAttacking);
+
+                lastAttackTime = now;
+            }
+        }
+    }
+
+    private long getAttackInterval() {
+        float attackSpeed =
+                player.getCharacter().getAttackSpeed();
+
+        return (long)(1_000_000_000L / attackSpeed);
     }
 
     private void weaponSpriteFollow() {

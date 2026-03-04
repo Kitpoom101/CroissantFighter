@@ -17,6 +17,7 @@ public class Pyro extends MeleeClass {
         setTotalFrames(1);
         setFRAME_DURATION(100_000_000);
         setName("Pyro");
+        setAttackSpeed(3.0F);
         setupAttackFrame(getTotalFrames());
     }
 
