@@ -8,8 +8,11 @@ import logic.gameLogic.PlayerState;
 import logic.interfaces.Attackable;
 
 public abstract class MeleeClass extends Character implements Attackable {
+
     public MeleeClass() {
         super(250, 20, 10, 1, 1.0F);
+        setBuff(15);
+        setOrigin(getDef());
     }
 
     @Override
@@ -20,10 +23,17 @@ public abstract class MeleeClass extends Character implements Attackable {
 
     public MeleeClass(int hp, int atk, int def, int attackRange, float attackSpeed) {
         super(hp, atk, def, attackRange, attackSpeed);
+
     }
 
     @Override
     public void useSpecialSkill() {
+        setDef(getDef() + getBuff());
+    }
+
+    @Override
+    public void resetBuff(){
+        setDef(getOrigin());
     }
 
     @Override

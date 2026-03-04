@@ -106,9 +106,11 @@ public class Scene2 extends Pane {
                 player1.getSprite(),
                 player2.getSprite(),
                 playerLogic1.getAttackHitbox(),
+                playerLogic1.getBuffText(),
                 player1.getWeaponSprite(),
                 player2.getWeaponSprite(),
-                playerLogic2.getAttackHitbox()
+                playerLogic2.getAttackHitbox(),
+                playerLogic2.getBuffText()
         );
 
         // Apply arena background image.
@@ -207,7 +209,7 @@ public class Scene2 extends Pane {
 
                 // End match immediately when timer reaches zero.
                 if (remainingSeconds <= 0) {
-                    endGameAndShowPopup("Time's up, you too slow");
+                    endGameAndShowPopup("Time's up, your too slow");
                     return;
                 }
 

@@ -4,6 +4,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import logic.gameLogic.AttackState;
 import logic.gameLogic.Player;
+import logic.gameLogic.SkillState;
 import logic.interfaces.AttackAnimation;
 import logic.interfaces.Attackable;
 import logic.interfaces.Damageable;
@@ -16,9 +17,14 @@ public abstract class Character implements Attackable, Damageable, AttackAnimati
     protected int def;
     protected int attackRange;
     protected float attackSpeed;
+    protected int buff;
+    protected int origin;
 
     // weapon
     private ImageView weaponSprite;
+
+    // skill
+    protected SkillState skillState = SkillState.CanUseSkill;
 
     // animation
     protected Image[] attackFrames;
@@ -82,7 +88,7 @@ public abstract class Character implements Attackable, Damageable, AttackAnimati
     }
 
     public void setAttackRange(int attackRange) {
-        this.attackRange = attackRange;
+        this.attackRange = Math.max(0, attackRange);
     }
 
     public int getDef() {
@@ -90,7 +96,7 @@ public abstract class Character implements Attackable, Damageable, AttackAnimati
     }
 
     public void setDef(int def) {
-        this.def = def;
+        this.def = Math.max(0, def);
     }
 
     public int getAtk() {
@@ -98,7 +104,7 @@ public abstract class Character implements Attackable, Damageable, AttackAnimati
     }
 
     public void setAtk(int atk) {
-        this.atk = atk;
+        this.atk = Math.max(0, atk);
     }
 
     public int getHp() {
@@ -106,7 +112,7 @@ public abstract class Character implements Attackable, Damageable, AttackAnimati
     }
 
     public void setHp(int hp) {
-        this.hp = hp;
+        this.hp = Math.max(0, hp);
     }
 
     public float getAttackSpeed() {
@@ -114,7 +120,7 @@ public abstract class Character implements Attackable, Damageable, AttackAnimati
     }
 
     public void setAttackSpeed(float attackSpeed) {
-        this.attackSpeed = attackSpeed;
+        this.attackSpeed = Math.max(0, attackSpeed);
     }
 
     public String getName() {
@@ -155,4 +161,30 @@ public abstract class Character implements Attackable, Damageable, AttackAnimati
     public void setAttackState(AttackState attackState) {
         this.attackState = attackState;
     }
+
+    public int getBuff() {
+        return buff;
+    }
+
+    public void setBuff(int buff) {
+        this.buff = buff;
+    }
+
+    public SkillState getSkillState() {
+        return skillState;
+    }
+
+    public void setSkillState(SkillState skillState) {
+        this.skillState = skillState;
+    }
+
+    public int getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(int origin) {
+        this.origin = origin;
+    }
+
+    public abstract void resetBuff();
 }
