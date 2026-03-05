@@ -7,7 +7,7 @@ import logic.gameLogic.AttackState;
 import logic.gameLogic.Player;
 import logic.interfaces.AttackAnimation;
 
-public class Katana extends MeleeClass implements AttackAnimation {
+public class Katana extends MeleeClass {
 
 
     public Katana(int hp, int atk, int def, int attackRange, float attackSpeed) {
