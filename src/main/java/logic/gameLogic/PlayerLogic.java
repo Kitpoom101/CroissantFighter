@@ -53,6 +53,8 @@ public class PlayerLogic {
 
     // ===== Skill ===== //
     private boolean skillActive = false;
+    private static final long SKILL_COOLDOWN_NANOS = 8_000_000_000L;
+    private long skillCooldownStartNanos = -1L;
 
     private Text buffText;
 
@@ -192,16 +194,31 @@ public class PlayerLogic {
 
         player.getCharacter()
                 .setSkillState(SkillState.CooldownSkill);
+        skillCooldownStartNanos = System.nanoTime();
 
         PauseTransition cooldown =
                 new PauseTransition(Duration.seconds(8));
 
-        cooldown.setOnFinished(e ->
+        cooldown.setOnFinished(e -> {
                 player.getCharacter()
-                        .setSkillState(SkillState.CanUseSkill)
-        );
+                        .setSkillState(SkillState.CanUseSkill);
+                skillCooldownStartNanos = -1L;
+        });
 
         cooldown.play();
+    }
+
+    public double getSkillCooldownProgress() {
+        SkillState state = player.getCharacter().getSkillState();
+        if (state == SkillState.CanUseSkill) {
+            return 1.0;
+        }
+        if (state != SkillState.CooldownSkill || skillCooldownStartNanos < 0) {
+            return 0.0;
+        }
+
+        long elapsed = System.nanoTime() - skillCooldownStartNanos;
+        return Math.max(0.0, Math.min((double) elapsed / SKILL_COOLDOWN_NANOS, 1.0));
     }
 
     private void showBuffText(String message){

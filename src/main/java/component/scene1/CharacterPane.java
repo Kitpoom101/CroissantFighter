@@ -1,4 +1,4 @@
-package component;
+package component.scene1;
 
 import javafx.geometry.Insets;
 import javafx.scene.image.Image;
@@ -16,9 +16,7 @@ import logic.entity.characters.rangedCharacters.Archer;
 import logic.entity.characters.rangedCharacters.Bubble;
 import logic.entity.characters.rangedCharacters.Mage;
 
-import java.awt.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class CharacterPane extends StackPane {
