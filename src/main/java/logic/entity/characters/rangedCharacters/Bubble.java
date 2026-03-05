@@ -9,9 +9,10 @@ import logic.entity.characterClass.HybridClass;
 import logic.entity.characterClass.RangedClass;
 import logic.gameLogic.AttackState;
 import logic.gameLogic.Player;
+import logic.interfaces.HaveWeapon;
 import logic.interfaces.SpawnAttack;
 
-public class Bubble extends RangedClass implements SpawnAttack {
+public class Bubble extends RangedClass implements SpawnAttack, HaveWeapon {
 
     private long blowerStartTime;
     private static final long BLOWER_DURATION = 1_000_000_000L;

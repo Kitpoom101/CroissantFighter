@@ -6,8 +6,9 @@ import logic.gameLogic.AttackState;
 import logic.gameLogic.Player;
 import logic.gameLogic.PlayerState;
 import logic.interfaces.Attackable;
+import logic.interfaces.HaveWeapon;
 
-public abstract class MeleeClass extends Character implements Attackable {
+public abstract class MeleeClass extends Character implements Attackable, HaveWeapon {
 
     public MeleeClass() {
         super(250, 20, 10, 1, 1.0F, 250);

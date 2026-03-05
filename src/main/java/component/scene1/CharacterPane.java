@@ -1,4 +1,4 @@
-package component;
+package component.scene1;
 
 import javafx.geometry.Insets;
 import javafx.scene.image.Image;
@@ -16,14 +16,16 @@ import logic.entity.characters.rangedCharacters.Archer;
 import logic.entity.characters.rangedCharacters.Bubble;
 import logic.entity.characters.rangedCharacters.Mage;
 
-import java.awt.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class CharacterPane extends StackPane {
 
-    private final String[] allSprite = {"/Katana.png", "/Hammer.png", "/Pyro.png", "/Barista.png"};
+    private final String[] allSprite = {
+            "/Katana.png", "/Hammer.png", "/Pyro.png",
+            "/Barista.png", "/Exorcist.png", "/Vampire.png",
+            "/Archer.png", "/Bubble.png", "/Mage.png"
+    };
     private final String[] names = {"Katana"};
     private Character character;
     private final Image charBG = new Image(ClassLoader.getSystemResource("CharPaneBg.png").toString());

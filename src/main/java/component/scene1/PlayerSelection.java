@@ -1,4 +1,4 @@
-package component;
+package component.scene1;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

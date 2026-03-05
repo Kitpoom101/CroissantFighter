@@ -1,7 +1,7 @@
 package component.scene2;
 
 import application.SceneHandler;
-import component.CharacterSelectScene;
+import component.scene1.CharacterSelectScene;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -28,6 +28,7 @@ import static logic.gameLogic.Selection.getPlayer_2_Character;
 public class Scene2 extends Pane {
     private static final double HEALTH_BAR_TOP_MARGIN = 20;
     private static final double HEALTH_BAR_SIDE_MARGIN = 20;
+    private static final double SKILL_BAR_VERTICAL_GAP = 10;
     private static final long MATCH_DURATION_SECONDS = 180;
     private static final long MATCH_DURATION_NANOS = MATCH_DURATION_SECONDS * 1_000_000_000L;
 
@@ -38,6 +39,8 @@ public class Scene2 extends Pane {
     private PlayerLogic playerLogic2;
     private HealthBar player1HealthBar;
     private HealthBar player2HealthBar;
+    private SkillBar player1SkillBar;
+    private SkillBar player2SkillBar;
     // Center timer label (MM:SS).
     private Label countdownLabel;
     // Frame loop that drives all runtime updates.
@@ -69,6 +72,8 @@ public class Scene2 extends Pane {
         // Initialize health bars with each character's starting HP.
         player1HealthBar = new HealthBar(player1.getCharacter().getHp());
         player2HealthBar = new HealthBar(player2.getCharacter().getHp());
+        player1SkillBar = new SkillBar();
+        player2SkillBar = new SkillBar();
         // Initialize timer label with full match duration.
         countdownLabel = new Label(formatTime(MATCH_DURATION_SECONDS));
         countdownLabel.setFont(Font.font("Monospaced", 28));
@@ -87,6 +92,20 @@ public class Scene2 extends Pane {
         );
         player2HealthBar.setLayoutY(HEALTH_BAR_TOP_MARGIN);
 
+        // Place player skill bars directly below each health bar.
+        player1SkillBar.setLayoutX(HEALTH_BAR_SIDE_MARGIN);
+        player1SkillBar.setLayoutY(
+                HEALTH_BAR_TOP_MARGIN + player1HealthBar.prefHeight(-1) + SKILL_BAR_VERTICAL_GAP
+        );
+        player2SkillBar.layoutXProperty().bind(
+                widthProperty().subtract(
+                        player2SkillBar.prefWidth(-1) + HEALTH_BAR_SIDE_MARGIN
+                )
+        );
+        player2SkillBar.setLayoutY(
+                HEALTH_BAR_TOP_MARGIN + player2HealthBar.prefHeight(-1) + SKILL_BAR_VERTICAL_GAP
+        );
+
         // Keep countdown centered horizontally based on scene width and label width.
         countdownLabel.layoutXProperty().bind(
                 Bindings.createDoubleBinding(
@@ -102,6 +121,8 @@ public class Scene2 extends Pane {
         getChildren().addAll(
                 player1HealthBar,
                 player2HealthBar,
+                player1SkillBar,
+                player2SkillBar,
                 countdownLabel,
                 player1.getPlayerRoot(),
                 player2.getPlayerRoot(),
@@ -199,6 +220,8 @@ public class Scene2 extends Pane {
                 // Sync health bar visuals with current HP values.
                 player1HealthBar.setCurrentHp(player1.getCharacter().getHp());
                 player2HealthBar.setCurrentHp(player2.getCharacter().getHp());
+                player1SkillBar.setCooldownProgress(playerLogic1.getSkillCooldownProgress());
+                player2SkillBar.setCooldownProgress(playerLogic2.getSkillCooldownProgress());
 
                 // Compute remaining time from elapsed nanoseconds.
                 long elapsedNanos = now - matchStartNanos;

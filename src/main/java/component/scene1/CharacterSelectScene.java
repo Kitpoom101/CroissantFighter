@@ -1,4 +1,4 @@
-package component;
+package component.scene1;
 
 import application.SceneHandler;
 import component.scene2.Scene2;
