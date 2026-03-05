@@ -25,6 +25,8 @@ public class Bubble extends RangedClass implements SpawnAttack, HandleOwnWeapon 
         super(150, 20, 4, 3, 0.5f, 2);
         setName("Bubble");
         setWeaponSprite("/animations/bubble/attack/atkprop/bubbleBlower.png");
+
+        setOrigin(getAtk());
     }
 
     @Override
@@ -116,7 +118,13 @@ public class Bubble extends RangedClass implements SpawnAttack, HandleOwnWeapon 
     }
 
     @Override
-    public void resetBuff() {
-
+    public void useSpecialSkill() {
+        setAtk(getAtk() + getBuff());
     }
+
+    @Override
+    public void resetBuff(){
+        setAtk(getOrigin());
+    }
+
 }

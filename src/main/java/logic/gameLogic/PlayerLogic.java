@@ -20,6 +20,9 @@ import javafx.animation.SequentialTransition;
 import javafx.util.Duration;
 import logic.entity.characters.hybridCharacters.Exorcist;
 import logic.entity.characters.hybridCharacters.Vampire;
+import logic.entity.characters.rangedCharacters.Archer;
+import logic.entity.characters.rangedCharacters.Bubble;
+import logic.entity.characters.rangedCharacters.Mage;
 import logic.interfaces.HaveWeapon;
 import logic.interfaces.OwnWeaponPos;
 import logic.interfaces.UsesAmmo;
@@ -214,8 +217,16 @@ public class PlayerLogic {
 
         if(character instanceof MeleeClass){
             showBuffText("DEF UP BY " + character.getBuff() + " !!");
-        } else if (character instanceof RangedClass) {
-            showBuffText("RANGE UP BY " + character.getBuff() + " !!");
+        } else if (character instanceof RangedClass rangedClass) {
+            if (rangedClass instanceof Archer){
+                showBuffText("RANGE UP BY " + character.getBuff() + " \n" +
+                        "ATTACK UP BY " + character.getBuff());
+            }else if (rangedClass instanceof Bubble){
+                showBuffText("ATTACK UP BY " + character.getBuff());
+            }else if (rangedClass instanceof Mage){
+                showBuffText("HEAL BY " + character.getBuff());
+            }
+
         } else if (character instanceof HybridClass){
             if (character instanceof Vampire){
                 showBuffText("ATTACK UP BY " + character.getBuff() + " !!" +
