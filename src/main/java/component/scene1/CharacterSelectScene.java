@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import logic.audio.AudioManager;
 import logic.entity.Character;
 import logic.gameLogic.SelectState;
 
@@ -109,6 +110,8 @@ public class CharacterSelectScene extends StackPane {
         getChildren().add(ui);
 
         setImageBackground();
+
+        AudioManager.playBGM("/audio/bgm/bgmSelectionSceneBalladDuParis.mp3");
     }
 
     // Applies a full-scene background image with "cover" behavior.

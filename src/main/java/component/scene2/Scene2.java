@@ -15,6 +15,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
+import logic.audio.AudioManager;
 import logic.entity.BaseProjectileAttack;
 import logic.gameLogic.Player;
 import logic.gameLogic.PlayerLogic;
@@ -154,6 +155,8 @@ public class Scene2 extends Pane {
                 startGameLoop();
             }
         });
+
+        AudioManager.playBGM("/audio/bgm/bgmScene2TraditionellMusette.mp3");
 
         // Register current instance for static access (projectile spawning path).
         instance = this;
