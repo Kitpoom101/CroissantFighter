@@ -17,6 +17,8 @@ import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 import logic.audio.AudioManager;
 import logic.entity.BaseProjectileAttack;
+import logic.entity.characters.hybridCharacters.Barista;
+import logic.entity.characters.rangedCharacters.Bubble;
 import logic.gameLogic.Player;
 import logic.gameLogic.PlayerLogic;
 import logic.gameLogic.PlayerState;
@@ -279,6 +281,12 @@ public class Scene2 extends Pane {
                         int damage = p.getDamage();
                         target.getCharacter().takeDamage(damage);
 
+                        if (p.getOwner().getCharacter() instanceof Bubble) {
+                            AudioManager.playRandomBubblePop();
+                        } else if (p.getOwner().getCharacter() instanceof Barista) {
+                            AudioManager.playSFX("/audio/sfx/attack/breakingDishes.mp3");
+                        }
+
                         int finalDamage = damage - target.getCharacter().getDef();
                         if (finalDamage > 0) {
                             showFloatingText(target, finalDamage, Color.DARKRED, "-");
@@ -493,9 +501,10 @@ public class Scene2 extends Pane {
                         "-fx-font-weight: bold; " +
                         "-fx-font-size: 24px;"
         );
-        restartBtn.setOnAction(e ->
-                SceneHandler.switchRoot(new CharacterSelectScene())
-        );
+        restartBtn.setOnAction(e -> {
+            AudioManager.playSFX("/audio/sfx/onMouseClicked/clickSFX.mp3");
+            SceneHandler.switchRoot(new CharacterSelectScene());
+        });
 
         overlay.getChildren().addAll(titleLabel, subtitleLabel, restartBtn);
         overlay.setOpacity(0);

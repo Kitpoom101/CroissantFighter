@@ -4,6 +4,8 @@ import javafx.scene.media.AudioClip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
+import java.util.Random;
+
 public class AudioManager {
     private static MediaPlayer bgmPlayer;
     private static MediaPlayer priorityPlayer;
@@ -55,5 +57,20 @@ public class AudioManager {
         });
 
         priorityPlayer.play();
+    }
+
+
+    // bubble <3
+    private static final String[] bubblePops = {
+            "/audio/sfx/attack/bubble/bubblePop1.mp3",
+            "/audio/sfx/attack/bubble/bubblePop2.mp3",
+            "/audio/sfx/attack/bubble/bubblePop3.mp3"
+    };
+
+    private static final Random random = new Random();
+
+    public static void playRandomBubblePop() {
+        int index = random.nextInt(bubblePops.length);
+        playSFX(bubblePops[index]);
     }
 }
