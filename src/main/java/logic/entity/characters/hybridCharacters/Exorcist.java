@@ -59,10 +59,10 @@ public class Exorcist extends HybridClass implements SpawnAttack, HaveWeapon {
 
         Image bulletImage = new Image(getClass().getResource("/projectilebaseattack.png").toExternalForm());
 
-        // 🔽 ปรับความเร็วกระสุนลงมาเป็น 8f (จากเดิม 15f) ให้ช้าลงสังเกตได้ง่ายขึ้น
+        // 🔽 ปรับความเร็วกระสุน
         BaseProjectileAttack bullet = new BaseProjectileAttack(
                 this.atk,
-                8f,
+                2f,
                 this.attackRange * 150,
                 startX,
                 startY,
