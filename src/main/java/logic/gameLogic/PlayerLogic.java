@@ -128,8 +128,16 @@ public class PlayerLogic {
                 player.getCharacter().setAttackState(AttackState.Attacking);
                 player.getCharacter().startAttack(player);
             } else if (!(player.getCharacter() instanceof MeleeClass)) {
-                player.setState(PlayerState.ATTACK);
-                attack();
+
+                long now = System.nanoTime();
+
+                if (now - lastAttackTime >= getAttackInterval()) {
+
+                    lastAttackTime = now;
+
+                    player.setState(PlayerState.ATTACK);
+                    attack();
+                }
             }
         }
 
@@ -315,7 +323,7 @@ public class PlayerLogic {
             int finalDamage = rawDamage - enemy.getCharacter().getDef();
 
             if (finalDamage > 0) {
-                Scene2.getInstance().showDamageText(enemy, finalDamage);
+                Scene2.getInstance().showFloatingText(enemy, finalDamage, Color.DARKRED, "-");
             }
 
             System.out.println("HIT!");

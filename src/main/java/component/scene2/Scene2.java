@@ -236,8 +236,9 @@ public class Scene2 extends Pane {
                         int damage = p.getDamage();
                         target.getCharacter().takeDamage(damage);
 
-                        if (damage - target.getCharacter().getDef() > 0) {
-                            showDamageText(target, damage - target.getCharacter().getDef());
+                        int finalDamage = damage - target.getCharacter().getDef();
+                        if (finalDamage > 0) {
+                            showFloatingText(target, finalDamage, Color.DARKRED, "-");
                         }
                         // Remove projectile visual from scene and list from simulation.
                         getChildren().remove(p.getSprite());
@@ -346,13 +347,13 @@ public class Scene2 extends Pane {
         projectileList.remove(p);
     }
 
-    public void showDamageText(Player target, int damage) {
-        Label damageLabel = new Label("-" + damage);
-        damageLabel.setTextFill(Color.DARKRED);
-        damageLabel.setFont(Font.font("Monospaced", 20));
-        damageLabel.setStyle("-fx-font-weight: bold;");
+    public void showFloatingText(Player target, int amount, Color color, String prefix) {
 
-        // Position above the player's hitbox
+        Label label = new Label(prefix + amount);
+        label.setTextFill(color);
+        label.setFont(Font.font("Monospaced", 20));
+        label.setStyle("-fx-font-weight: bold;");
+
         double x = target.getHitbox().localToScene(
                 target.getHitbox().getBoundsInLocal()
         ).getMinX();
@@ -361,30 +362,31 @@ public class Scene2 extends Pane {
                 target.getHitbox().getBoundsInLocal()
         ).getMinY();
 
-        damageLabel.setLayoutX(x + 20); // slight horizontal offset
-        damageLabel.setLayoutY(y - 10); // slightly above head
+        label.setLayoutX(x + 20);
+        label.setLayoutY(y - 10);
 
-        getChildren().add(damageLabel);
-        damageLabel.toFront();
+        getChildren().add(label);
+        label.toFront();
 
-        // Floating + fade animation
-        javafx.animation.FadeTransition fade = new javafx.animation.FadeTransition(
-                javafx.util.Duration.seconds(0.8),
-                damageLabel
-        );
+        javafx.animation.FadeTransition fade =
+                new javafx.animation.FadeTransition(
+                        javafx.util.Duration.seconds(0.8),
+                        label
+                );
         fade.setFromValue(1.0);
         fade.setToValue(0.0);
 
-        javafx.animation.TranslateTransition move = new javafx.animation.TranslateTransition(
-                javafx.util.Duration.seconds(0.8),
-                damageLabel
-        );
-        move.setByY(-30); // float upward
+        javafx.animation.TranslateTransition move =
+                new javafx.animation.TranslateTransition(
+                        javafx.util.Duration.seconds(0.8),
+                        label
+                );
+        move.setByY(-30);
 
         javafx.animation.ParallelTransition animation =
                 new javafx.animation.ParallelTransition(fade, move);
 
-        animation.setOnFinished(e -> getChildren().remove(damageLabel));
+        animation.setOnFinished(e -> getChildren().remove(label));
         animation.play();
     }
 }

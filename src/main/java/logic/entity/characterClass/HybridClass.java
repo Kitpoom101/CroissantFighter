@@ -8,7 +8,7 @@ import logic.interfaces.Attackable;
 public abstract class HybridClass extends Character implements Attackable {
 
     public HybridClass() {
-        super(150, 15, 5, 2, 1.0F);
+        super(150, 15, 5, 2, 1.0F, 150);
         setBuff(10);
         setOrigin(getAtk());
     }
@@ -20,7 +20,7 @@ public abstract class HybridClass extends Character implements Attackable {
 
 
     public HybridClass(int hp, int atk, int def, int attackRange, float attackSpeed) {
-        super(hp, atk, def, attackRange, attackSpeed);
+        super(hp, atk, def, attackRange, attackSpeed, 150);
 
     }
 
