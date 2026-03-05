@@ -24,7 +24,7 @@ public class Bubble extends RangedClass implements SpawnAttack {
     public Bubble() {
         super();
         setName("Bubble");
-
+        setAttackSpeed(0.5f);
         setTotalFrames(1);
         setFRAME_DURATION(300_000_000); // 0.3 sec
         setupAttackFrame(getTotalFrames());

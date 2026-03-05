@@ -346,7 +346,7 @@ public class Scene2 extends Pane {
         projectileList.remove(p);
     }
 
-    private void showDamageText(Player target, int damage) {
+    public void showDamageText(Player target, int damage) {
         Label damageLabel = new Label("-" + damage);
         damageLabel.setTextFill(Color.DARKRED);
         damageLabel.setFont(Font.font("Monospaced", 20));
