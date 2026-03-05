@@ -187,4 +187,12 @@ public abstract class Character implements Attackable, Damageable, AttackAnimati
     }
 
     public abstract void resetBuff();
+
+    public int getFrameIndex() {
+        return frameIndex;
+    }
+
+    public void setFrameIndex(int frameIndex) {
+        this.frameIndex = frameIndex;
+    }
 }

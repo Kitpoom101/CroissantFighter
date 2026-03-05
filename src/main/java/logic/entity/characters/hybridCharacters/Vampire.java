@@ -9,6 +9,8 @@ import logic.interfaces.HaveWeapon;
 
 public class Vampire extends HybridClass implements HaveWeapon {
     protected int maxHp;
+    protected double lifeStealMultiplier;
+    protected double originLifeStealMultiplier;
     public Vampire(int hp, int atk, int def, int attackRange, float attackSpeed) {
         super(hp, atk, def, attackRange, attackSpeed);
         setName("Vampire");
@@ -17,16 +19,22 @@ public class Vampire extends HybridClass implements HaveWeapon {
     public Vampire(){
         super();
         setMaxHp(getHp());
+
         setTotalFrames(2);
         setupAttackFrame(getTotalFrames());
-        setAttackSpeed(1.2F);
-        setFRAME_DURATION(100_000_000);// nano-sec
+
+        setLifeStealMultiplier(0.35);
+        setOriginLifeStealMultiplier(getLifeStealMultiplier());
+
+        setAttackSpeed(2.0F);
+        setFRAME_DURATION(300_000_000);// nano-sec
+
         setName("Vampire");
     }
 
     @Override
     public AttackData getAttackData() {
-        return new AttackData(60, 100);
+        return new AttackData(200, 100);
     }
 
     @Override
@@ -41,6 +49,27 @@ public class Vampire extends HybridClass implements HaveWeapon {
         }
     }
 
+    @Override
+    public void updateAttack(Player self) {
+        super.updateAttack(self);
+        if(frameIndex == 1 && getAttackState() == AttackState.Attacking ){
+            setAttackState(AttackState.WillAttack);
+        }
+    }
+
+    @Override
+    public void useSpecialSkill() {
+        setAtk(getAtk() + getBuff());
+        setLifeStealMultiplier(getLifeStealMultiplier() + 0.5);
+    }
+
+    @Override
+    public void resetBuff(){
+        setAtk(getOrigin());
+        setLifeStealMultiplier(getOriginLifeStealMultiplier());
+    }
+
+
     public int getMaxHp() {
         return maxHp;
     }
@@ -49,11 +78,19 @@ public class Vampire extends HybridClass implements HaveWeapon {
         this.maxHp = maxHp;
     }
 
-    @Override
-    public void updateAttack(Player self) {
-        super.updateAttack(self);
-        if(frameIndex == 1 && getAttackState() == AttackState.Attacking ){
-            setAttackState(AttackState.WillAttack);
-        }
+    public double getLifeStealMultiplier() {
+        return lifeStealMultiplier;
+    }
+
+    public void setLifeStealMultiplier(double lifeStealMultiplier) {
+        this.lifeStealMultiplier = lifeStealMultiplier;
+    }
+
+    public double getOriginLifeStealMultiplier() {
+        return originLifeStealMultiplier;
+    }
+
+    public void setOriginLifeStealMultiplier(double originLifeStealMultiplier) {
+        this.originLifeStealMultiplier = originLifeStealMultiplier;
     }
 }

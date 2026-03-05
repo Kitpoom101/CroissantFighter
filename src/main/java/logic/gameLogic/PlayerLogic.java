@@ -117,7 +117,7 @@ public class PlayerLogic {
                 player.setState(PlayerState.ATTACK);
                 player.getCharacter().setAttackState(AttackState.Attacking);
                 player.getCharacter().startAttack(player);
-            } else if (!(player.getCharacter() instanceof MeleeClass)) {
+            } else if (!(player.getCharacter() instanceof HaveWeapon) || player.getCharacter() instanceof RangedClass) {
                 player.setState(PlayerState.ATTACK);
                 attack();
             }
@@ -163,7 +163,13 @@ public class PlayerLogic {
         } else if (character instanceof RangedClass) {
             showBuffText("RANGE UP BY " + character.getBuff() + " !!");
         } else if (character instanceof HybridClass){
-            showBuffText("ATTACK UP BY " + character.getBuff() + " !!");
+            if (character instanceof Vampire){
+                showBuffText("ATTACK UP BY " + character.getBuff() + " !!" +
+                        "\nAND MORE LIFE STEAL");
+            }else{
+                showBuffText("ATTACK UP BY " + character.getBuff() + " !!");
+            }
+
         } else {
             showBuffText("How?");
         }
@@ -287,7 +293,10 @@ public class PlayerLogic {
         if (player.isFacingRight()) {
             if (player.getCharacter() instanceof Vampire){
                 attackHitbox.setLayoutX(
-                        playerX + sprite.getBoundsInParent().getWidth() + 120
+                        playerX + sprite.getBoundsInParent().getWidth() + 30
+                );
+                attackHitbox.setLayoutY(
+                        playerY + 35
                 );
             }else{
                 attackHitbox.setLayoutX(
@@ -298,7 +307,10 @@ public class PlayerLogic {
         } else {
             if (player.getCharacter() instanceof Vampire){
                 attackHitbox.setLayoutX(
-                        playerX - data.getWidth() - 120
+                        playerX - data.getWidth() - 30
+                );
+                attackHitbox.setLayoutY(
+                        playerY + 35
                 );
             }else{
                 attackHitbox.setLayoutX(
@@ -324,6 +336,17 @@ public class PlayerLogic {
             System.out.println("HIT!");
 
             enemy.getCharacter().takeDamage(player.getCharacter().getAtk());
+
+            // for calculating vampire damage
+            if (player.getCharacter() instanceof Vampire vampire){
+                player.getCharacter().setHp((int) Math.min(
+                            vampire.getMaxHp(),
+                            ((vampire.getAtk() - enemy.getCharacter().getDef() * 0.5)
+                                    * vampire.getLifeStealMultiplier())
+                                    + vampire.getHp()
+                        )
+                );
+            }
         }
     }
 
@@ -365,7 +388,6 @@ public class PlayerLogic {
         player.translate(velocityX, 0);
         // ===== PREVENT PLAYER MOVEMENT ===== //
         clampToArenaBounds();
-
 
         // ===== WEAPON SPRITE FOLLOW ===== //
         weaponSpriteFollow();
@@ -432,17 +454,63 @@ public class PlayerLogic {
             Group body = player.getPlayerRoot();
 
             // weapon sprite position
-            player.getWeaponSprite().setLayoutY(body.getLayoutY());
+            if (!(player.getCharacter() instanceof Vampire)){
+                player.getWeaponSprite().setLayoutY(body.getLayoutY());
+            }
 
             if(player.isFacingRight()){
                 player.getWeaponSprite().setScaleX(1);
+                if (player.getCharacter() instanceof Vampire){
+                    vampireWeapon(body, player.isFacingRight());
+                    return;
+                }
                 player.getWeaponSprite().setLayoutX(
                         body.getLayoutX() + body.getBoundsInParent().getWidth()
                 );
             }else{
                 player.getWeaponSprite().setScaleX(-1);
+                if (player.getCharacter() instanceof Vampire){
+                    vampireWeapon(body, player.isFacingRight());
+                    return;
+                }
                 player.getWeaponSprite().setLayoutX(
                         body.getLayoutX() - player.getWeaponSprite().getImage().getWidth()
+                );
+            }
+        }
+    }
+
+    private void vampireWeapon(Group body, boolean right) {
+        if (right){
+            if (player.getCharacter().getFrameIndex() == 0) {
+                player.getWeaponSprite().setLayoutY(
+                        body.getLayoutY() + body.getBoundsInParent().getHeight() / 2
+                );
+                player.getWeaponSprite().setLayoutX(
+                        body.getLayoutX() - body.getBoundsInParent().getWidth() / 8
+                );
+            } else {
+                player.getWeaponSprite().setLayoutY(
+                        body.getLayoutY()
+                );
+                player.getWeaponSprite().setLayoutX(
+                        body.getLayoutX() + body.getBoundsInParent().getWidth()
+                );
+            }
+        }else{
+            if (player.getCharacter().getFrameIndex() == 0) {
+                player.getWeaponSprite().setLayoutY(
+                        body.getLayoutY() + body.getBoundsInParent().getHeight() / 2
+                );
+                player.getWeaponSprite().setLayoutX(
+                        body.getLayoutX() + body.getBoundsInParent().getWidth() / 3
+                );
+            } else {
+                player.getWeaponSprite().setLayoutY(
+                        body.getLayoutY()
+                );
+                player.getWeaponSprite().setLayoutX(
+                        body.getLayoutX() - body.getBoundsInParent().getWidth() * 1.5
                 );
             }
         }
