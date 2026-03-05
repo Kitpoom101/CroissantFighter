@@ -24,7 +24,8 @@ public class BaseProjectileAttack {
 
     public BaseProjectileAttack(int damage, float speed, int range,
                                 float startX, float startY,
-                                float directionX, float directionY, Player owner) {
+                                float directionX, float directionY, Player owner, Image image,
+                                float sizeMultiplier) {
 
         this.damage = damage;
         this.speed = speed;
@@ -37,16 +38,16 @@ public class BaseProjectileAttack {
 
         this.owner = owner;
 
-        Image image = new Image(
-                getClass().getResource("/projectilebaseattack.png").toExternalForm()
-        );
         sprite = new ImageView(image);
 
-        sprite.setLayoutX(x);
-        sprite.setLayoutY(y);
+        double size = 40 * sizeMultiplier;
 
-        sprite.setFitWidth(40);
+        sprite.setFitWidth(size);
         sprite.setPreserveRatio(true);
+
+        sprite.setLayoutX(x);
+        sprite.setLayoutY(y - size / 2);
+
     }
 
     public Player getOwner() {
@@ -73,5 +74,9 @@ public class BaseProjectileAttack {
 
     public ImageView getSprite() {
         return sprite;
+    }
+
+    public int getDamage() {
+        return damage;
     }
 }

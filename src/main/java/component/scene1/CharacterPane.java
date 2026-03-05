@@ -1,0 +1,120 @@
+package component.scene1;
+
+import javafx.geometry.Insets;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import logic.entity.Character;
+import logic.entity.characters.hybridCharacters.Barista;
+import logic.entity.characters.hybridCharacters.Exorcist;
+import logic.entity.characters.hybridCharacters.Vampire;
+import logic.entity.characters.meleeCharacters.Hammer;
+import logic.entity.characters.meleeCharacters.Katana;
+import logic.entity.characters.meleeCharacters.Pyro;
+import logic.entity.characters.rangedCharacters.Archer;
+import logic.entity.characters.rangedCharacters.Bubble;
+import logic.entity.characters.rangedCharacters.Mage;
+
+import java.util.ArrayList;
+import java.util.Objects;
+
+public class CharacterPane extends StackPane {
+
+    private final String[] allSprite = {
+            "/Katana.png", "/Hammer.png", "/Pyro.png",
+            "/Barista.png", "/Exorcist.png", "/Vampire.png",
+            "/Archer.png", "/Bubble.png", "/Mage.png"
+    };
+    private final String[] names = {"Katana"};
+    private Character character;
+    private final Image charBG = new Image(ClassLoader.getSystemResource("CharPaneBg.png").toString());
+    private final Image charBGSelect = new Image(ClassLoader.getSystemResource("CharPaneSelect.png").toString());
+
+    private ArrayList<Character> characterList = new ArrayList<>();
+    {
+        characterList.add(new Katana());
+        characterList.add(new Hammer());
+        characterList.add(new Pyro());
+        characterList.add(new Barista());
+        characterList.add(new Exorcist());
+        characterList.add(new Vampire());
+        characterList.add(new Archer());
+        characterList.add(new Bubble());
+        characterList.add(new Mage());
+    }
+
+    private String name;
+
+    public CharacterPane(int charNum){
+        setName(charNum);
+        setCharacter(charNum);
+
+        setPrefSize(100, 100);
+        setImageBackground(charBG);
+
+        ImageView view = new ImageView(spriteLoader(charNum));
+        view.setFitWidth(80);   // smaller than 100
+        view.setFitHeight(80);
+        view.setPreserveRatio(true);
+
+        getChildren().add(view);
+
+        setOnMouseEntered(e -> {
+            setOpacity(0.8);
+        });
+        setOnMouseExited(e -> {
+            setOpacity(1.0);
+        });
+
+        System.out.println(getName());
+    }
+
+    private void draw(Color backgroundColor) {
+        BackgroundFill bgFill = new BackgroundFill(backgroundColor, new CornerRadii(5), Insets.EMPTY);
+        BackgroundFill[] bgFillA = {bgFill};
+
+        this.setBackground(new Background(bgFillA));
+    }
+
+    private void setImageBackground(Image image){
+        this.setBackground(new Background(new BackgroundImage(image, null ,null ,null, new BackgroundSize(this.getPrefWidth(), this.getPrefHeight(), false, false, false, false))));
+    }
+
+    private Image spriteLoader(int i){
+        String path = i < allSprite.length
+                ? allSprite[i] : "/Missing.png";
+
+        return new Image(
+                Objects.requireNonNull(
+                        getClass().getResourceAsStream(path)
+                )
+        );
+    }
+
+    public void setSelected(boolean value){
+        if(value){
+            setImageBackground(charBGSelect);
+        } else {
+            setImageBackground(charBG);
+        }
+    }
+
+    // setter & getter
+
+    public void setCharacter(int i){
+        this.character = characterList.get(i);
+    }
+
+    public Character getCharacter(){
+        return character;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(int i) {
+        this.name = characterList.get(i).getName();
+    }
+}

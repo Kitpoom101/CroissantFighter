@@ -6,10 +6,14 @@ import logic.gameLogic.AttackState;
 import logic.gameLogic.Player;
 import logic.gameLogic.PlayerState;
 import logic.interfaces.Attackable;
+import logic.interfaces.HaveWeapon;
 
-public abstract class MeleeClass extends Character implements Attackable {
+public abstract class MeleeClass extends Character implements Attackable, HaveWeapon {
+
     public MeleeClass() {
         super(250, 20, 10, 1, 1.0F);
+        setBuff(15);
+        setOrigin(getDef());
     }
 
     @Override
@@ -20,10 +24,17 @@ public abstract class MeleeClass extends Character implements Attackable {
 
     public MeleeClass(int hp, int atk, int def, int attackRange, float attackSpeed) {
         super(hp, atk, def, attackRange, attackSpeed);
+
     }
 
     @Override
     public void useSpecialSkill() {
+        setDef(getDef() + getBuff());
+    }
+
+    @Override
+    public void resetBuff(){
+        setDef(getOrigin());
     }
 
     @Override
@@ -36,7 +47,6 @@ public abstract class MeleeClass extends Character implements Attackable {
         frameIndex = 0;
         finished = false;
         lastFrameTime = System.nanoTime();
-        setAttackState(AttackState.AllowAttack);
         if (attackFrames.length > 0) self.getWeaponSprite().setImage(attackFrames[0]);
     }
 
@@ -54,7 +64,6 @@ public abstract class MeleeClass extends Character implements Attackable {
             if(frameIndex >= attackFrames.length){
                 finished = true;
                 self.setState(PlayerState.WALK);
-                setAttackState(AttackState.AllowAttack);
                 return;
             }
 

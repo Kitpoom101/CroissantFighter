@@ -2,6 +2,7 @@ package logic.gameLogic;
 
 public enum AttackState {
     NotAttacking,
-    AllowAttack,
+    Attacking,
     WillAttack,
+    AttackCooldown
 }

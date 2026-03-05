@@ -20,7 +20,8 @@ public class Katana extends MeleeClass implements AttackAnimation {
         setName("Katana");
         setTotalFrames(2);
         setAtk(50);
-        setFRAME_DURATION(300_000_000);// nano-sec
+        setAttackSpeed(1.2F);
+        setFRAME_DURATION(100_000_000);// nano-sec
         setupAttackFrame(getTotalFrames());
     }
 
@@ -44,7 +45,7 @@ public class Katana extends MeleeClass implements AttackAnimation {
     @Override
     public void updateAttack(Player self) {
         super.updateAttack(self);
-        if(frameIndex == 1 && getAttackState() == AttackState.AllowAttack ){
+        if(frameIndex == 1 && getAttackState() == AttackState.Attacking ){
             setAttackState(AttackState.WillAttack);
         }
     }

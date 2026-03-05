@@ -17,6 +17,7 @@ public class Pyro extends MeleeClass {
         setTotalFrames(1);
         setFRAME_DURATION(100_000_000);
         setName("Pyro");
+        setAttackSpeed(2.0F);
         setupAttackFrame(getTotalFrames());
     }
 
@@ -41,7 +42,7 @@ public class Pyro extends MeleeClass {
     @Override
     public void updateAttack(Player self) {
         super.updateAttack(self);
-        if(frameIndex == 0 && getAttackState() == AttackState.AllowAttack ){
+        if(frameIndex == 0 && getAttackState() == AttackState.Attacking ){
             setAttackState(AttackState.WillAttack);
         }
     }

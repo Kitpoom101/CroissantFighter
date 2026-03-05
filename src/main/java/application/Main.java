@@ -1,8 +1,7 @@
 package application;
 
-import component.CharacterSelectScene;
+import component.scene1.CharacterSelectScene;
 import javafx.application.Application;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class Main extends Application {

@@ -4,5 +4,6 @@ public enum PlayerState {
     WALK,
     ATTACK,
     HIT,
-    DEAD
+    DEAD,
+    SKILL
 }
