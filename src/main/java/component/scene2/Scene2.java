@@ -256,6 +256,13 @@ public class Scene2 extends Pane {
                                     .localToScene(target.getHitbox().getBoundsInLocal())
                             )) {
 
+                        if (p.hasKnockback()) {
+
+                            double randomX = 67 + Math.random() * 8;
+                            double randomY = 67 + Math.random() * 30;
+
+                            target.translate(p.getDirectionX() * randomX, -randomY);
+                        }
                         int damage = p.getDamage();
                         target.getCharacter().takeDamage(damage);
 

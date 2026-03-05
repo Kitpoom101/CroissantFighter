@@ -24,22 +24,26 @@ public class Barista extends HybridClass implements SpawnAttack {
     public void attack(float startX, float startY, boolean facingRight, Player p) {
 
         float dirX = facingRight ? 1 : -1;
+        float speed = 5.5f + (float)Math.random();
 
         BaseProjectileAttack coffeeShot =
                 new BaseProjectileAttack(
-                        this.atk,
-                        6f,
-                        this.attackRange * 100,
+                        this.getAtk(),
+                        speed,
+                        this.attackRange * 200,
                         startX,
                         startY,
                         dirX,
-                        0,
+                        -0.15f, // slight arc
                         p,
                         new Image(
-                                getClass().getResource("/projectilebaseattack.png").toExternalForm()
+                                getClass().getResource(
+                                        "/animations/barista/attack/coffee.png"
+                                ).toExternalForm()
                         ),
-                        1
+                        1.2f // slightly bigger
                 );
+        coffeeShot.setHasKnockback(true);
 
         spawnProjectile(coffeeShot);
     }

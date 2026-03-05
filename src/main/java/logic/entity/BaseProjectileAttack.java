@@ -19,6 +19,8 @@ public class BaseProjectileAttack {
     protected float directionY;
     private Player owner;
 
+    private boolean knockback;
+
 
     private ImageView sprite;
 
@@ -78,5 +80,29 @@ public class BaseProjectileAttack {
 
     public int getDamage() {
         return damage;
+    }
+
+    public boolean hasKnockback() {
+        return knockback;
+    }
+
+    public void setHasKnockback(boolean hasKnockback) {
+        this.knockback = hasKnockback;
+    }
+
+    public float getDirectionX() {
+        return directionX;
+    }
+
+    public void setDirectionX(float directionX) {
+        this.directionX = directionX;
+    }
+
+    public float getDirectionY() {
+        return directionY;
+    }
+
+    public void setDirectionY(float directionY) {
+        this.directionY = directionY;
     }
 }
