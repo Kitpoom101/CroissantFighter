@@ -368,15 +368,12 @@ public class PlayerLogic {
             int rawDamage = player.getCharacter().getAtk();
             enemy.getCharacter().takeDamage(rawDamage);
 
-            int finalDamage = rawDamage - enemy.getCharacter().getDef();
+            int finalDamage = Math.max(1, rawDamage - enemy.getCharacter().getDef());
 
-            if (finalDamage > 0) {
-                Scene2.getInstance().showFloatingText(enemy, finalDamage, Color.DARKRED, "-");
-            }
+            Scene2.getInstance().showFloatingText(enemy, finalDamage, Color.DARKRED, "-");
+
 
             System.out.println("HIT!");
-
-            enemy.getCharacter().takeDamage(player.getCharacter().getAtk());
 
             // for calculating vampire damage
             if (player.getCharacter() instanceof Vampire vampire){

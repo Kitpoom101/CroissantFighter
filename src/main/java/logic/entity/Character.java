@@ -77,7 +77,7 @@ public abstract class Character implements Attackable, Damageable, AttackAnimati
 
     public void takeDamage(int damage) {
 
-        int finalDamage = Math.max(0, damage - def);
+        int finalDamage = Math.max(1, damage - def);
 
         hp -= finalDamage;
 
