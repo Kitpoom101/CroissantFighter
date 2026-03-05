@@ -6,8 +6,9 @@ import logic.entity.characterClass.HybridClass;
 import logic.gameLogic.AttackState;
 import logic.gameLogic.Player;
 import logic.interfaces.HaveWeapon;
+import logic.interfaces.OwnWeaponPos;
 
-public class Vampire extends HybridClass implements HaveWeapon {
+public class Vampire extends HybridClass implements HaveWeapon, OwnWeaponPos {
     protected int maxHp;
     protected double lifeStealMultiplier;
     protected double originLifeStealMultiplier;

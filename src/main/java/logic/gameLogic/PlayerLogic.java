@@ -19,6 +19,7 @@ import javafx.animation.SequentialTransition;
 import javafx.util.Duration;
 import logic.entity.characters.hybridCharacters.Vampire;
 import logic.interfaces.HaveWeapon;
+import logic.interfaces.OwnWeaponPos;
 
 import java.security.Key;
 
@@ -131,7 +132,7 @@ public class PlayerLogic {
                 player.setState(PlayerState.ATTACK);
                 player.getCharacter().setAttackState(AttackState.Attacking);
                 player.getCharacter().startAttack(player);
-            } else if (!(player.getCharacter() instanceof MeleeClass)) {
+            } else if (!(player.getCharacter() instanceof HaveWeapon)) {
 
                 long now = System.nanoTime();
 
@@ -317,7 +318,9 @@ public class PlayerLogic {
         attackHitbox.setWidth(data.getWidth());
         attackHitbox.setHeight(data.getHeight());
 
-        attackHitbox.setLayoutY(playerY);
+        if (!(player.getCharacter() instanceof OwnWeaponPos)){
+            attackHitbox.setLayoutY(playerY);
+        }
 
         if (player.isFacingRight()) {
             if (player.getCharacter() instanceof Vampire){
