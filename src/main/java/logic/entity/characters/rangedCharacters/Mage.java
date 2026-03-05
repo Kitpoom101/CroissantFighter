@@ -111,7 +111,12 @@ public class Mage extends RangedClass implements SpawnAttack, HandleOwnWeapon {
     }
 
     @Override
-    public void resetBuff() {
+    public void useSpecialSkill() {
+        setHp(getHp() + getBuff());
+    }
+
+    @Override
+    public void resetBuff(){
 
     }
 

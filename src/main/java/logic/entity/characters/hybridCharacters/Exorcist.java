@@ -56,7 +56,7 @@ public class Exorcist extends HybridClass implements SpawnAttack, UsesAmmo {
         float dirX = facingRight ? 1 : -1;
 
         Image bulletImage = new Image(
-                getClass().getResource("/projectilebaseattack.png")
+                getClass().getResource("/animations/exorcist/bullet.png")
                         .toExternalForm()
         );
 
@@ -70,7 +70,7 @@ public class Exorcist extends HybridClass implements SpawnAttack, UsesAmmo {
                 0,
                 p,
                 bulletImage,
-                0.5f
+                1f
         );
 
         AudioManager.playSFX("/audio/sfx/attack/pew.wav");

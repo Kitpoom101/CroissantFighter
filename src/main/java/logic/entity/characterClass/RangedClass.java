@@ -25,7 +25,7 @@ public abstract class RangedClass extends Character
     // ===== Constructor =====
     public RangedClass() {
         super(125, 25, 3, 3, 2.0F, 100);
-        setBuff(10);
+
         setOrigin(getAttackRange());
 
         this.maxAmmo = 3;
@@ -38,6 +38,7 @@ public abstract class RangedClass extends Character
         super(hp, atk, def, attackRange, attackSpeed, 100);
         this.maxAmmo = maxAmmo;
         this.currentAmmo = maxAmmo;
+        setBuff(10);
     }
 
     // ===== Template Attack Entry =====

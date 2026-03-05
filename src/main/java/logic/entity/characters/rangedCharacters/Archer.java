@@ -12,11 +12,14 @@ import logic.interfaces.HaveWeapon;
 import logic.interfaces.SpawnAttack;
 
 public class Archer extends RangedClass implements SpawnAttack, HandleOwnWeapon {
-
+    protected int originAttackRange;
     public Archer() {
         super(125, 25, 3, 3, 0.75f, 3);
         setName("Archer");
         setWeaponSprite("/animations/archer/attack/Bow.png");
+
+        setOrigin(getAtk());
+        setOriginAttackRange(getAttackRange());
     }
 
     @Override
@@ -81,7 +84,21 @@ public class Archer extends RangedClass implements SpawnAttack, HandleOwnWeapon 
     }
 
     @Override
-    public void resetBuff() {
+    public void useSpecialSkill() {
+        setAttackRange(getAttackRange() + getBuff());
+        setAtk(getAtk() + getBuff());
+    }
 
+    @Override
+    public void resetBuff(){
+        setAttackRange(getOriginAttackRange());
+        setAtk(getOrigin());
+    }
+
+    public int getOriginAttackRange() {
+        return originAttackRange;
+    }
+    public void setOriginAttackRange(int originAttackRange) {
+        this.originAttackRange = originAttackRange;
     }
 }
