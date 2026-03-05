@@ -4,6 +4,7 @@ import component.scene2.Scene2;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
+import logic.audio.AudioManager;
 import logic.entity.AttackData;
 import logic.entity.BaseProjectileAttack;
 import logic.entity.characterClass.RangedClass;
@@ -91,6 +92,7 @@ public class Mage extends RangedClass implements SpawnAttack, HandleOwnWeapon {
                 );
 
         spawnProjectile(cardProjectile);
+        AudioManager.playSFX("/audio/sfx/attack/mage/cardThrow.mp3");
     }
 
     @Override
@@ -116,5 +118,11 @@ public class Mage extends RangedClass implements SpawnAttack, HandleOwnWeapon {
     @Override
     public void resetBuff(){
 
+    }
+
+    @Override
+    public void reload() {
+        super.reload();
+        AudioManager.playSFX("/audio/sfx/attack/mage/cardReload.mp3");
     }
 }

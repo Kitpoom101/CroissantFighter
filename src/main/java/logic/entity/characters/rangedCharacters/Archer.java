@@ -2,6 +2,7 @@ package logic.entity.characters.rangedCharacters;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import logic.audio.AudioManager;
 import logic.entity.AttackData;
 import logic.entity.BaseProjectileAttack;
 import logic.entity.characterClass.RangedClass;
@@ -61,6 +62,7 @@ public class Archer extends RangedClass implements SpawnAttack, HandleOwnWeapon 
                         3
                 );
 
+        AudioManager.playSFX("/audio/sfx/attack/arrowShoot.mp3");
         spawnProjectile(arrow);
 
 
