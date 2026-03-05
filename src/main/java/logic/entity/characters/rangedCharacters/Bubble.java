@@ -9,10 +9,11 @@ import logic.entity.characterClass.HybridClass;
 import logic.entity.characterClass.RangedClass;
 import logic.gameLogic.AttackState;
 import logic.gameLogic.Player;
+import logic.interfaces.HandleOwnWeapon;
 import logic.interfaces.HaveWeapon;
 import logic.interfaces.SpawnAttack;
 
-public class Bubble extends RangedClass implements SpawnAttack, HaveWeapon {
+public class Bubble extends RangedClass implements SpawnAttack, HandleOwnWeapon {
 
     private static final int MIN_AMMO = 3;
     private static final int MAX_AMMO = 8;
@@ -23,6 +24,7 @@ public class Bubble extends RangedClass implements SpawnAttack, HaveWeapon {
     public Bubble() {
         super(150, 20, 4, 3, 0.5f, 2);
         setName("Bubble");
+        setWeaponSprite("/animations/bubble/attack/atkprop/bubbleBlower.png");
     }
 
     @Override
@@ -44,6 +46,8 @@ public class Bubble extends RangedClass implements SpawnAttack, HaveWeapon {
 
         float dirX = facingRight ? 1 : -1;
 
+        float spawnOffset = 100 * dirX;
+
         for (float i = 1.0F; i > 0; i -= 0.1) {
 
             float randomY =
@@ -54,7 +58,7 @@ public class Bubble extends RangedClass implements SpawnAttack, HaveWeapon {
                             (int)(this.atk * i * 0.67),
                             6f * i * 0.1f,
                             (int)(this.attackRange * 100 * i),
-                            startX + 100,
+                            startX + spawnOffset,
                             startY,
                             dirX,
                             randomY,
@@ -80,19 +84,6 @@ public class Bubble extends RangedClass implements SpawnAttack, HaveWeapon {
         ImageView blower = getWeaponSprite();
 
         blowerStartTime = System.nanoTime();
-
-        // position in front
-        float offsetX = self.isFacingRight() ? 40 : -40;
-
-        blower.setLayoutX(self.getSprite().getLayoutX() + offsetX);
-        blower.setLayoutY(self.getSprite().getLayoutY());
-
-        blower.setScaleX(self.isFacingRight() ? 1 : -1); // flip if facing left
-
-        blower.setVisible(true);
-
-        getWeaponSprite().setFitWidth(40);
-        getWeaponSprite().setFitHeight(40);
     }
 
     @Override

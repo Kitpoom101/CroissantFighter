@@ -71,9 +71,6 @@ public abstract class RangedClass extends Character
         lastFrameTime = System.nanoTime();
 
         setAttackState(AttackState.Attacking);
-
-        if (attackFrames.length > 0)
-            self.getWeaponSprite().setImage(attackFrames[0]);
     }
 
     @Override
@@ -83,19 +80,13 @@ public abstract class RangedClass extends Character
 
         if (now - lastFrameTime >= FRAME_DURATION) {
 
-            lastFrameTime = now;
-            frameIndex++;
+            getWeaponSprite().setVisible(false);
 
-            if (frameIndex >= attackFrames.length) {
+            // 🔥 Reset state ONLY after finishing
+            setAttackState(AttackState.NotAttacking);
 
-                finished = true;
-                setAttackState(AttackState.NotAttacking);
-                self.setState(PlayerState.WALK);
-                return;
-            }
-
-            self.getWeaponSprite()
-                    .setImage(attackFrames[frameIndex]);
+            // return player to walk state
+            self.setState(logic.gameLogic.PlayerState.WALK);
         }
     }
 
