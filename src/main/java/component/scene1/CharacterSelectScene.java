@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import logic.audio.AudioManager;
 import logic.entity.Character;
 import logic.gameLogic.SelectState;
 
@@ -51,18 +52,25 @@ public class CharacterSelectScene extends StackPane {
         // Create 9 character cards and wire click-to-select behavior.
         for (int i = 0; i < 9; i++) {
             CharacterPane pane = new CharacterPane(i);
-            pane.setOnMouseClicked(e ->
-                selectCharacter(pane)
-            );
+            pane.setOnMouseClicked(e -> {
+                        selectCharacter(pane);
+                AudioManager.playSFX("/audio/sfx/onMouseClicked/clickSFX.mp3");
+            });
             characterRow.getChildren().add(pane);
         }
 
         // Action buttons for confirming/canceling current selection step.
         Button confirmBtn = new Button("Confirm");
-        confirmBtn.setOnAction(e -> confirmSelection());
+        confirmBtn.setOnAction(e -> {
+            AudioManager.playSFX("/audio/sfx/onMouseClicked/clickSFX.mp3");
+            confirmSelection();
+        });
 
         Button cancelBtn = new Button("Cancel");
-        cancelBtn.setOnAction(e -> cancelSelection());
+        cancelBtn.setOnAction(e ->  {
+            AudioManager.playSFX("/audio/sfx/onMouseClicked/clickSFX.mp3");
+            cancelSelection();
+        });
 
         // Container for action buttons.
         HBox actionRow = new HBox(10);
@@ -109,6 +117,8 @@ public class CharacterSelectScene extends StackPane {
         getChildren().add(ui);
 
         setImageBackground();
+
+        AudioManager.playBGM("/audio/bgm/bgmSelectionSceneBalladDuParis.mp3");
     }
 
     // Applies a full-scene background image with "cover" behavior.

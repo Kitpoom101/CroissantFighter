@@ -15,6 +15,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
+import logic.audio.AudioManager;
 import logic.entity.BaseProjectileAttack;
 import logic.gameLogic.Player;
 import logic.gameLogic.PlayerLogic;
@@ -154,6 +155,8 @@ public class Scene2 extends Pane {
                 startGameLoop();
             }
         });
+
+        AudioManager.playBGM("/audio/bgm/bgmScene2TraditionellMusette.mp3");
 
         // Register current instance for static access (projectile spawning path).
         instance = this;
@@ -463,6 +466,7 @@ public class Scene2 extends Pane {
         if (winner == null) {
             titleLabel = new Label("TIME UP!");
             subtitleLabel.setText("DRAW");
+            AudioManager.playPrioritySFX("/audio/sfx/gameOverHandler/drawSFX.mp3");
         } else {
             titleLabel = new Label("VICTORY");
 
@@ -472,6 +476,8 @@ public class Scene2 extends Pane {
             subtitleLabel.setText(
                     "PLAYER " + playerNumber + " (" + characterName + ") WINS!"
             );
+
+            AudioManager.playPrioritySFX("/audio/sfx/gameOverHandler/winningSFX.mp3");
         }
 
         titleLabel.setFont(Font.font("Verdana", FontWeight.EXTRA_BOLD, 80));

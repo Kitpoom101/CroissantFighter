@@ -9,6 +9,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import logic.audio.AudioManager;
 import logic.entity.AttackData;
 import logic.entity.characterClass.HybridClass;
 import logic.entity.characterClass.MeleeClass;
@@ -355,6 +356,8 @@ public class PlayerLogic {
         // 🔥 ถ้าเป็น melee ทำเหมือนเดิม
         attackHitbox.setWidth(data.getWidth());
         attackHitbox.setHeight(data.getHeight());
+
+        AudioManager.playSFX("/audio/sfx/attack/blackFlash.mp3");
 
         if (!(player.getCharacter() instanceof OwnWeaponPos)){
             attackHitbox.setLayoutY(playerY);
