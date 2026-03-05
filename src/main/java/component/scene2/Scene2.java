@@ -2,7 +2,7 @@ package component.scene2;
 
 import application.SceneHandler;
 import component.scene1.CharacterSelectScene;
-import javafx.animation.AnimationTimer;
+import javafx.animation.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -13,9 +13,12 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.util.Duration;
 import logic.entity.BaseProjectileAttack;
 import logic.gameLogic.Player;
 import logic.gameLogic.PlayerLogic;
+import logic.gameLogic.PlayerState;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -70,8 +73,9 @@ public class Scene2 extends Pane {
         playerLogic2 = new PlayerLogic(player2, player1, 2);
         
         // Initialize health bars with each character's starting HP.
-        player1HealthBar = new HealthBar(player1.getCharacter().getHp());
-        player2HealthBar = new HealthBar(player2.getCharacter().getHp());
+        // ใช้ HealthBar ใหม่พร้อมชื่อตัวละคร
+        player1HealthBar = new HealthBar(player1.getCharacter().getHp(), player1.getCharacter().getName(), true);
+        player2HealthBar = new HealthBar(player2.getCharacter().getHp(), player2.getCharacter().getName(), false);
         player1SkillBar = new SkillBar();
         player2SkillBar = new SkillBar();
         // Initialize timer label with full match duration.
@@ -232,9 +236,10 @@ public class Scene2 extends Pane {
 
                 // End match immediately when timer reaches zero.
                 if (remainingSeconds <= 0) {
-                    endGameAndShowPopup("Time's up, your too slow");
+                    handleGameOver(null, null); // Draw or Time Out logic
                     return;
                 }
+
 
                 // Check if someone has reached 0 HP.
                 checkGameOver();
@@ -298,18 +303,11 @@ public class Scene2 extends Pane {
 
     // Ends match when one player's HP is zero.
     private void checkGameOver() {
-        // Avoid repeated end-game handling.
         if (gameOver) return;
-
-        // Read current HP values.
-        int player1Hp = player1.getCharacter().getHp();
-        int player2Hp = player2.getCharacter().getHp();
-
-        // Declare the opponent as winner when a player's HP reaches zero.
-        if (player1Hp <= 0) {
-            endGameAndShowPopup(2);
-        } else if (player2Hp <= 0) {
-            endGameAndShowPopup(1);
+        if (player1.getCharacter().getHp() <= 0) {
+            handleGameOver(player2, player1);
+        } else if (player2.getCharacter().getHp() <= 0) {
+            handleGameOver(player1, player2);
         }
     }
 
@@ -419,4 +417,89 @@ public class Scene2 extends Pane {
         animation.setOnFinished(e -> getChildren().remove(label));
         animation.play();
     }
+
+    private void handleGameOver(Player winner, Player loser) {
+        gameOver = true;
+        gameLoop.stop();
+
+        if (loser != null && winner != null) {
+            loser.setState(PlayerState.DEAD);
+
+            // 1. Death Animation: ล้มลง 90 องศา
+            RotateTransition rotate = new RotateTransition(Duration.seconds(0.5), loser.getPlayerRoot());
+            rotate.setToAngle(loser.isFacingRight() ? 90 : -90);
+
+            // 2. Fade Out: จางหายไป
+            FadeTransition fade = new FadeTransition(Duration.seconds(1), loser.getPlayerRoot());
+            fade.setFromValue(1.0);
+            fade.setToValue(0.0);
+            fade.setDelay(Duration.seconds(0.5));
+
+            SequentialTransition deathAnim = new SequentialTransition(rotate, fade);
+            deathAnim.setOnFinished(e -> showVictoryOverlay(winner));
+            deathAnim.play();
+        } else {
+            showVictoryOverlay(null);
+        }
+    }
+
+    private void showVictoryOverlay(Player winner) {
+
+        VBox overlay = new VBox(20);
+        overlay.setAlignment(Pos.CENTER);
+        overlay.setBackground(new Background(
+                new BackgroundFill(Color.rgb(0, 0, 0, 0.7), null, null)
+        ));
+        overlay.setPrefSize(getWidth(), getHeight());
+
+        Label titleLabel;
+        Label subtitleLabel = new Label();
+
+        if (winner == null) {
+            titleLabel = new Label("TIME UP!");
+            subtitleLabel.setText("DRAW");
+        } else {
+            titleLabel = new Label("VICTORY");
+
+            int playerNumber = (winner == player1) ? 1 : 2;
+            String characterName = winner.getCharacter().getName();
+
+            subtitleLabel.setText(
+                    "PLAYER " + playerNumber + " (" + characterName + ") WINS!"
+            );
+        }
+
+        titleLabel.setFont(Font.font("Verdana", FontWeight.EXTRA_BOLD, 80));
+        titleLabel.setTextFill(Color.GOLD);
+
+        subtitleLabel.setFont(Font.font("Verdana", FontWeight.BOLD, 36));
+        subtitleLabel.setTextFill(Color.WHITE);
+
+        Button restartBtn = new Button("REMATCH");
+        restartBtn.setStyle(
+                "-fx-background-color: #ffcc00; " +
+                        "-fx-text-fill: black; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-font-size: 24px;"
+        );
+        restartBtn.setOnAction(e ->
+                SceneHandler.switchRoot(new CharacterSelectScene())
+        );
+
+        overlay.getChildren().addAll(titleLabel, subtitleLabel, restartBtn);
+        overlay.setOpacity(0);
+        getChildren().add(overlay);
+
+        FadeTransition fade = new FadeTransition(Duration.seconds(1), overlay);
+        fade.setToValue(1.0);
+
+        ScaleTransition scale = new ScaleTransition(Duration.seconds(0.5), titleLabel);
+        scale.setFromX(0);
+        scale.setFromY(0);
+        scale.setToX(1);
+        scale.setToY(1);
+
+        new ParallelTransition(fade, scale).play();
+    }
+
 }

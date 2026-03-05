@@ -73,6 +73,8 @@ public class Bubble extends RangedClass implements SpawnAttack, HaveWeapon {
     @Override
     public void startAttack(Player self) {
 
+        setAttackState(AttackState.WillAttack);
+
         ImageView blower = getWeaponSprite();
 
         blowerStartTime = System.nanoTime();
