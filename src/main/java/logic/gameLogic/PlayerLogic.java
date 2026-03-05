@@ -21,6 +21,7 @@ import logic.entity.characters.hybridCharacters.Exorcist;
 import logic.entity.characters.hybridCharacters.Vampire;
 import logic.interfaces.HaveWeapon;
 import logic.interfaces.OwnWeaponPos;
+import logic.interfaces.UsesAmmo;
 
 import java.security.Key;
 
@@ -124,8 +125,8 @@ public class PlayerLogic {
         ammoText.setStroke(Color.BLACK);
         ammoText.setStrokeWidth(0.5);
         ammoText.setVisible(false);
+        //player.getPlayerRoot().getChildren().add(ammoText);
 
-        player.getPlayerRoot().getChildren().add(ammoText);
     }
 
     /* ---------- INPUT ---------- */
@@ -170,8 +171,8 @@ public class PlayerLogic {
         }
 
         if (event.getCode() == reloadKey) {
-            if (player.getCharacter() instanceof Exorcist) {
-                ((Exorcist) player.getCharacter()).reload();
+            if (player.getCharacter() instanceof UsesAmmo ammoUser) {
+                ammoUser.reload();
             }
         }
 
@@ -321,7 +322,22 @@ public class PlayerLogic {
         double playerY = sprite.getLayoutY();
 
         // 🔥 ถ้าเป็น ranged
-        if (data == null) {
+        if (player.getCharacter() instanceof RangedClass ranged) {
+
+            float startX = (float) (playerX + sprite.getBoundsInParent().getWidth() / 2);
+            float startY = (float) (playerY + sprite.getBoundsInParent().getHeight() / 2);
+
+            ranged.tryAttack(
+                    player,
+                    startX,
+                    startY,
+                    player.isFacingRight()
+            );
+
+            return;
+        }
+
+        if (data == null && player.getCharacter() instanceof HybridClass) {
 
             float startX = (float) (playerX + sprite.getBoundsInParent().getWidth() / 2);
             float startY = (float) (playerY + sprite.getBoundsInParent().getHeight() / 2);
@@ -471,35 +487,42 @@ public class PlayerLogic {
         updateHitboxTimer();
 
         // for ammo
-        if (player.getCharacter() instanceof logic.entity.characters.hybridCharacters.Exorcist) {
-            ((logic.entity.characters.hybridCharacters.Exorcist) player.getCharacter()).updateExorcistLogic();
-        }
 
-        if (player.getCharacter() instanceof logic.entity.characters.hybridCharacters.Exorcist) {
-            var exo = (logic.entity.characters.hybridCharacters.Exorcist) player.getCharacter();
-            exo.updateExorcistLogic();
+        if (player.getCharacter() instanceof UsesAmmo ammoUser) {
+
+            ammoUser.updateAmmo();
 
             ammoText.setVisible(true);
+            Group sprite = player.getPlayerRoot();
 
-            // จัดตำแหน่งให้ตัวหนังสืออยู่เหนือหัวตัวละคร (แกน Y ติดลบคือลอยขึ้นไป)
-            ammoText.setLayoutX(40);
-            ammoText.setLayoutY(-10);
+            double textWidth = ammoText.getBoundsInLocal().getWidth();
 
-            // เปลี่ยนข้อความและสีตามสถานะ
-            if (exo.isReloading()) {
+            ammoText.setLayoutX(
+                    sprite.getLayoutX()
+                            + sprite.getBoundsInParent().getWidth() / 2
+                            - textWidth / 2 - 10
+            );
+
+            ammoText.setLayoutY(
+                    sprite.getLayoutY() - 10
+            );
+
+            if (ammoUser.isReloading()) {
                 ammoText.setText("Reloading...");
                 ammoText.setFill(Color.YELLOW);
             } else {
-                ammoText.setText("Ammo: " + exo.getCurrentAmmo() + "/" + exo.getMaxAmmo());
-                // ถ้ากระสุนหมดให้ตัวหนังสือเป็นสีแดงเพื่อเตือนผู้เล่น
-                if (exo.getCurrentAmmo() == 0) {
+                ammoText.setText("Ammo: " +
+                        ammoUser.getCurrentAmmo() +
+                        "/" +
+                        ammoUser.getMaxAmmo());
+
+                if (ammoUser.getCurrentAmmo() == 0)
                     ammoText.setFill(Color.RED);
-                } else {
+                else
                     ammoText.setFill(Color.WHITE);
-                }
             }
+
         } else {
-            // ถ้าไม่ใช่ Exorcist ให้ซ่อนข้อความไป
             ammoText.setVisible(false);
         }
 
@@ -657,5 +680,9 @@ public class PlayerLogic {
             velocityY = 0;
             onGround = true;
         }
+    }
+
+    public Text getAmmoText() {
+        return ammoText;
     }
 }

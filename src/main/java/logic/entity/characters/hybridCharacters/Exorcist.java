@@ -5,10 +5,10 @@ import logic.entity.BaseProjectileAttack;
 import logic.entity.characterClass.HybridClass;
 import logic.gameLogic.Player;
 import logic.gameLogic.PlayerState;
-import logic.interfaces.HaveWeapon;
 import logic.interfaces.SpawnAttack;
+import logic.interfaces.UsesAmmo;
 
-public class Exorcist extends HybridClass implements SpawnAttack {
+public class Exorcist extends HybridClass implements SpawnAttack, UsesAmmo {
 
     // ระบบกระสุน
     private final int MAX_AMMO = 3;
@@ -25,12 +25,14 @@ public class Exorcist extends HybridClass implements SpawnAttack {
 
     public Exorcist(int hp, int atk, int def, int attackRange, float attackSpeed) {
         super(hp, atk, def, attackRange, attackSpeed);
-        init();
+        setName("Exorcist");
+        //init();
     }
 
     public Exorcist() {
         super();
-        init();
+        setName("Exorcist");
+        //init();
     }
 
     private void init() {
@@ -46,23 +48,20 @@ public class Exorcist extends HybridClass implements SpawnAttack {
 
     @Override
     public void attack(float startX, float startY, boolean facingRight, Player p) {
-        long now = System.nanoTime();
 
-        if (isReloading || currentAmmo <= 0 || (now - lastShotTime < SHOOT_DELAY)) {
-            return;
-        }
-
-        currentAmmo--;
-        lastShotTime = now;
+        if (!canShoot()) return;
+        consumeAmmo();
 
         float dirX = facingRight ? 1 : -1;
 
-        Image bulletImage = new Image(getClass().getResource("/projectilebaseattack.png").toExternalForm());
+        Image bulletImage = new Image(
+                getClass().getResource("/projectilebaseattack.png")
+                        .toExternalForm()
+        );
 
-        // 🔽 ปรับความเร็วกระสุน
         BaseProjectileAttack bullet = new BaseProjectileAttack(
                 this.atk,
-                2f,
+                3f,
                 this.attackRange * 150,
                 startX,
                 startY,
@@ -74,10 +73,18 @@ public class Exorcist extends HybridClass implements SpawnAttack {
         );
 
         spawnProjectile(bullet);
-        getWeaponSprite().setVisible(true);
+    }
 
-        p.setState(PlayerState.WALK);
+    public boolean canShoot() {
+        long now = System.nanoTime();
+        return !isReloading &&
+                currentAmmo > 0 &&
+                (now - lastShotTime >= SHOOT_DELAY);
+    }
 
+    public void consumeAmmo() {
+        currentAmmo--;
+        lastShotTime = System.nanoTime();
     }
 
     public void reload() {
@@ -87,17 +94,18 @@ public class Exorcist extends HybridClass implements SpawnAttack {
         }
     }
 
-    public void updateExorcistLogic() {
+    @Override
+    public void updateAmmo() {
         long now = System.nanoTime();
 
-        if (isReloading) {
-            if (now - reloadStartTime >= RELOAD_DURATION) {
-                currentAmmo = MAX_AMMO;
-                isReloading = false;
-            }
+        if (isReloading && now - reloadStartTime >= RELOAD_DURATION) {
+            currentAmmo = MAX_AMMO;
+            isReloading = false;
         }
 
-        if (getWeaponSprite().isVisible() && (now - lastShotTime > 200_000_000L)) {
+        if (getWeaponSprite().isVisible() &&
+                now - lastShotTime > 200_000_000L) {
+
             getWeaponSprite().setVisible(false);
         }
     }

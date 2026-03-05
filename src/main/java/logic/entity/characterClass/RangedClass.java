@@ -6,49 +6,74 @@ import logic.gameLogic.AttackState;
 import logic.gameLogic.Player;
 import logic.gameLogic.PlayerState;
 import logic.interfaces.Attackable;
+import logic.interfaces.UsesAmmo;
 
-public abstract class RangedClass extends Character implements Attackable {
+public abstract class RangedClass extends Character
+        implements Attackable, UsesAmmo {
+
+    // ===== Ammo System =====
+    private int maxAmmo;
+    private int currentAmmo;
+
+    private boolean isReloading = false;
+    private long reloadStartTime = 0;
+    private long reloadDuration = 1_500_000_000L; // 1.5 sec
+
+    private long lastShotTime = 0;
+    private long shootDelay = 500_000_000L; // 0.5 sec
+
+    // ===== Constructor =====
     public RangedClass() {
         super(125, 25, 3, 3, 2.0F, 100);
         setBuff(10);
         setOrigin(getAttackRange());
+
+        this.maxAmmo = 3;
+        this.currentAmmo = maxAmmo;
     }
 
-    @Override
-    public void attack(float startX, float startY, boolean facingRight, Player player) {
-
-    }
-
-
-    public RangedClass(int hp, int atk, int def, int attackRange, float attackSpeed) {
+    public RangedClass(int hp, int atk, int def,
+                       int attackRange, float attackSpeed,
+                       int maxAmmo) {
         super(hp, atk, def, attackRange, attackSpeed, 100);
-
+        this.maxAmmo = maxAmmo;
+        this.currentAmmo = maxAmmo;
     }
 
-    @Override
-    public void useSpecialSkill() {
-        setAttackRange(getAttackRange() + getBuff());
+    // ===== Template Attack Entry =====
+    public final void tryAttack(Player self,
+                                float startX,
+                                float startY,
+                                boolean facingRight) {
+
+        updateAmmo();
+
+        if (!canShoot()) return;
+
+        consumeAmmo();
+        startAttack(self);
+
+        spawnRangedAttack(startX, startY, facingRight, self);
     }
 
-    @Override
-    public void resetBuff(){
-        setAttackRange(getOrigin());
-    }
+    protected abstract void spawnRangedAttack(
+            float startX,
+            float startY,
+            boolean facingRight,
+            Player p
+    );
 
-
-
-    @Override
-    public AttackData getAttackData() {
-        return null;
-    }
-
+    // ===== Animation =====
     @Override
     public void startAttack(Player self) {
         frameIndex = 0;
         finished = false;
         lastFrameTime = System.nanoTime();
+
         setAttackState(AttackState.Attacking);
-        if (attackFrames.length > 0) self.getWeaponSprite().setImage(attackFrames[0]);
+
+        if (attackFrames.length > 0)
+            self.getWeaponSprite().setImage(attackFrames[0]);
     }
 
     @Override
@@ -56,30 +81,64 @@ public abstract class RangedClass extends Character implements Attackable {
 
         long now = System.nanoTime();
 
-        // change frame every few ticks
-        if(now - lastFrameTime >= FRAME_DURATION){
+        if (now - lastFrameTime >= FRAME_DURATION) {
 
             lastFrameTime = now;
             frameIndex++;
 
-            if(frameIndex >= attackFrames.length){
+            if (frameIndex >= attackFrames.length) {
+
                 finished = true;
+                setAttackState(AttackState.NotAttacking);
                 self.setState(PlayerState.WALK);
-                setAttackState(AttackState.Attacking);
                 return;
             }
 
             self.getWeaponSprite()
                     .setImage(attackFrames[frameIndex]);
         }
-
-        // ⭐ HIT FRAME (middle frame)
-//        if(frameIndex == 1){
-//            dealDamage(self, enemy);
-//        }
     }
 
-    public boolean isAttackFinished(){
-        return this.finished;
+    public boolean isAttackFinished() {
+        return finished;
     }
+
+    // ===== Ammo Logic =====
+    public boolean canShoot() {
+        long now = System.nanoTime();
+        return !isReloading &&
+                currentAmmo > 0 &&
+                (now - lastShotTime >= shootDelay);
+    }
+
+    public void consumeAmmo() {
+        currentAmmo--;
+        lastShotTime = System.nanoTime();
+
+        if (currentAmmo <= 0)
+            reload();
+    }
+
+    public void reload() {
+        if (!isReloading) {
+            isReloading = true;
+            reloadStartTime = System.nanoTime();
+        }
+    }
+
+    public void updateAmmo() {
+        long now = System.nanoTime();
+
+        if (isReloading &&
+                now - reloadStartTime >= reloadDuration) {
+
+            currentAmmo = maxAmmo;
+            isReloading = false;
+        }
+    }
+
+    // ===== Getters =====
+    public int getCurrentAmmo() { return currentAmmo; }
+    public int getMaxAmmo() { return maxAmmo; }
+    public boolean isReloading() { return isReloading; }
 }

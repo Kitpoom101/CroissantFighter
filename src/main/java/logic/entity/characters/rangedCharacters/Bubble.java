@@ -14,54 +14,56 @@ import logic.interfaces.SpawnAttack;
 
 public class Bubble extends RangedClass implements SpawnAttack, HaveWeapon {
 
+    private static final int MIN_AMMO = 3;
+    private static final int MAX_AMMO = 8;
+
     private long blowerStartTime;
     private static final long BLOWER_DURATION = 1_000_000_000L;
 
-    public Bubble(int hp, int atk, int def, int attackRange, float attackSpeed) {
-        super(hp, atk, def, attackRange, attackSpeed);
-        setName("Bubble");
-    }
-
     public Bubble() {
-        super();
+        super(150, 20, 4, 3, 0.5f, 2);
         setName("Bubble");
-        setAttackSpeed(0.5f);
-        setTotalFrames(1);
-        setFRAME_DURATION(300_000_000); // 0.3 sec
-        setupAttackFrame(getTotalFrames());
-
-        getWeaponSprite().setImage(
-                new Image(
-                        getClass()
-                                .getResource("/animations/bubble/attack/atkprop/bubbleBlower.png")
-                                .toExternalForm()
-                )
-        );
-
-        getWeaponSprite().setVisible(false);
     }
 
     @Override
-    public void attack(float startX, float startY, boolean facingRight, Player p) {
+    public void attack(float startX, float startY, boolean facingRight, Player player) {
+
+    }
+
+    @Override
+    public AttackData getAttackData() {
+        return null;
+    }
+
+    @Override
+    protected void spawnRangedAttack(
+            float startX,
+            float startY,
+            boolean facingRight,
+            Player p) {
 
         float dirX = facingRight ? 1 : -1;
 
         for (float i = 1.0F; i > 0; i -= 0.1) {
 
-            float randomY = (float)((Math.random() - 0.5) * 0.6);
+            float randomY =
+                    (float)((Math.random() - 0.5) * 0.6);
 
             BaseProjectileAttack bubble =
                     new BaseProjectileAttack(
-                            (int) (this.atk * i * 0.67),
+                            (int)(this.atk * i * 0.67),
                             6f * i * 0.1f,
-                            (int) (this.attackRange * 100 * i),
+                            (int)(this.attackRange * 100 * i),
                             startX + 100,
                             startY,
                             dirX,
                             randomY,
                             p,
                             new Image(
-                                    getClass().getResource("/animations/bubble/attack/atkprop/emojiBubble.png").toExternalForm()
+                                    getClass()
+                                            .getResource(
+                                                    "/animations/bubble/attack/atkprop/emojiBubble.png")
+                                            .toExternalForm()
                             ),
                             i
                     );
@@ -120,5 +122,10 @@ public class Bubble extends RangedClass implements SpawnAttack, HaveWeapon {
     @Override
     public boolean isAttackFinished() {
         return false;
+    }
+
+    @Override
+    public void resetBuff() {
+
     }
 }

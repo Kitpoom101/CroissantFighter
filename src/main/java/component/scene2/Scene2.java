@@ -71,6 +71,11 @@ public class Scene2 extends Pane {
         // Create gameplay logic controllers (each knows self + enemy).
         playerLogic1 = new PlayerLogic(player1, player2, 1);
         playerLogic2 = new PlayerLogic(player2, player1, 2);
+
+        getChildren().addAll(
+                playerLogic1.getAmmoText(),
+                playerLogic2.getAmmoText()
+        );
         
         // Initialize health bars with each character's starting HP.
         // ใช้ HealthBar ใหม่พร้อมชื่อตัวละคร
