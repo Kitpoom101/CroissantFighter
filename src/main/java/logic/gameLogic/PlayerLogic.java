@@ -17,6 +17,7 @@ import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
 import javafx.util.Duration;
+import logic.entity.characters.hybridCharacters.Exorcist;
 import logic.entity.characters.hybridCharacters.Vampire;
 import logic.interfaces.HaveWeapon;
 import logic.interfaces.OwnWeaponPos;
@@ -36,6 +37,7 @@ public class PlayerLogic {
     private KeyCode attackKey;
     private KeyCode specialAttackKey;
     private KeyCode jumpKey;
+    private KeyCode reloadKey;
 
     // ====== JUMP =======
     private double velocityY = 0;
@@ -61,6 +63,9 @@ public class PlayerLogic {
     // store movement
     private boolean moveLeft;
     private boolean moveRight;
+
+    // attack charge eg. ammo
+    private Text ammoText;
 
     private final double speed = 5;
 
@@ -90,6 +95,7 @@ public class PlayerLogic {
             attackKey = KeyCode.E;
             specialAttackKey = KeyCode.Q;
             jumpKey = KeyCode.W;
+            reloadKey = KeyCode.R;
         }
         else if(playerNum == 2){
             leftKey = KeyCode.J;
@@ -97,6 +103,7 @@ public class PlayerLogic {
             attackKey = KeyCode.O;
             specialAttackKey = KeyCode.U;
             jumpKey = KeyCode.I;
+            reloadKey = KeyCode.P;
         }
 
         // for hit box //
@@ -110,6 +117,15 @@ public class PlayerLogic {
         buffText = new Text("");
         buffText.setStyle("-fx-font-size: 24px; -fx-fill: black;");
         buffText.setOpacity(0);
+
+        // for ammo //
+        ammoText = new Text();
+        ammoText.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        ammoText.setStroke(Color.BLACK);
+        ammoText.setStrokeWidth(0.5);
+        ammoText.setVisible(false);
+
+        player.getPlayerRoot().getChildren().add(ammoText);
     }
 
     /* ---------- INPUT ---------- */
@@ -150,6 +166,12 @@ public class PlayerLogic {
             if (player.getCharacter().getSkillState() == SkillState.CanUseSkill){
                 player.getCharacter().setSkillState(SkillState.CanUseSkill);
                 skill();
+            }
+        }
+
+        if (event.getCode() == reloadKey) {
+            if (player.getCharacter() instanceof Exorcist) {
+                ((Exorcist) player.getCharacter()).reload();
             }
         }
 
@@ -447,6 +469,40 @@ public class PlayerLogic {
 
         // ===== UPDATE HITBOX ===== //
         updateHitboxTimer();
+
+        // for ammo
+        if (player.getCharacter() instanceof logic.entity.characters.hybridCharacters.Exorcist) {
+            ((logic.entity.characters.hybridCharacters.Exorcist) player.getCharacter()).updateExorcistLogic();
+        }
+
+        if (player.getCharacter() instanceof logic.entity.characters.hybridCharacters.Exorcist) {
+            var exo = (logic.entity.characters.hybridCharacters.Exorcist) player.getCharacter();
+            exo.updateExorcistLogic();
+
+            ammoText.setVisible(true);
+
+            // จัดตำแหน่งให้ตัวหนังสืออยู่เหนือหัวตัวละคร (แกน Y ติดลบคือลอยขึ้นไป)
+            ammoText.setLayoutX(40);
+            ammoText.setLayoutY(-10);
+
+            // เปลี่ยนข้อความและสีตามสถานะ
+            if (exo.isReloading()) {
+                ammoText.setText("Reloading...");
+                ammoText.setFill(Color.YELLOW);
+            } else {
+                ammoText.setText("Ammo: " + exo.getCurrentAmmo() + "/" + exo.getMaxAmmo());
+                // ถ้ากระสุนหมดให้ตัวหนังสือเป็นสีแดงเพื่อเตือนผู้เล่น
+                if (exo.getCurrentAmmo() == 0) {
+                    ammoText.setFill(Color.RED);
+                } else {
+                    ammoText.setFill(Color.WHITE);
+                }
+            }
+        } else {
+            // ถ้าไม่ใช่ Exorcist ให้ซ่อนข้อความไป
+            ammoText.setVisible(false);
+        }
+
     }
 
     private void updateHitboxTimer() {

@@ -44,7 +44,7 @@ public class Player {
         hitbox.setLayoutX(25);
         hitbox.setLayoutY(20);
 
-        playerRoot.getChildren().addAll(sprite, hitbox);
+        playerRoot.getChildren().addAll(sprite, hitbox, character.getWeaponSprite());
 
         DropShadow glow = new DropShadow();
         glow.setColor(Color.BLUE);
