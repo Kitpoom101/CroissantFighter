@@ -20,6 +20,8 @@ import javafx.util.Duration;
 import logic.entity.characters.hybridCharacters.Vampire;
 import logic.interfaces.HaveWeapon;
 
+import java.security.Key;
+
 public class PlayerLogic {
 
     // store player
@@ -32,6 +34,16 @@ public class PlayerLogic {
     private KeyCode rightKey;
     private KeyCode attackKey;
     private KeyCode specialAttackKey;
+    private KeyCode jumpKey;
+
+    // ====== JUMP =======
+    private double velocityY = 0;
+
+    private final double GRAVITY = 0.3;
+    private final double JUMP_FORCE = -12;
+    private final double MAX_FALL_SPEED = 7;
+
+    private boolean onGround = true;
 
     // ====== HITBOX ===== //
     private Rectangle attackHitbox;
@@ -76,12 +88,14 @@ public class PlayerLogic {
             rightKey = KeyCode.D;
             attackKey = KeyCode.E;
             specialAttackKey = KeyCode.Q;
+            jumpKey = KeyCode.W;
         }
         else if(playerNum == 2){
             leftKey = KeyCode.J;
             rightKey = KeyCode.L;
-            attackKey = KeyCode.I;
-            specialAttackKey = KeyCode.O;
+            attackKey = KeyCode.O;
+            specialAttackKey = KeyCode.U;
+            jumpKey = KeyCode.I;
         }
 
         // for hit box //
@@ -117,9 +131,17 @@ public class PlayerLogic {
                 player.setState(PlayerState.ATTACK);
                 player.getCharacter().setAttackState(AttackState.Attacking);
                 player.getCharacter().startAttack(player);
-            } else if (!(player.getCharacter() instanceof HaveWeapon) || player.getCharacter() instanceof RangedClass) {
-                player.setState(PlayerState.ATTACK);
-                attack();
+            } else if (!(player.getCharacter() instanceof MeleeClass)) {
+
+                long now = System.nanoTime();
+
+                if (now - lastAttackTime >= getAttackInterval()) {
+
+                    lastAttackTime = now;
+
+                    player.setState(PlayerState.ATTACK);
+                    attack();
+                }
             }
         }
 
@@ -127,6 +149,13 @@ public class PlayerLogic {
             if (player.getCharacter().getSkillState() == SkillState.CanUseSkill){
                 player.getCharacter().setSkillState(SkillState.CanUseSkill);
                 skill();
+            }
+        }
+
+        if(event.getCode() == jumpKey){
+            if(onGround){
+                velocityY = JUMP_FORCE;
+                onGround = false;
             }
         }
     }
@@ -333,6 +362,15 @@ public class PlayerLogic {
                         .localToScene(enemy.getHitbox().getBoundsInLocal())
                 )) {
 
+            int rawDamage = player.getCharacter().getAtk();
+            enemy.getCharacter().takeDamage(rawDamage);
+
+            int finalDamage = rawDamage - enemy.getCharacter().getDef();
+
+            if (finalDamage > 0) {
+                Scene2.getInstance().showFloatingText(enemy, finalDamage, Color.DARKRED, "-");
+            }
+
             System.out.println("HIT!");
 
             enemy.getCharacter().takeDamage(player.getCharacter().getAtk());
@@ -385,9 +423,19 @@ public class PlayerLogic {
         /* apply movement */
         // only when walk state
         //if (player.getState() == PlayerState.WALK){
-        player.translate(velocityX, 0);
+        // apply gravity
+        velocityY += GRAVITY;
+
+        if (velocityY > MAX_FALL_SPEED)
+            velocityY = MAX_FALL_SPEED;
+
+// move player
+        player.translate(velocityX, velocityY);
+
         // ===== PREVENT PLAYER MOVEMENT ===== //
         clampToArenaBounds();
+        checkGroundCollision();
+
 
         // ===== WEAPON SPRITE FOLLOW ===== //
         weaponSpriteFollow();
@@ -536,6 +584,22 @@ public class PlayerLogic {
             sprite.setLayoutX(minX);
         } else if (sprite.getLayoutX() > maxX) {
             sprite.setLayoutX(maxX);
+        }
+    }
+
+    private void checkGroundCollision() {
+
+        if (!(player.getPlayerRoot().getParent() instanceof Region arena))
+            return;
+
+        Group sprite = player.getPlayerRoot();
+
+        double groundY = arena.getHeight() - sprite.getBoundsInParent().getHeight();
+
+        if (sprite.getLayoutY() >= groundY) {
+            sprite.setLayoutY(groundY);
+            velocityY = 0;
+            onGround = true;
         }
     }
 }

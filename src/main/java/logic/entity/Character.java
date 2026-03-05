@@ -13,6 +13,7 @@ public abstract class Character implements Attackable, Damageable, AttackAnimati
 
     protected String name;
     protected int hp;
+    protected int maxHp;
     protected int atk;
     protected int def;
     protected int attackRange;
@@ -38,7 +39,8 @@ public abstract class Character implements Attackable, Damageable, AttackAnimati
     protected boolean finished = false;
     protected AttackState attackState = AttackState.NotAttacking;
 
-    public Character(int hp, int atk, int def, int attackRange, float attackSpeed) {
+    public Character(int hp, int atk, int def, int attackRange, float attackSpeed, int maxHp) {
+        this.setMaxHp(maxHp);
         this.setHp(hp);
         this.setAtk(atk);
         this.setDef(def);
@@ -112,7 +114,11 @@ public abstract class Character implements Attackable, Damageable, AttackAnimati
     }
 
     public void setHp(int hp) {
-        this.hp = Math.max(0, hp);
+        this.hp = Math.min(Math.max(0, hp), this.getMaxHp());
+    }
+
+    public int getMaxHp() {
+        return maxHp;
     }
 
     public float getAttackSpeed() {
@@ -187,6 +193,10 @@ public abstract class Character implements Attackable, Damageable, AttackAnimati
     }
 
     public abstract void resetBuff();
+
+    public void setMaxHp(int maxHp) {
+        this.maxHp = maxHp;
+    }
 
     public int getFrameIndex() {
         return frameIndex;

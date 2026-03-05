@@ -9,7 +9,7 @@ import logic.interfaces.Attackable;
 
 public abstract class RangedClass extends Character implements Attackable {
     public RangedClass() {
-        super(100, 25, 5, 3, 2.0F);
+        super(100, 25, 5, 3, 2.0F, 100);
         setBuff(10);
         setOrigin(getAttackRange());
     }
@@ -21,7 +21,7 @@ public abstract class RangedClass extends Character implements Attackable {
 
 
     public RangedClass(int hp, int atk, int def, int attackRange, float attackSpeed) {
-        super(hp, atk, def, attackRange, attackSpeed);
+        super(hp, atk, def, attackRange, attackSpeed, 100);
 
     }
 

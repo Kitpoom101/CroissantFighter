@@ -11,7 +11,7 @@ import logic.interfaces.HaveWeapon;
 public abstract class MeleeClass extends Character implements Attackable, HaveWeapon {
 
     public MeleeClass() {
-        super(250, 20, 10, 1, 1.0F);
+        super(250, 20, 10, 1, 1.0F, 250);
         setBuff(15);
         setOrigin(getDef());
     }
@@ -23,7 +23,7 @@ public abstract class MeleeClass extends Character implements Attackable, HaveWe
 
 
     public MeleeClass(int hp, int atk, int def, int attackRange, float attackSpeed) {
-        super(hp, atk, def, attackRange, attackSpeed);
+        super(hp, atk, def, attackRange, attackSpeed, 250);
 
     }
 
