@@ -1,0 +1,109 @@
+@startuml
+class logic.entity.characters.hybridCharacters.Barista {
++ <<Create>> Barista(int,int,int,int,float)
++ <<Create>> Barista()
+}
+
+class logic.entity.characters.meleeCharacters.Pyro {
++ <<Create>> Pyro(int,int,int,int,float)
++ <<Create>> Pyro()
+}
+
+class logic.entity.characterClass.RangedClass {
++ <<Create>> RangedClass()
++ <<Create>> RangedClass(int,int,int,int,float)
++ void attack()
++ void useSpecialSkill()
+}
+
+class logic.entity.characterClass.HybridClass {
++ <<Create>> HybridClass()
++ <<Create>> HybridClass(int,int,int,int,float)
++ void attack()
++ void useSpecialSkill()
+}
+
+class logic.entity.characters.meleeCharacters.Katana {
++ <<Create>> Katana(int,int,int,int,float)
++ <<Create>> Katana()
+}
+
+class logic.entity.characters.hybridCharacters.Vampire {
++ <<Create>> Vampire(int,int,int,int,float)
++ <<Create>> Vampire()
+}
+
+class logic.entity.characters.rangedCharacters.Archer {
++ <<Create>> Archer(int,int,int,int,float)
++ <<Create>> Archer()
+}
+
+class logic.entity.characters.rangedCharacters.Mage {
++ <<Create>> Mage(int,int,int,int,float)
++ <<Create>> Mage()
+}
+
+class logic.entity.characters.rangedCharacters.Bubble {
++ <<Create>> Bubble(int,int,int,int,float)
++ <<Create>> Bubble()
+}
+
+abstract class logic.entity.Character {
+- int hp
+- int atk
+- int def
+- int attackRange
+- float attackSpeed
++ <<Create>> Character(int,int,int,int,float)
++ <<Create>> Character()
++ void moveLeft()
++ void moveRight()
++ void jump()
++ void attack()
++ void useSpecialSkill()
++ int getAttackRange()
++ void setAttackRange(int)
++ int getDef()
++ void setDef(int)
++ int getAtk()
++ void setAtk(int)
++ int getHp()
++ void setHp(int)
++ float getAttackSpeed()
++ void setAttackSpeed(float)
+}
+
+
+class logic.entity.characters.meleeCharacters.Hammer {
++ <<Create>> Hammer(int,int,int,int,float)
++ <<Create>> Hammer()
+}
+
+class logic.entity.characterClass.MeleeClass {
++ <<Create>> MeleeClass()
++ <<Create>> MeleeClass(int,int,int,int,float)
++ void attack()
++ void useSpecialSkill()
+}
+
+class logic.entity.characters.hybridCharacters.Exorcist {
++ <<Create>> Exorcist(int,int,int,int,float)
++ <<Create>> Exorcist()
+}
+
+
+
+logic.entity.characterClass.HybridClass <|-- logic.entity.characters.hybridCharacters.Barista
+logic.entity.characterClass.MeleeClass <|-- logic.entity.characters.meleeCharacters.Pyro
+logic.entity.Character <|-- logic.entity.characterClass.RangedClass
+logic.entity.Character <|-- logic.entity.characterClass.HybridClass
+logic.entity.characterClass.MeleeClass <|-- logic.entity.characters.meleeCharacters.Katana
+logic.entity.characterClass.HybridClass <|-- logic.entity.characters.hybridCharacters.Vampire
+logic.entity.characterClass.RangedClass <|-- logic.entity.characters.rangedCharacters.Archer
+logic.entity.characterClass.RangedClass <|-- logic.entity.characters.rangedCharacters.Mage
+logic.entity.characterClass.RangedClass <|-- logic.entity.characters.rangedCharacters.Bubble
+logic.interfaces.Attackable <|.. logic.entity.Character
+logic.entity.characterClass.MeleeClass <|-- logic.entity.characters.meleeCharacters.Hammer
+logic.entity.Character <|-- logic.entity.characterClass.MeleeClass
+logic.entity.characterClass.HybridClass <|-- logic.entity.characters.hybridCharacters.Exorcist
+@enduml

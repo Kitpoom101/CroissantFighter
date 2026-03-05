@@ -1,0 +1,49 @@
+package logic.entity.characters.meleeCharacters;
+
+import javafx.scene.image.Image;
+import logic.entity.AttackData;
+import logic.entity.characterClass.MeleeClass;
+import logic.gameLogic.AttackState;
+import logic.gameLogic.Player;
+
+public class Pyro extends MeleeClass {
+    public Pyro(int hp, int atk, int def, int attackRange, float attackSpeed) {
+        super(hp, atk, def, attackRange, attackSpeed);
+        setName("Pyro");
+    }
+
+    public Pyro() {
+        super();
+        setTotalFrames(1);
+        setFRAME_DURATION(100_000_000);
+        setName("Pyro");
+        setAttackSpeed(2.0F);
+        setupAttackFrame(getTotalFrames());
+    }
+
+    @Override
+    public AttackData getAttackData() {
+        return new AttackData(150, 120);
+    }
+
+
+    @Override
+    public void setupAttackFrame(int totalFrame) {
+        attackFrames = new Image[totalFrame];
+
+        for (int i = 0; i < totalFrame; i++) {
+            String path =
+                    "/animations/pyro/attack/frame" + (i + 1) + ".png";
+            attackFrames[i] = new Image(
+                    getClass().getResource(path).toExternalForm());
+        }
+    }
+
+    @Override
+    public void updateAttack(Player self) {
+        super.updateAttack(self);
+        if(frameIndex == 0 && getAttackState() == AttackState.Attacking ){
+            setAttackState(AttackState.WillAttack);
+        }
+    }
+}
