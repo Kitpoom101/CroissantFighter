@@ -44,8 +44,8 @@ public class Mage extends RangedClass implements SpawnAttack {
                 break;
 
             case DEATH:
-                damage *= 1.3;
-                int sacrifice = (int) (this.getHp() * 0.10F);
+                damage *= 1.5;
+                int sacrifice = (int) (this.getHp() * 0.25F);
                 this.takeDamage(sacrifice);
 
                 if (sacrifice > 0) {
@@ -59,12 +59,14 @@ public class Mage extends RangedClass implements SpawnAttack {
                 int actualHeal = Math.min(healAmount, this.getMaxHp() - this.getHp());
                 this.setHp(this.getHp() + actualHeal);
 
-                Scene2.getInstance().showFloatingText(
-                        p,
-                        actualHeal,
-                        Color.LIMEGREEN,
-                        "+"
-                );
+                if (actualHeal > 0) {
+                    Scene2.getInstance().showFloatingText(
+                            p,
+                            actualHeal,
+                            Color.LIMEGREEN,
+                            "+"
+                    );
+                }
 
                 damage *= 0.8;
                 break;
