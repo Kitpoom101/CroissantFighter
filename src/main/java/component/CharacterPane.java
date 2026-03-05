@@ -23,7 +23,11 @@ import java.util.Objects;
 
 public class CharacterPane extends StackPane {
 
-    private final String[] allSprite = {"/Katana.png", "/Hammer.png", "/Pyro.png", "/Barista.png"};
+    private final String[] allSprite = {
+            "/Katana.png", "/Hammer.png", "/Pyro.png",
+            "/Barista.png", "/Exorcist.png", "/Vampire.png",
+            "/Archer.png", "/Bubble.png", "/Mage.png"
+    };
     private final String[] names = {"Katana"};
     private Character character;
     private final Image charBG = new Image(ClassLoader.getSystemResource("CharPaneBg.png").toString());

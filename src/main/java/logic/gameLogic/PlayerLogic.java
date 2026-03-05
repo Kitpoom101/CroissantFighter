@@ -17,6 +17,8 @@ import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
 import javafx.util.Duration;
+import logic.entity.characters.hybridCharacters.Vampire;
+import logic.interfaces.HaveWeapon;
 
 public class PlayerLogic {
 
@@ -266,13 +268,27 @@ public class PlayerLogic {
         attackHitbox.setLayoutY(playerY);
 
         if (player.isFacingRight()) {
-            attackHitbox.setLayoutX(
-                    playerX + sprite.getBoundsInParent().getWidth()
-            );
+            if (player.getCharacter() instanceof Vampire){
+                attackHitbox.setLayoutX(
+                        playerX + sprite.getBoundsInParent().getWidth() + 120
+                );
+            }else{
+                attackHitbox.setLayoutX(
+                        playerX + sprite.getBoundsInParent().getWidth()
+                );
+            }
+
         } else {
-            attackHitbox.setLayoutX(
-                    playerX - data.getWidth()
-            );
+            if (player.getCharacter() instanceof Vampire){
+                attackHitbox.setLayoutX(
+                        playerX - data.getWidth() - 120
+                );
+            }else{
+                attackHitbox.setLayoutX(
+                        playerX - data.getWidth()
+                );
+            }
+
         }
 
         attackHitbox.setVisible(true);
@@ -358,7 +374,7 @@ public class PlayerLogic {
     }
 
     private void attackAnimation(){
-        if(player.getState() == PlayerState.ATTACK && player.getCharacter() instanceof MeleeClass){
+        if(player.getState() == PlayerState.ATTACK && player.getCharacter() instanceof HaveWeapon){
             player.getWeaponSprite().setVisible(true);
             player.getCharacter().updateAttack(player);
             if(player.getCharacter().getAttackState() == AttackState.WillAttack){
@@ -395,7 +411,7 @@ public class PlayerLogic {
     }
 
     private void weaponSpriteFollow() {
-        if (player.getCharacter() instanceof MeleeClass){
+        if (player.getCharacter() instanceof HaveWeapon){
             Group body = player.getPlayerRoot();
 
             // weapon sprite position
