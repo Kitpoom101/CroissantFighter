@@ -47,6 +47,8 @@ public class BaseProjectileAttack {
         sprite.setFitWidth(size);
         sprite.setPreserveRatio(true);
 
+        sprite.setScaleX(directionX < 0 ? -1 : 1);
+
         sprite.setLayoutX(x);
         sprite.setLayoutY(y - size / 2);
 

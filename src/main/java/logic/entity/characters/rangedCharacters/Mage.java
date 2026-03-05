@@ -2,18 +2,22 @@ package logic.entity.characters.rangedCharacters;
 
 import component.scene2.Scene2;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import logic.entity.AttackData;
 import logic.entity.BaseProjectileAttack;
 import logic.entity.characterClass.RangedClass;
 import logic.gameLogic.Player;
 import logic.gameLogic.TarotType;
+import logic.interfaces.HandleOwnWeapon;
+import logic.interfaces.HaveWeapon;
 import logic.interfaces.SpawnAttack;
 
-public class Mage extends RangedClass implements SpawnAttack {
+public class Mage extends RangedClass implements SpawnAttack, HandleOwnWeapon {
     public Mage() {
         super(100, 30, 2, 4, 0.5f, 5);
         setName("Mage");
+        setWeaponSprite("/animations/mage/staff.png");
     }
 
     @Override
@@ -63,12 +67,14 @@ public class Mage extends RangedClass implements SpawnAttack {
                 break;
         }
 
+        float spawnOffset = dirX > 0 ? 60 * dirX : 145 * dirX;
+
         BaseProjectileAttack cardProjectile =
                 new BaseProjectileAttack(
                         damage,
                         1.2f,
                         (int)(this.attackRange * 100),
-                        startX + 100,
+                        startX + spawnOffset,
                         startY,
                         dirX,
                         -0.15f,
@@ -89,12 +95,7 @@ public class Mage extends RangedClass implements SpawnAttack {
 
     @Override
     public void startAttack(Player self) {
-
-    }
-
-    @Override
-    public void updateAttack(Player self) {
-
+        super.startAttack(self);
     }
 
     @Override

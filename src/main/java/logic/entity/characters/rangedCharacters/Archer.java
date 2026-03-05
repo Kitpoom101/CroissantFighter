@@ -1,17 +1,21 @@
 package logic.entity.characters.rangedCharacters;
 
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import logic.entity.AttackData;
 import logic.entity.BaseProjectileAttack;
 import logic.entity.characterClass.RangedClass;
 import logic.gameLogic.Player;
+import logic.interfaces.HandleOwnWeapon;
+import logic.interfaces.HaveWeapon;
 import logic.interfaces.SpawnAttack;
 
-public class Archer extends RangedClass implements SpawnAttack {
+public class Archer extends RangedClass implements SpawnAttack, HandleOwnWeapon {
 
     public Archer() {
         super(125, 25, 3, 3, 0.75f, 3);
         setName("Archer");
+        setWeaponSprite("/animations/archer/attack/Bow.png");
     }
 
     @Override
@@ -34,12 +38,14 @@ public class Archer extends RangedClass implements SpawnAttack {
         float dirX = facingRight ? 1 : -1;
         float randomY = (float)((Math.random() - 0.5) * 0.6);
 
+        float spawnOffset = dirX > 0 ? 60 * dirX : 155 * dirX;
+
         BaseProjectileAttack arrow =
                 new BaseProjectileAttack(
                         this.atk,
                         1.5f,
                         (int)(this.attackRange * 100),
-                        startX + 100,
+                        startX + spawnOffset,
                         startY,
                         dirX,
                         randomY,
@@ -59,12 +65,7 @@ public class Archer extends RangedClass implements SpawnAttack {
 
     @Override
     public void startAttack(Player self) {
-
-    }
-
-    @Override
-    public void updateAttack(Player self) {
-
+        super.startAttack(self);
     }
 
     @Override

@@ -141,6 +141,14 @@ public abstract class Character implements Attackable, Damageable, AttackAnimati
         return weaponSprite;
     }
 
+    public void setWeaponSprite(String path) {
+        this.weaponSprite.setImage(new Image(
+                getClass()
+                        .getResource(path)
+                        .toExternalForm()
+        ));
+    }
+
     public abstract AttackData getAttackData();
 
     public void setTotalFrames(int totalFrames) {
