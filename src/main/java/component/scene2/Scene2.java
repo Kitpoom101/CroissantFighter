@@ -454,6 +454,7 @@ public class Scene2 extends Pane {
             SequentialTransition deathAnim = new SequentialTransition(rotate, fade);
             deathAnim.setOnFinished(e -> showVictoryOverlay(winner));
             deathAnim.play();
+            AudioManager.playSFX("/audio/sfx/gameOverHandler/dieSFX.mp3");
         } else {
             showVictoryOverlay(null);
         }

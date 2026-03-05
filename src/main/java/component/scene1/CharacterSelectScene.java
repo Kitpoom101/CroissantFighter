@@ -54,7 +54,7 @@ public class CharacterSelectScene extends StackPane {
             CharacterPane pane = new CharacterPane(i);
             pane.setOnMouseClicked(e -> {
                         selectCharacter(pane);
-                AudioManager.playSFX("/audio/sfx/onMouseClicked/clickSFX.mp3");
+                AudioManager.playSFX("/audio/sfx/onMouseClicked/chaSelect.mp3");
             });
             characterRow.getChildren().add(pane);
         }
@@ -68,7 +68,7 @@ public class CharacterSelectScene extends StackPane {
 
         Button cancelBtn = new Button("Cancel");
         cancelBtn.setOnAction(e ->  {
-            AudioManager.playSFX("/audio/sfx/onMouseClicked/clickSFX.mp3");
+            AudioManager.playSFX("/audio/sfx/onMouseClicked/cancelClick.mp3");
             cancelSelection();
         });
 

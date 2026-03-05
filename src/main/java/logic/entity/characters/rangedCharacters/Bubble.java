@@ -15,14 +15,14 @@ import logic.interfaces.SpawnAttack;
 
 public class Bubble extends RangedClass implements SpawnAttack, HandleOwnWeapon {
 
-    private static final int MIN_AMMO = 3;
-    private static final int MAX_AMMO = 8;
+    private static final int MIN_AMMO = 1;
+    private static final int MAX_AMMO = 5;
 
     private long blowerStartTime;
     private static final long BLOWER_DURATION = 1_000_000_000L;
 
     public Bubble() {
-        super(150, 20, 4, 3, 0.5f, 2);
+        super(150, 20, 4, 3, 0.5f, 1);
         setName("Bubble");
         setWeaponSprite("/animations/bubble/attack/atkprop/bubbleBlower.png");
     }
@@ -118,5 +118,15 @@ public class Bubble extends RangedClass implements SpawnAttack, HandleOwnWeapon 
     @Override
     public void resetBuff() {
 
+    }
+
+    @Override
+    public void reload() {
+        super.reload();
+
+        int randomMax = MIN_AMMO + (int)(Math.random() * (MAX_AMMO - MIN_AMMO + 1));
+
+        setMaxAmmo(randomMax);
+        setCurrentAmmo(randomMax);
     }
 }

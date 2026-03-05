@@ -132,4 +132,12 @@ public abstract class RangedClass extends Character
     public int getCurrentAmmo() { return currentAmmo; }
     public int getMaxAmmo() { return maxAmmo; }
     public boolean isReloading() { return isReloading; }
+
+    public void setCurrentAmmo(int currentAmmo) {
+        this.currentAmmo = currentAmmo;
+    }
+
+    public void setMaxAmmo(int maxAmmo) {
+        this.maxAmmo = maxAmmo;
+    }
 }

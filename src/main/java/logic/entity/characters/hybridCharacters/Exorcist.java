@@ -1,6 +1,7 @@
 package logic.entity.characters.hybridCharacters;
 
 import javafx.scene.image.Image;
+import logic.audio.AudioManager;
 import logic.entity.BaseProjectileAttack;
 import logic.entity.characterClass.HybridClass;
 import logic.gameLogic.Player;
@@ -72,6 +73,7 @@ public class Exorcist extends HybridClass implements SpawnAttack, UsesAmmo {
                 0.5f
         );
 
+        AudioManager.playSFX("/audio/sfx/attack/pew.wav");
         spawnProjectile(bullet);
     }
 
