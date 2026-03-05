@@ -466,6 +466,7 @@ public class Scene2 extends Pane {
         if (winner == null) {
             titleLabel = new Label("TIME UP!");
             subtitleLabel.setText("DRAW");
+            AudioManager.playPrioritySFX("/audio/sfx/gameOverHandler/drawSFX.mp3");
         } else {
             titleLabel = new Label("VICTORY");
 
@@ -475,6 +476,8 @@ public class Scene2 extends Pane {
             subtitleLabel.setText(
                     "PLAYER " + playerNumber + " (" + characterName + ") WINS!"
             );
+
+            AudioManager.playPrioritySFX("/audio/sfx/gameOverHandler/winningSFX.mp3");
         }
 
         titleLabel.setFont(Font.font("Verdana", FontWeight.EXTRA_BOLD, 80));
