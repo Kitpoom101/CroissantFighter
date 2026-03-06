@@ -1,0 +1,287 @@
+@startuml
+class logic.entity.characters.rangedCharacters.Mage {
++ void attack(float,float,boolean,Player)
++ AttackData getAttackData()
+# void spawnRangedAttack(float,float,boolean,Player)
++ void startAttack(Player)
++ void setupAttackFrame(int)
++ boolean isAttackFinished()
++ void useSpecialSkill()
++ void resetBuff()
++ void reload()
+}
+
+abstract class logic.entity.characterClass.HybridClass {
++ void attack(float,float,boolean,Player)
++ void useSpecialSkill()
++ void resetBuff()
++ AttackData getAttackData()
++ void startAttack(Player)
++ void updateAttack(Player)
++ boolean isAttackFinished()
+}
+
+class logic.entity.AttackData {
+- double width
+- double height
++ double getWidth()
++ double getHeight()
+}
+
+
+abstract class logic.entity.characterClass.RangedClass {
+- int maxAmmo
+- int currentAmmo
+- boolean isReloading
+- long reloadStartTime
+- long reloadDuration
+- long lastShotTime
+- long shootDelay
++ void tryAttack(Player,float,float,boolean)
+# {abstract}void spawnRangedAttack(float,float,boolean,Player)
++ void startAttack(Player)
++ void updateAttack(Player)
++ boolean isAttackFinished()
++ boolean canShoot()
++ void consumeAmmo()
++ void reload()
++ void updateAmmo()
++ int getCurrentAmmo()
++ int getMaxAmmo()
++ boolean isReloading()
++ void setCurrentAmmo(int)
++ void setMaxAmmo(int)
+}
+
+
+class logic.entity.BaseProjectileAttack {
+# int damage
+# float speed
+# int range
+# float currentDistance
+# float x
+# float y
+# float directionX
+# float directionY
+- Player owner
+- boolean knockback
+- ImageView sprite
++ Player getOwner()
++ void update()
++ boolean isOutOfRange()
++ ImageView getSprite()
++ int getDamage()
++ boolean hasKnockback()
++ void setHasKnockback(boolean)
++ float getDirectionX()
++ void setDirectionX(float)
++ float getDirectionY()
++ void setDirectionY(float)
+}
+
+
+class logic.entity.characters.hybridCharacters.Vampire {
+# int maxHp
+# double lifeStealMultiplier
+# double originLifeStealMultiplier
++ AttackData getAttackData()
++ void setupAttackFrame(int)
++ void updateAttack(Player)
++ void useSpecialSkill()
++ void resetBuff()
++ int getMaxHp()
++ void setMaxHp(int)
++ double getLifeStealMultiplier()
++ void setLifeStealMultiplier(double)
++ double getOriginLifeStealMultiplier()
++ void setOriginLifeStealMultiplier(double)
+}
+
+
+abstract class logic.entity.characterClass.MeleeClass {
++ void attack(float,float,boolean,Player)
++ void useSpecialSkill()
++ void resetBuff()
++ AttackData getAttackData()
++ void startAttack(Player)
++ void updateAttack(Player)
++ boolean isAttackFinished()
+}
+
+class logic.entity.characters.rangedCharacters.Archer {
+# int originAttackRange
++ void attack(float,float,boolean,Player)
++ AttackData getAttackData()
+# void spawnRangedAttack(float,float,boolean,Player)
++ void startAttack(Player)
++ void setupAttackFrame(int)
++ boolean isAttackFinished()
++ void useSpecialSkill()
++ void resetBuff()
++ int getOriginAttackRange()
++ void setOriginAttackRange(int)
+}
+
+
+class logic.entity.characters.meleeCharacters.Katana {
++ AttackData getAttackData()
++ void setupAttackFrame(int)
++ void updateAttack(Player)
+}
+
+class logic.entity.characters.hybridCharacters.Barista {
++ void attack(float,float,boolean,Player)
++ void startAttack(Player)
++ void updateAttack(Player)
++ void setupAttackFrame(int)
++ boolean isAttackFinished()
+}
+
+abstract class logic.entity.Character {
+# String name
+# int hp
+# int maxHp
+# int atk
+# int def
+# int attackRange
+# float attackSpeed
+# int buff
+# int origin
+- ImageView weaponSprite
+# SkillState skillState
+# Image[] attackFrames
+# int totalFrames
+# int frameIndex
+# long lastFrameTime
+# long FRAME_DURATION
+# boolean finished
+# AttackState attackState
++ void moveLeft()
++ void moveRight()
++ void jump()
++ {abstract}void attack(float,float,boolean,Player)
++ void useSpecialSkill()
++ void takeDamage(int)
++ int getAttackRange()
++ void setAttackRange(int)
++ int getDef()
++ void setDef(int)
++ int getAtk()
++ void setAtk(int)
++ int getHp()
++ void setHp(int)
++ int getMaxHp()
++ float getAttackSpeed()
++ void setAttackSpeed(float)
++ String getName()
++ void setName(String)
++ ImageView getWeaponSprite()
++ void setWeaponSprite(String)
++ {abstract}AttackData getAttackData()
++ void setTotalFrames(int)
++ void setFRAME_DURATION(long)
++ int getTotalFrames()
++ boolean isAttackFinished()
++ AttackState getAttackState()
++ void setAttackState(AttackState)
++ int getBuff()
++ void setBuff(int)
++ SkillState getSkillState()
++ void setSkillState(SkillState)
++ int getOrigin()
++ void setOrigin(int)
++ {abstract}void resetBuff()
++ void setMaxHp(int)
++ int getFrameIndex()
++ void setFrameIndex(int)
+}
+
+
+class logic.entity.characters.hybridCharacters.Exorcist {
+- int MAX_AMMO
+- int currentAmmo
+- boolean isReloading
+- long reloadStartTime
+- long RELOAD_DURATION
+- long lastShotTime
+- long SHOOT_DELAY
+- void init()
++ void attack(float,float,boolean,Player)
++ boolean canShoot()
++ void consumeAmmo()
++ void reload()
++ void updateAmmo()
++ int getCurrentAmmo()
++ int getMaxAmmo()
++ boolean isReloading()
++ void startAttack(Player)
++ void updateAttack(Player)
++ void setupAttackFrame(int)
++ boolean isAttackFinished()
+}
+
+
+class logic.entity.characters.rangedCharacters.Bubble {
+- {static} int MIN_AMMO
+- {static} int MAX_AMMO
+- long blowerStartTime
+- {static} long BLOWER_DURATION
++ void attack(float,float,boolean,Player)
++ AttackData getAttackData()
+# void spawnRangedAttack(float,float,boolean,Player)
++ void startAttack(Player)
++ void updateAttack(Player)
++ void setupAttackFrame(int)
++ boolean isAttackFinished()
++ void useSpecialSkill()
++ void resetBuff()
++ void reload()
+}
+
+
+class logic.entity.characters.meleeCharacters.Hammer {
++ AttackData getAttackData()
++ void setupAttackFrame(int)
++ void updateAttack(Player)
+}
+
+class logic.entity.characters.meleeCharacters.Pyro {
++ AttackData getAttackData()
++ void setupAttackFrame(int)
++ void updateAttack(Player)
+}
+
+
+
+logic.interfaces.SpawnAttack <|.. logic.entity.characters.rangedCharacters.Mage
+logic.interfaces.HandleOwnWeapon <|.. logic.entity.characters.rangedCharacters.Mage
+logic.entity.characterClass.RangedClass <|-- logic.entity.characters.rangedCharacters.Mage
+logic.interfaces.Attackable <|.. logic.entity.characterClass.HybridClass
+logic.entity.Character <|-- logic.entity.characterClass.HybridClass
+logic.interfaces.Attackable <|.. logic.entity.characterClass.RangedClass
+logic.interfaces.UsesAmmo <|.. logic.entity.characterClass.RangedClass
+logic.entity.Character <|-- logic.entity.characterClass.RangedClass
+logic.interfaces.HaveWeapon <|.. logic.entity.characters.hybridCharacters.Vampire
+logic.interfaces.OwnWeaponPos <|.. logic.entity.characters.hybridCharacters.Vampire
+logic.entity.characterClass.HybridClass <|-- logic.entity.characters.hybridCharacters.Vampire
+logic.interfaces.Attackable <|.. logic.entity.characterClass.MeleeClass
+logic.interfaces.HaveWeapon <|.. logic.entity.characterClass.MeleeClass
+logic.entity.Character <|-- logic.entity.characterClass.MeleeClass
+logic.interfaces.SpawnAttack <|.. logic.entity.characters.rangedCharacters.Archer
+logic.entity.characterClass.RangedClass <|-- logic.entity.characters.rangedCharacters.Archer
+logic.entity.characterClass.MeleeClass <|-- logic.entity.characters.meleeCharacters.Katana
+logic.interfaces.SpawnAttack <|.. logic.entity.characters.hybridCharacters.Barista
+logic.interfaces.HandleOwnWeapon <|.. logic.entity.characters.hybridCharacters.Barista
+logic.entity.characterClass.HybridClass <|-- logic.entity.characters.hybridCharacters.Barista
+logic.interfaces.Attackable <|.. logic.entity.Character
+logic.interfaces.Damageable <|.. logic.entity.Character
+logic.interfaces.AttackAnimation <|.. logic.entity.Character
+logic.interfaces.SpawnAttack <|.. logic.entity.characters.hybridCharacters.Exorcist
+logic.interfaces.UsesAmmo <|.. logic.entity.characters.hybridCharacters.Exorcist
+logic.entity.characterClass.HybridClass <|-- logic.entity.characters.hybridCharacters.Exorcist
+logic.interfaces.SpawnAttack <|.. logic.entity.characters.rangedCharacters.Bubble
+logic.interfaces.HandleOwnWeapon <|.. logic.entity.characters.rangedCharacters.Bubble
+logic.entity.characterClass.RangedClass <|-- logic.entity.characters.rangedCharacters.Bubble
+logic.entity.characterClass.MeleeClass <|-- logic.entity.characters.meleeCharacters.Hammer
+logic.entity.characterClass.MeleeClass <|-- logic.entity.characters.meleeCharacters.Pyro
+@enduml

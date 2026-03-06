@@ -103,11 +103,6 @@ public abstract class Character implements Attackable, Damageable, AttackAnimati
         this.setAttackSpeed(1.0F);
     }
 
-
-    public void moveLeft() {}
-    public void moveRight() {}
-    public void jump() {}
-
     /**
      * Performs character attack action.
      *
