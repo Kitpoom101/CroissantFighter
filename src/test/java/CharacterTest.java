@@ -31,7 +31,7 @@ class CharacterTest {
         character = new Katana();
         assertEquals("Katana", character.getName());
         assertEquals(200, character.getHp());
-        assertEquals(50, character.getAtk());
+        assertEquals(30, character.getAtk());
         assertEquals(7, character.getDef());
         assertEquals(1, character.getAttackRange());
         assertEquals(1.2F, character.getAttackSpeed());
@@ -66,7 +66,7 @@ class CharacterTest {
         assertEquals("Hammer", character.getName());
         assertEquals(200, character.getHp());
         assertEquals(200, character.getMaxHp());
-        assertEquals(60, character.getAtk());
+        assertEquals(40, character.getAtk());
         assertEquals(7, character.getDef());
         assertEquals(1, character.getAttackRange());
         assertEquals(0.6F, character.getAttackSpeed());
