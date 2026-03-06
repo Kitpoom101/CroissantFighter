@@ -2,49 +2,92 @@
 
 ## Welcome to CroissantFighter!!
 
-CroissantFighter is a **2-player fighting game built with Java and JavaFX**.  
-Players select characters with unique abilities and battle each other in a fast-paced arena.
+**CroissantFighter** is a **2-player fighting game built with Java and
+JavaFX**. Players select characters with unique abilities and battle
+each other in a fast-paced arena.
 
-Each character belongs to a different combat class, giving them different playstyles and strengths.
+Each character belongs to a different combat class, giving them
+different playstyles and strengths.
 
----
+------------------------------------------------------------------------
 
 ## 🎮 Features
 
-- Multiple playable characters
-- Different character classes:
-    - ⚔️ **Melee** – strong close combat fighters
-    - 🏹 **Ranged** – attack enemies from a distance
-    - 🧪 **Hybrid** – a mix of melee and ranged abilities
-- Character selection screen
-- Attack animations
-- Projectile-based combat for ranged characters
-- Local multiplayer gameplay
+-   Multiple playable characters
+-   Character selection screen
+-   Different combat classes
+  -   ⚔️ **Melee** -- strong close combat fighters
+  -   🏹 **Ranged** -- attack from a distance
+  -   🧪 **Hybrid** -- mix of melee and ranged abilities
+-   Attack animations
+-   Projectile combat system
+-   Local multiplayer gameplay
 
----
+------------------------------------------------------------------------
 
 ## 🛠 Technologies Used
 
-- **Java**
-- **JavaFX**
-- **Gradle**
-- **JUnit**
+-   Java
+-   JavaFX
+-   Gradle
+-   JUnit
 
----
+------------------------------------------------------------------------
 
 ## 🚀 How to Run the Game
 
-Make sure **Java** and **JavaFX** are installed.
-
-Locate where your javafx-sdk are installed and put it in the following command
+Make sure **Java** and **JavaFX** are installed on your machine.
 
 Run the game using the following command:
 
-```bash
+``` bash
 java --module-path "E:\javafx-sdk-25.0.1\lib" --add-modules javafx.controls,javafx.media -jar CroissantFighter-1-with-sources.jar
 ```
 
----
+If your JavaFX SDK is installed somewhere else, replace the path with
+your own JavaFX `lib` directory.
 
----
+------------------------------------------------------------------------
+
+## 📁 Project Structure
+
+    CroissantFighter
+    │
+    ├── src/
+    │   ├── main/
+    │   │   ├── java/          # All main game source code
+    │   │   │   ├── application
+    │   │   │   ├── component
+    │   │   │   └── logic
+    │   │   │
+    │   │   └── resources/     # Game assets
+    │   │       ├── animations
+    │   │       ├── sprites
+    │   │       ├── audio
+    │   │       └── images
+    │   │
+    │   └── test/
+    │       └── java/          # JUnit test files
+    │
+    ├── CharacterUML.png       # UML diagram of the character class structure
+    │
+    ├── build.gradle
+    ├── gradlew
+    └── README.md
+
+------------------------------------------------------------------------
+
+## 📊 UML Diagram
+
+The **class design of the characters** can be found in:
+
+    CharacterUML.png
+
+This diagram shows the inheritance structure between: - Base
+`Character` - `MeleeClass` - `RangedClass` - `HybridClass` - Individual
+playable characters.
+
+------------------------------------------------------------------------
+
+
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/IY9augGa)
