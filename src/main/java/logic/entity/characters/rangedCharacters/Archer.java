@@ -14,7 +14,7 @@ import logic.interfaces.SpawnAttack;
 public class Archer extends RangedClass implements SpawnAttack, HandleOwnWeapon {
     protected int originAttackRange;
     public Archer() {
-        super(125, 25, 3, 3, 0.75f, 3);
+        super(125, 35, 3, 3, 0.75f, 3);
         setName("Archer");
         setWeaponSprite("/animations/archer/attack/Bow.png");
 

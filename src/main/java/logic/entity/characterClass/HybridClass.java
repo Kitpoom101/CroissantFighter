@@ -9,7 +9,7 @@ import logic.interfaces.Attackable;
 public abstract class HybridClass extends Character implements Attackable {
 
     public HybridClass() {
-        super(150, 15, 5, 2, 1.0F, 150);
+        super(150, 20, 5, 2, 1.0F, 150);
         setBuff(10);
         setOrigin(getAtk());
     }

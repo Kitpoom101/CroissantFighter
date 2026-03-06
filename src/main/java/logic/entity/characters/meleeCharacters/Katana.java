@@ -19,7 +19,7 @@ public class Katana extends MeleeClass {
         super();
         setName("Katana");
         setTotalFrames(2);
-        setAtk(50);
+        setAtk(30);
         setAttackSpeed(1.2F);
         setFRAME_DURATION(100_000_000);// nano-sec
         setupAttackFrame(getTotalFrames());

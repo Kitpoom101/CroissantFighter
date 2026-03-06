@@ -24,7 +24,7 @@ public abstract class RangedClass extends Character
 
     // ===== Constructor =====
     public RangedClass() {
-        super(125, 25, 3, 3, 2.0F, 100);
+        super(125, 25, 3, 3, 2.0F, 125);
 
         setOrigin(getAttackRange());
 
