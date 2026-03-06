@@ -501,14 +501,25 @@ public class PlayerLogic {
             System.out.println("HIT!");
 
             // for calculating vampire damage
-            if (player.getCharacter() instanceof Vampire vampire){
-                player.getCharacter().setHp((int) Math.min(
-                            vampire.getMaxHp(),
-                            ((vampire.getAtk() - enemy.getCharacter().getDef() * 0.5)
-                                    * vampire.getLifeStealMultiplier())
-                                    + vampire.getHp()
-                        )
+            if (player.getCharacter() instanceof Vampire vampire) {
+
+                int oldHp = vampire.getHp();
+
+                int heal = (int) ((vampire.getAtk() - enemy.getCharacter().getDef() * 0.5)
+                        * vampire.getLifeStealMultiplier());
+
+                int newHp = (int) Math.min(
+                        vampire.getMaxHp(),
+                        oldHp + heal
                 );
+
+                int actualHeal = newHp - oldHp;
+
+                vampire.setHp(newHp);
+
+                if (actualHeal > 0) {
+                    Scene2.getInstance().showFloatingText(player, actualHeal, Color.LIMEGREEN, "+");
+                }
             }
         }
     }

@@ -92,7 +92,7 @@ public class Exorcist extends HybridClass implements SpawnAttack, UsesAmmo {
         );
 
         BaseProjectileAttack bullet = new BaseProjectileAttack(
-                this.atk,
+                (int) (this.atk * (3 - getCurrentAmmo() - 0.15)),
                 3f,
                 this.attackRange * 150,
                 startX,

@@ -49,10 +49,15 @@ public class Barista extends HybridClass implements SpawnAttack, HandleOwnWeapon
 
         float dirX = facingRight ? 1 : -1;
         float speed = 5.5f + (float)Math.random();
+        int damage = this.getAtk();
+
+        if (Math.random() < 0.25) { // 25% crit chance
+            damage *= 2; // 200% damage
+        }
 
         BaseProjectileAttack coffeeShot =
                 new BaseProjectileAttack(
-                        this.getAtk(),
+                        damage,
                         speed,
                         this.attackRange * 200,
                         startX,

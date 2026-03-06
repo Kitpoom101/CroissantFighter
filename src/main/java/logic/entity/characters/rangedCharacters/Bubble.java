@@ -37,8 +37,6 @@ public class Bubble extends RangedClass implements SpawnAttack, HandleOwnWeapon 
         super(125, 20, 4, 3, 0.5f, 1);
         setName("Bubble");
         setWeaponSprite("/animations/bubble/attack/atkprop/bubbleBlower.png");
-
-        setOrigin(getAtk());
     }
 
     /**
@@ -120,12 +118,6 @@ public class Bubble extends RangedClass implements SpawnAttack, HandleOwnWeapon 
      */
     @Override
     public void startAttack(Player self) {
-
-        setAttackState(AttackState.WillAttack);
-
-        ImageView blower = getWeaponSprite();
-
-        blowerStartTime = System.nanoTime();
     }
 
     /**
@@ -135,21 +127,6 @@ public class Bubble extends RangedClass implements SpawnAttack, HandleOwnWeapon 
      */
     @Override
     public void updateAttack(Player self) {
-
-        if (!getWeaponSprite().isVisible()) return;
-
-        long now = System.nanoTime();
-
-        if (now - blowerStartTime >= BLOWER_DURATION) {
-
-            getWeaponSprite().setVisible(false);
-
-            // 🔥 Reset state ONLY after finishing
-            setAttackState(AttackState.NotAttacking);
-
-            // return player to walk state
-            self.setState(logic.gameLogic.PlayerState.WALK);
-        }
     }
 
     /**
@@ -186,7 +163,7 @@ public class Bubble extends RangedClass implements SpawnAttack, HandleOwnWeapon 
      */
     @Override
     public void resetBuff() {
-        setAtk(getOrigin());
+
     }
 
 
