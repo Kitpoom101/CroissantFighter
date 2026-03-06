@@ -15,7 +15,7 @@ import logic.interfaces.SpawnAttack;
 /**
  * Archer ranged character that fires arrow projectiles.
  */
-public class Archer extends RangedClass implements SpawnAttack, HandleOwnWeapon {
+public class Archer extends RangedClass implements SpawnAttack {
     /** Original attack range used for skill reset. */
     protected int originAttackRange;
     /**
