@@ -15,7 +15,7 @@ public class Hammer extends MeleeClass {
     public Hammer() {
         super();
         setName("Hammer");
-        setAtk(60);
+        setAtk(40);
         setTotalFrames(2);
         setAttackSpeed(0.6F);
         setFRAME_DURATION(400_000_000);
