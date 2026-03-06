@@ -2,6 +2,7 @@ package application;
 
 import component.scene1.CharacterSelectScene;
 import javafx.application.Application;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 /**
@@ -25,6 +26,10 @@ public class Main extends Application {
                 new CharacterSelectScene();
 
         SceneHandler.init(primaryStage, characterSelectScene);
+
+        primaryStage.getIcons().add(new Image(
+                getClass().getResourceAsStream("/Missing.png")
+        ));
 
         primaryStage.setTitle("CroissantFighter");
         primaryStage.show();
