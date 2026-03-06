@@ -40,7 +40,7 @@ public class Player {
     public Player(Character character, int i) {
 
         Image image = new Image(
-                getClass().getResource("/animations/BaseIdleGif/Idle.gif").toExternalForm()
+                getClass().getResource("/animations/BaseIdleGif/Idle.GIF").toExternalForm()
         );
 
         setCharacter(character);

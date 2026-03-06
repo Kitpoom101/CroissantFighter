@@ -20,7 +20,7 @@ public abstract class MeleeClass extends Character implements Attackable, HaveWe
      * Creates a melee character with default melee archetype stats.
      */
     public MeleeClass() {
-        super(200, 20, 7, 1, 1.0F, 250);
+        super(200, 20, 7, 1, 1.0F, 200);
         setBuff(15);
         setOrigin(getDef());
     }

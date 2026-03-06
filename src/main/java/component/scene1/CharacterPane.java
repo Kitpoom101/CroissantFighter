@@ -39,9 +39,9 @@ public class CharacterPane extends StackPane {
     /** Character model represented by this pane. */
     private Character character;
     /** Normal (unselected) pane background. */
-    private final Image charBG = new Image(ClassLoader.getSystemResource("CharPaneBg.png").toString());
+    private final Image charBG = new Image(getClass().getResource("/CharPaneBG.png").toExternalForm());
     /** Selected pane background. */
-    private final Image charBGSelect = new Image(ClassLoader.getSystemResource("CharPaneSelect.png").toString());
+    private final Image charBGSelect = new Image(getClass().getResource("/CharPaneSelect.png").toExternalForm());
 
     /** Available character instances indexed to UI card positions. */
     private ArrayList<Character> characterList = new ArrayList<>();

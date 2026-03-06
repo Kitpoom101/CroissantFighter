@@ -6,12 +6,13 @@ import logic.entity.AttackData;
 import logic.entity.BaseProjectileAttack;
 import logic.entity.characterClass.HybridClass;
 import logic.gameLogic.Player;
+import logic.interfaces.HandleOwnWeapon;
 import logic.interfaces.SpawnAttack;
 
 /**
  * Barista hybrid character that throws coffee projectiles with slight arc and knockback.
  */
-public class Barista extends HybridClass implements SpawnAttack {
+public class Barista extends HybridClass implements SpawnAttack, HandleOwnWeapon {
     /**
      * Creates Barista with custom stats.
      *

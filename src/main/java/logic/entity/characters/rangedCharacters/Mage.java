@@ -23,7 +23,7 @@ public class Mage extends RangedClass implements SpawnAttack, HandleOwnWeapon {
      * Creates Mage with tuned stats and staff sprite.
      */
     public Mage() {
-        super(100, 30, 2, 4, 0.5f, 5);
+        super(125, 30, 2, 4, 0.5f, 5);
         setName("Mage");
         setWeaponSprite("/animations/mage/staff.png");
     }

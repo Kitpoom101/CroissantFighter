@@ -58,7 +58,7 @@ public class Pyro extends MeleeClass {
 
         for (int i = 0; i < totalFrame; i++) {
             String path =
-                    "/animations/pyro/attack/frame" + (i + 1) + ".png";
+                    "/animations/Pyro/attack/frame" + (i + 1) + ".png";
             attackFrames[i] = new Image(
                     getClass().getResource(path).toExternalForm());
         }

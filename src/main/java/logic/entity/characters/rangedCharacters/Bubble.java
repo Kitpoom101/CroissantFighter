@@ -34,7 +34,7 @@ public class Bubble extends RangedClass implements SpawnAttack, HandleOwnWeapon 
      * Creates Bubble with tuned stats and weapon sprite.
      */
     public Bubble() {
-        super(150, 20, 4, 3, 0.5f, 1);
+        super(125, 20, 4, 3, 0.5f, 1);
         setName("Bubble");
         setWeaponSprite("/animations/bubble/attack/atkprop/bubbleBlower.png");
 

@@ -1,16 +1,6 @@
 package logic.interfaces;
 
-<<<<<<< HEAD
-public interface UsesAmmo {
-    void reload();
-    void updateAmmo();
-    boolean canShoot();
-    void consumeAmmo();
-    int getCurrentAmmo();
-    int getMaxAmmo();
-    boolean isReloading();
-}
-=======
+
 /**
  * Contract for characters that use an ammo/reload shooting model.
  */
@@ -52,4 +42,3 @@ public interface UsesAmmo {
      */
     boolean isReloading();
 }
->>>>>>> 23ef68f25df49dd0ac9dde91c9c2c97d542dee1b

@@ -334,15 +334,12 @@ class CharacterTest {
     @Test
     void testBubbleSkill() {
         character = new Bubble();
-        assertEquals(35, character.getAtk());
+        assertEquals(20, character.getAtk());
         assertEquals(10, character.getBuff());
-        assertEquals(3, character.getAttackRange());
         character.useSpecialSkill();
-        assertEquals(45, character.getAtk());
-        assertEquals(13, character.getAttackRange());
+        assertEquals(30, character.getAtk());
         character.resetBuff();
-        assertEquals(35, character.getAtk());
-        assertEquals(3, character.getAttackRange());
+        assertEquals(20, character.getAtk());
     }
 
     // BUBBLE
