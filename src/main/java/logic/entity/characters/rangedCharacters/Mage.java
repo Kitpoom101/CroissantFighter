@@ -14,23 +14,51 @@ import logic.interfaces.HandleOwnWeapon;
 import logic.interfaces.HaveWeapon;
 import logic.interfaces.SpawnAttack;
 
+
+/**
+ * Mage ranged character that throws tarot-card projectiles with random effects.
+ */
 public class Mage extends RangedClass implements SpawnAttack, HandleOwnWeapon {
+    /**
+     * Creates Mage with tuned stats and staff sprite.
+     */
     public Mage() {
-        super(125, 30, 2, 4, 0.5f, 5);
+        super(100, 30, 2, 4, 0.5f, 5);
         setName("Mage");
         setWeaponSprite("/animations/mage/staff.png");
     }
 
+    /**
+     * Not used directly; ranged attacks should be routed via {@code tryAttack}.
+     *
+     * @param startX spawn X
+     * @param startY spawn Y
+     * @param facingRight facing direction
+     * @param player owning player
+     */
     @Override
     public void attack(float startX, float startY, boolean facingRight, Player player) {
 
     }
 
+    /**
+     * Mage uses projectile attack model, so melee attack data is unused.
+     *
+     * @return {@code null}
+     */
     @Override
     public AttackData getAttackData() {
         return null;
     }
 
+    /**
+     * Spawns tarot projectile and applies card-specific effects before firing.
+     *
+     * @param startX spawn X
+     * @param startY spawn Y
+     * @param facingRight facing direction
+     * @param p owning player
+     */
     @Override
     protected void spawnRangedAttack(
             float startX,
@@ -95,31 +123,57 @@ public class Mage extends RangedClass implements SpawnAttack, HandleOwnWeapon {
         AudioManager.playSFX("/audio/sfx/attack/mage/cardThrow.mp3");
     }
 
+    /**
+     * Delegates start behavior to ranged base class.
+     *
+     * @param self owning player
+     */
     @Override
     public void startAttack(Player self) {
         super.startAttack(self);
     }
 
+    /**
+     * Not used for Mage projectile attacks.
+     *
+     * @param totalFrame frame count
+     */
     @Override
     public void setupAttackFrame(int totalFrame) {
 
     }
 
+    /**
+     * Completion is controlled by ranged base state.
+     *
+     * @return always {@code false}
+     */
     @Override
     public boolean isAttackFinished() {
         return false;
     }
 
+
+    /**
+     * Mage skill heals by buff amount.
+     */
     @Override
     public void useSpecialSkill() {
         setHp(getHp() + getBuff());
     }
 
+
+    /**
+     * Mage heal skill has no additional reset behavior.
+     */
     @Override
     public void resetBuff(){
 
     }
 
+    /**
+     * Performs reload and plays Mage-specific reload SFX.
+     */
     @Override
     public void reload() {
         super.reload();

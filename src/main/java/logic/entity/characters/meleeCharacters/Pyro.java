@@ -6,12 +6,27 @@ import logic.entity.characterClass.MeleeClass;
 import logic.gameLogic.AttackState;
 import logic.gameLogic.Player;
 
+/**
+ * Pyro melee character with very fast single-frame strike timing.
+ */
 public class Pyro extends MeleeClass {
+    /**
+     * Creates Pyro with custom stats.
+     *
+     * @param hp HP value
+     * @param atk attack value
+     * @param def defense value
+     * @param attackRange range value
+     * @param attackSpeed attack speed
+     */
     public Pyro(int hp, int atk, int def, int attackRange, float attackSpeed) {
         super(hp, atk, def, attackRange, attackSpeed);
         setName("Pyro");
     }
 
+    /**
+     * Creates Pyro with default tuned stats and animation setup.
+     */
     public Pyro() {
         super();
         setTotalFrames(1);
@@ -21,12 +36,22 @@ public class Pyro extends MeleeClass {
         setupAttackFrame(getTotalFrames());
     }
 
+    /**
+     * Returns Pyro melee hitbox size.
+     *
+     * @return attack data
+     */
     @Override
     public AttackData getAttackData() {
         return new AttackData(150, 120);
     }
 
 
+    /**
+     * Loads Pyro attack frame resources.
+     *
+     * @param totalFrame total frame count to load
+     */
     @Override
     public void setupAttackFrame(int totalFrame) {
         attackFrames = new Image[totalFrame];
@@ -39,6 +64,11 @@ public class Pyro extends MeleeClass {
         }
     }
 
+    /**
+     * Updates animation and immediately flags strike frame.
+     *
+     * @param self owning player
+     */
     @Override
     public void updateAttack(Player self) {
         super.updateAttack(self);

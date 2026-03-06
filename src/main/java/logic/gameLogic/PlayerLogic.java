@@ -27,68 +27,106 @@ import logic.interfaces.HaveWeapon;
 import logic.interfaces.OwnWeaponPos;
 import logic.interfaces.UsesAmmo;
 
+
 import java.security.Key;
 
+/**
+ * Runtime controller for a single player.
+ * <p>
+ * Handles input mapping, movement physics, attacks, skill activation/cooldown,
+ * hit detection, and visual combat feedback.
+ * </p>
+ */
 public class PlayerLogic {
 
-    // store player
+    /** Controlled player instance. */
     private Player player;
+    /** Opponent player instance used for collision and damage calculations. */
     private Player enemy;
+    /** Player slot number used to select key bindings. */
     private int playerNum;
 
-    // store keycode
+    /** Key binding for moving left. */
     private KeyCode leftKey;
+    /** Key binding for moving right. */
     private KeyCode rightKey;
+    /** Key binding for normal attack. */
     private KeyCode attackKey;
+    /** Key binding for skill usage. */
     private KeyCode specialAttackKey;
+
+    /** Key binding for jump. */
     private KeyCode jumpKey;
+    /** Key binding for manual reload (ammo classes). */
     private KeyCode reloadKey;
 
-    // ====== JUMP =======
+    /** Vertical velocity used by jump/gravity simulation. */
     private double velocityY = 0;
 
+    /** Gravity acceleration per frame. */
     private final double GRAVITY = 0.3;
+    /** Initial jump impulse. */
     private final double JUMP_FORCE = -12;
+    /** Maximum downward fall speed clamp. */
     private final double MAX_FALL_SPEED = 7;
 
+    /** True when character stands on the ground. */
     private boolean onGround = true;
 
-    // ====== HITBOX ===== //
+    /** Temporary melee attack hitbox node. */
     private Rectangle attackHitbox;
 
+    /** True when an attack action is currently active. */
     private boolean attacking = false;
+    /** Timestamp when temporary attack hitbox became visible. */
     private long hitboxStartTime = 0;
+    /** Lifespan of temporary melee hitbox in nanoseconds. */
     private final long HITBOX_DURATION = 500_000_000L; // 0.5 sec in nanoseconds
-    // ====== HITBOX ===== //
 
-    // Attack
+    /** Timestamp of last attack used for attack-speed cooldown checks. */
     private long lastAttackTime = 0;
+    /** Prevents repeated attack trigger while attack key is held down. */
     private boolean attackHeld = false;
 
-    // store movement
+    /** Left movement input state. */
     private boolean moveLeft;
+    /** Right movement input state. */
     private boolean moveRight;
 
-    // attack charge eg. ammo
+
+    /** UI text showing ammo/reload information for ammo-based characters. */
     private Text ammoText;
 
+    /** Legacy movement speed constant (currently unused). */
     private final double speed = 5;
 
-    // ===== Skill ===== //
+    /** True while a temporary skill buff is currently active. */
     private boolean skillActive = false;
+    /** Cooldown duration for skill recharge in nanoseconds. */
     private static final long SKILL_COOLDOWN_NANOS = 8_000_000_000L;
+    /** Start timestamp for current cooldown cycle, or {@code -1L} when inactive. */
     private long skillCooldownStartNanos = -1L;
 
+    /** UI text showing skill buff activation feedback. */
     private Text buffText;
 
-    /* ===== MOVEMENT PHYSICS ===== */
-
+    /** Horizontal velocity used by acceleration/friction movement model. */
     private double velocityX = 0;
 
+    /** Horizontal acceleration per frame while movement key is pressed. */
     private final double ACCELERATION = 0.4;
+    /** Maximum horizontal speed clamp. */
     private final double MAX_SPEED = 3;
+    /** Friction multiplier applied every frame. */
     private final double FRICTION = 0.85;
 
+    /**
+     * Creates a controller for one player and sets up default key bindings and UI helpers.
+     *
+     * @param player controlled player
+     * @param enemy opposing player
+     * @param i player index used for input scheme selection
+     */
     public PlayerLogic(Player player, Player enemy, int i) {
         this.player = player;
         this.enemy = enemy;
@@ -135,7 +173,11 @@ public class PlayerLogic {
 
     /* ---------- INPUT ---------- */
 
-    /* KEY PRESSED */
+    /**
+     * Handles key-press input for movement, attack, jump, reload, and skill activation.
+     *
+     * @param event JavaFX key event
+     */
     public void handleKeyPressed(KeyEvent event) {
 
         if(event.getCode() == leftKey)
@@ -188,7 +230,11 @@ public class PlayerLogic {
         }
     }
 
-    /* KEY RELEASED */
+    /**
+     * Handles key-release input and clears hold-state flags.
+     *
+     * @param event JavaFX key event
+     */
     public void handleKeyReleased(KeyEvent event) {
 
         if(event.getCode() == leftKey)
@@ -202,6 +248,9 @@ public class PlayerLogic {
         }
     }
 
+    /**
+     * Activates the character special skill, applies buff text, and starts cooldown flow.
+     */
     private void skill() {
 
         if(skillActive) return;
@@ -261,6 +310,9 @@ public class PlayerLogic {
         startSkillCooldown();
     }
 
+    /**
+     * Starts/restarts skill cooldown timer and transitions skill state back to usable when done.
+     */
     private void startSkillCooldown(){
 
         player.getCharacter()
@@ -279,6 +331,11 @@ public class PlayerLogic {
         cooldown.play();
     }
 
+    /**
+     * Returns normalized cooldown progress for skill bar rendering.
+     *
+     * @return progress in range {@code [0.0, 1.0]}
+     */
     public double getSkillCooldownProgress() {
         SkillState state = player.getCharacter().getSkillState();
         if (state == SkillState.CanUseSkill) {
@@ -292,6 +349,11 @@ public class PlayerLogic {
         return Math.max(0.0, Math.min((double) elapsed / SKILL_COOLDOWN_NANOS, 1.0));
     }
 
+    /**
+     * Plays temporary buff message animation above the controlled character.
+     *
+     * @param message text to display
+     */
     private void showBuffText(String message){
 
         buffText.setText(message);
@@ -320,10 +382,18 @@ public class PlayerLogic {
         sequence.play();
     }
 
+    /**
+     * Returns the buff message text node for scene attachment.
+     *
+     * @return buff text node
+     */
     public Text getBuffText() {
         return buffText;
     }
 
+    /**
+     * Executes attack behavior based on current character type (ranged/hybrid/melee).
+     */
     private void attack() {
         attacking = true;
 
@@ -410,6 +480,9 @@ public class PlayerLogic {
         checkHit();
     }
 
+    /**
+     * Checks melee hitbox intersection against enemy hitbox and applies damage/lifesteal.
+     */
     private void checkHit() {
 
         if (attackHitbox.getBoundsInParent()
@@ -440,11 +513,18 @@ public class PlayerLogic {
         }
     }
 
+    /**
+     * Returns the active attack hitbox node for rendering/debugging.
+     *
+     * @return attack hitbox rectangle
+     */
     public Rectangle getAttackHitbox() {
         return attackHitbox;
     }
 
-    /* CALLED EVERY FRAME */
+    /**
+     * Per-frame update entry point for movement, physics, attack flow, and UI helpers.
+     */
     public void update() {
 
         /* acceleration */
@@ -542,6 +622,9 @@ public class PlayerLogic {
 
     }
 
+    /**
+     * Hides the temporary melee hitbox after its configured lifetime expires.
+     */
     private void updateHitboxTimer() {
 
         if(!attackHitbox.isVisible()) return;
@@ -553,6 +636,9 @@ public class PlayerLogic {
         }
     }
 
+    /**
+     * Updates weapon animation frames and triggers attack execution at hit frames.
+     */
     private void attackAnimation(){
         if(player.getState() == PlayerState.ATTACK && player.getCharacter() instanceof HaveWeapon){
             player.getWeaponSprite().setVisible(true);
@@ -570,6 +656,9 @@ public class PlayerLogic {
         }
     }
 
+    /**
+     * Unlocks next attack when attack-speed cooldown interval has elapsed.
+     */
     private void handleAttackSpeed() {
 
         if(player.getCharacter().getAttackState() != AttackState.AttackCooldown)
@@ -583,6 +672,11 @@ public class PlayerLogic {
         }
     }
 
+    /**
+     * Computes minimum nanosecond interval between attacks from character attack speed.
+     *
+     * @return attack interval in nanoseconds
+     */
     private long getAttackInterval() {
         float attackSpeed =
                 player.getCharacter().getAttackSpeed();
@@ -590,6 +684,9 @@ public class PlayerLogic {
         return (long)(1_000_000_000L / attackSpeed);
     }
 
+    /**
+     * Keeps weapon sprite aligned to player orientation and position.
+     */
     private void weaponSpriteFollow() {
         if (player.getCharacter() instanceof HaveWeapon){
             Group body = player.getPlayerRoot();
@@ -621,6 +718,13 @@ public class PlayerLogic {
         }
     }
 
+
+    /**
+     * Applies custom weapon position offsets for vampire animations.
+     *
+     * @param body player root node
+     * @param right true when facing right, false when facing left
+     */
     private void vampireWeapon(Group body, boolean right) {
         if (right){
             if (player.getCharacter().getFrameIndex() == 0) {
@@ -657,6 +761,10 @@ public class PlayerLogic {
         }
     }
 
+
+    /**
+     * Clamps player horizontal position inside arena bounds.
+     */
     private void clampToArenaBounds() {
         if (!(player.getPlayerRoot().getParent() instanceof Region arena)) {
             return;
@@ -680,6 +788,10 @@ public class PlayerLogic {
         }
     }
 
+
+    /**
+     * Resolves simple ground collision and resets vertical motion when touching ground.
+     */
     private void checkGroundCollision() {
 
         if (!(player.getPlayerRoot().getParent() instanceof Region arena))
@@ -696,6 +808,12 @@ public class PlayerLogic {
         }
     }
 
+
+    /**
+     * Returns the ammo text node used by ammo-based characters.
+     *
+     * @return ammo text node
+     */
     public Text getAmmoText() {
         return ammoText;
     }

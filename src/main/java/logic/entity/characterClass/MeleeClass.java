@@ -8,10 +8,19 @@ import logic.gameLogic.PlayerState;
 import logic.interfaces.Attackable;
 import logic.interfaces.HaveWeapon;
 
+/**
+ * Base class for melee characters.
+ * <p>
+ * Provides close-range attack animation flow and defense-based skill buff behavior.
+ * </p>
+ */
 public abstract class MeleeClass extends Character implements Attackable, HaveWeapon {
 
+    /**
+     * Creates a melee character with default melee archetype stats.
+     */
     public MeleeClass() {
-        super(200, 20, 7, 1, 1.0F, 200);
+        super(200, 20, 7, 1, 1.0F, 250);
         setBuff(15);
         setOrigin(getDef());
     }
@@ -22,26 +31,51 @@ public abstract class MeleeClass extends Character implements Attackable, HaveWe
     }
 
 
+    /**
+     * Creates a melee character with custom stats.
+     *
+     * @param hp HP value
+     * @param atk attack value
+     * @param def defense value
+     * @param attackRange range value
+     * @param attackSpeed attack speed
+     */
     public MeleeClass(int hp, int atk, int def, int attackRange, float attackSpeed) {
         super(hp, atk, def, attackRange, attackSpeed, 250);
 
     }
 
+    /**
+     * Temporarily increases defense by buff amount.
+     */
     @Override
     public void useSpecialSkill() {
         setDef(getDef() + getBuff());
     }
 
+    /**
+     * Restores defense to pre-buff origin value.
+     */
     @Override
     public void resetBuff(){
         setDef(getOrigin());
     }
 
+    /**
+     * Returns melee hitbox data.
+     *
+     * @return attack data, or {@code null} when overridden subtype not configured
+     */
     @Override
     public AttackData getAttackData() {
         return null;
     }
 
+    /**
+     * Initializes melee attack animation state.
+     *
+     * @param self owning player
+     */
     @Override
     public void startAttack(Player self) {
         frameIndex = 0;
@@ -50,6 +84,11 @@ public abstract class MeleeClass extends Character implements Attackable, HaveWe
         if (attackFrames.length > 0) self.getWeaponSprite().setImage(attackFrames[0]);
     }
 
+    /**
+     * Updates melee animation frame progression.
+     *
+     * @param self owning player
+     */
     @Override
     public void updateAttack(Player self) {
 
@@ -77,6 +116,11 @@ public abstract class MeleeClass extends Character implements Attackable, HaveWe
 //        }
     }
 
+    /**
+     * Indicates whether melee animation sequence has finished.
+     *
+     * @return finished state
+     */
     public boolean isAttackFinished(){
         return this.finished;
     }

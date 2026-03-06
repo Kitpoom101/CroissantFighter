@@ -4,14 +4,24 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
+/**
+ * Displays a compact skill cooldown bar.
+ */
 public class SkillBar extends Pane {
 
+    /** Fixed width for the skill bar in pixels. */
     private static final double BAR_WIDTH = 220;
+    /** Fixed height for the skill bar in pixels. */
     private static final double BAR_HEIGHT = 16;
 
+    /** Static red layer that indicates the full cooldown area. */
     private final Rectangle cooldownBackground;
+    /** Dynamic yellow layer that grows as cooldown progress increases. */
     private final Rectangle chargeForeground;
 
+    /**
+     * Creates a new skill bar with red base and empty yellow charge.
+     */
     public SkillBar() {
         setPrefSize(BAR_WIDTH, BAR_HEIGHT);
 
@@ -30,6 +40,12 @@ public class SkillBar extends Pane {
         getChildren().addAll(cooldownBackground, chargeForeground);
     }
 
+    /**
+     * Updates the cooldown progress shown by the yellow fill.
+     *
+     * @param progress cooldown progress in range {@code [0.0, 1.0]}.
+     *                 Values outside the range are clamped.
+     */
     public void setCooldownProgress(double progress) {
         double clamped = Math.max(0.0, Math.min(progress, 1.0));
         chargeForeground.setWidth(BAR_WIDTH * clamped);

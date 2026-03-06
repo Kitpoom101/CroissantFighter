@@ -1,0 +1,11 @@
+application
+component.scene1
+component.scene2
+logic.audio
+logic.entity
+logic.entity.characterClass
+logic.entity.characters.hybridCharacters
+logic.entity.characters.meleeCharacters
+logic.entity.characters.rangedCharacters
+logic.gameLogic
+logic.interfaces

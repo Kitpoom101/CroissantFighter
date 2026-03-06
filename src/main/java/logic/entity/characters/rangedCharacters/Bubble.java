@@ -13,32 +13,67 @@ import logic.interfaces.HandleOwnWeapon;
 import logic.interfaces.HaveWeapon;
 import logic.interfaces.SpawnAttack;
 
+
+/**
+ * Bubble ranged character that emits multiple bubble projectiles per shot.
+ */
 public class Bubble extends RangedClass implements SpawnAttack, HandleOwnWeapon {
 
+    /** Minimum randomized ammo size after reload. */
     private static final int MIN_AMMO = 1;
+    /** Maximum randomized ammo size after reload. */
     private static final int MAX_AMMO = 5;
 
+    /** Timestamp when blower visual was shown. */
     private long blowerStartTime;
+    /** Duration blower visual remains visible. */
     private static final long BLOWER_DURATION = 1_000_000_000L;
 
+
+    /**
+     * Creates Bubble with tuned stats and weapon sprite.
+     */
     public Bubble() {
-        super(125, 20, 4, 3, 0.5f, 1);
+        super(150, 20, 4, 3, 0.5f, 1);
         setName("Bubble");
         setWeaponSprite("/animations/bubble/attack/atkprop/bubbleBlower.png");
 
         setOrigin(getAtk());
     }
 
+    /**
+     * Not used directly; ranged attacks are spawned via {@code tryAttack}.
+     *
+     * @param startX spawn X
+     * @param startY spawn Y
+     * @param facingRight facing direction
+     * @param player owning player
+     */
     @Override
     public void attack(float startX, float startY, boolean facingRight, Player player) {
 
     }
 
+
+    /**
+     * Bubble uses projectile attack so hitbox attack data is unused.
+     *
+     * @return {@code null}
+     */
     @Override
     public AttackData getAttackData() {
         return null;
     }
 
+
+    /**
+     * Spawns a burst of bubbles with varied scale/speed/range values.
+     *
+     * @param startX spawn X
+     * @param startY spawn Y
+     * @param facingRight facing direction
+     * @param p owning player
+     */
     @Override
     protected void spawnRangedAttack(
             float startX,
@@ -78,6 +113,11 @@ public class Bubble extends RangedClass implements SpawnAttack, HandleOwnWeapon 
         }
     }
 
+    /**
+     * Starts Bubble attack by setting strike state and blower timer.
+     *
+     * @param self owning player
+     */
     @Override
     public void startAttack(Player self) {
 
@@ -88,6 +128,11 @@ public class Bubble extends RangedClass implements SpawnAttack, HandleOwnWeapon 
         blowerStartTime = System.nanoTime();
     }
 
+    /**
+     * Hides blower sprite after configured duration and resets attack state.
+     *
+     * @param self owning player
+     */
     @Override
     public void updateAttack(Player self) {
 
@@ -107,26 +152,47 @@ public class Bubble extends RangedClass implements SpawnAttack, HandleOwnWeapon 
         }
     }
 
+    /**
+     * Not used for Bubble projectile attacks.
+     *
+     * @param totalFrame frame count
+     */
     @Override
     public void setupAttackFrame(int totalFrame) {
 
     }
 
+    /**
+     * Completion is controlled by state and visual timer.
+     *
+     * @return always {@code false}
+     */
     @Override
     public boolean isAttackFinished() {
         return false;
     }
 
+
+    /**
+     * Bubble skill increases attack value.
+     */
     @Override
     public void useSpecialSkill() {
         setAtk(getAtk() + getBuff());
     }
 
+    /**
+     * Restores attack to origin value.
+     */
     @Override
     public void resetBuff() {
         setAtk(getOrigin());
     }
 
+
+    /**
+     * Reloads and randomizes ammo size between configured min/max bounds.
+     */
     @Override
     public void reload() {
         super.reload();
