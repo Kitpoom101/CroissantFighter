@@ -28,7 +28,7 @@ public class Main extends Application {
         SceneHandler.init(primaryStage, characterSelectScene);
 
         primaryStage.getIcons().add(new Image(
-                getClass().getResourceAsStream("/Missing.png")
+                getClass().getResourceAsStream("/logo.png")
         ));
 
         primaryStage.setTitle("CroissantFighter");

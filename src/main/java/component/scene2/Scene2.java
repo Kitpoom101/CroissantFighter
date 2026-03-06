@@ -322,10 +322,10 @@ public class Scene2 extends Pane {
                             AudioManager.playSFX("/audio/sfx/attack/breakingDishes.mp3");
                         }
 
-                        int finalDamage = damage - target.getCharacter().getDef();
-                        if (finalDamage > 0) {
+                        int finalDamage = Math.max(1, damage - target.getCharacter().getDef());
+                        //if (finalDamage > 0) {
                             showFloatingText(target, finalDamage, Color.DARKRED, "-");
-                        }
+                        //}
                         // Remove projectile visual from scene and list from simulation.
                         getChildren().remove(p.getSprite());
                         iterator.remove();
@@ -435,8 +435,8 @@ public class Scene2 extends Pane {
         getChildren().add(p.getSprite());
         // Ensure projectile appears above most scene nodes.
         p.getSprite().toFront();
-        System.out.println("Projectile added");
-        System.out.println(p.getDamage());
+        //System.out.println("Projectile added");
+        //System.out.println(p.getDamage());
     }
 
     /**

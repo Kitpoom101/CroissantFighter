@@ -14,10 +14,6 @@ import logic.interfaces.HandleOwnWeapon;
 import logic.interfaces.HaveWeapon;
 import logic.interfaces.SpawnAttack;
 
-
-/**
- * Mage ranged character that throws tarot-card projectiles with random effects.
- */
 public class Mage extends RangedClass implements SpawnAttack, HandleOwnWeapon {
     /**
      * Creates Mage with tuned stats and staff sprite.
@@ -28,41 +24,18 @@ public class Mage extends RangedClass implements SpawnAttack, HandleOwnWeapon {
         super(125, 30, 2, 4, 0.5f, 5);
         setName("Mage");
         setWeaponSprite("/animations/mage/staff.png");
-        setOrigin(getAtk());
-        setOriginAttackRange(getAttackRange());
     }
 
-    /**
-     * Not used directly; ranged attacks should be routed via {@code tryAttack}.
-     *
-     * @param startX spawn X
-     * @param startY spawn Y
-     * @param facingRight facing direction
-     * @param player owning player
-     */
     @Override
     public void attack(float startX, float startY, boolean facingRight, Player player) {
 
     }
 
-    /**
-     * Mage uses projectile attack model, so melee attack data is unused.
-     *
-     * @return {@code null}
-     */
     @Override
     public AttackData getAttackData() {
         return null;
     }
 
-    /**
-     * Spawns tarot projectile and applies card-specific effects before firing.
-     *
-     * @param startX spawn X
-     * @param startY spawn Y
-     * @param facingRight facing direction
-     * @param p owning player
-     */
     @Override
     protected void spawnRangedAttack(
             float startX,
@@ -87,22 +60,30 @@ public class Mage extends RangedClass implements SpawnAttack, HandleOwnWeapon {
                 break;
             case DEATH:
                 damage *= 1.5;
-                this.takeDamage((int)(this.getHp() * 0.25f));
+                int sacrifice = (int) (this.getHp() * 0.25F);
+                this.takeDamage(sacrifice);
+
+                if (sacrifice > 0) {
+                    Scene2.getInstance().showFloatingText(p, sacrifice, Color.DARKRED, "-");
+                }
+
                 break;
+
             case EMPRESS:
-                int heal = (int) (getMaxHp() * 0.2f);
-
-                int oldHp = getHp();
-                int newHp = Math.min(getMaxHp(), oldHp + heal);
-                int actualHeal = newHp - oldHp;
-
-                this.setHp(newHp);
-
-                damage *= 0.8;
+                int healAmount = (int) (this.getMaxHp() * 0.2f);
+                int actualHeal = Math.min(healAmount, this.getMaxHp() - this.getHp());
+                this.setHp(this.getHp() + actualHeal);
 
                 if (actualHeal > 0) {
-                    Scene2.getInstance().showFloatingText(p, actualHeal, Color.LIMEGREEN, "+");
+                    Scene2.getInstance().showFloatingText(
+                            p,
+                            actualHeal,
+                            Color.LIMEGREEN,
+                            "+"
+                    );
                 }
+
+                damage *= 0.8;
                 break;
         }
 
@@ -133,68 +114,34 @@ public class Mage extends RangedClass implements SpawnAttack, HandleOwnWeapon {
         AudioManager.playSFX("/audio/sfx/attack/mage/cardThrow.mp3");
     }
 
-    /**
-     * Delegates start behavior to ranged base class.
-     *
-     * @param self owning player
-     */
     @Override
     public void startAttack(Player self) {
         super.startAttack(self);
     }
 
-    /**
-     * Not used for Mage projectile attacks.
-     *
-     * @param totalFrame frame count
-     */
     @Override
     public void setupAttackFrame(int totalFrame) {
 
     }
 
-    /**
-     * Completion is controlled by ranged base state.
-     *
-     * @return always {@code false}
-     */
     @Override
     public boolean isAttackFinished() {
         return false;
     }
 
-
-    /**
-     * Mage skill heals by buff amount.
-     */
     @Override
     public void useSpecialSkill() {
-        setAttackRange(getAttackRange() + getBuff());
+        setHp(getHp() + getBuff());
     }
 
-
-    /**
-     * Mage heal skill has no additional reset behavior.
-     */
     @Override
     public void resetBuff(){
-        setAttackRange(getOriginAttackRange());
+
     }
 
-    /**
-     * Performs reload and plays Mage-specific reload SFX.
-     */
     @Override
     public void reload() {
         super.reload();
         AudioManager.playSFX("/audio/sfx/attack/mage/cardReload.mp3");
-    }
-
-    public int getOriginAttackRange() {
-        return originAttackRange;
-    }
-
-    public void setOriginAttackRange(int originAttackRange) {
-        this.originAttackRange = originAttackRange;
     }
 }

@@ -27,6 +27,12 @@ class CharacterTest {
         katana = new Katana();
     }
 
+    @Test
+    void testNegativeHP(){
+        katana.setHp(-10);
+        assertEquals(0, katana.getHp());
+    }
+
     // ==== MELEE ==== //
 
     // KATANA
