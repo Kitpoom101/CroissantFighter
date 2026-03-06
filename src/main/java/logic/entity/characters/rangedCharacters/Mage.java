@@ -15,10 +15,14 @@ import logic.interfaces.HaveWeapon;
 import logic.interfaces.SpawnAttack;
 
 public class Mage extends RangedClass implements SpawnAttack, HandleOwnWeapon {
+    protected int originAttackRange;
+
     public Mage() {
         super(100, 30, 2, 4, 0.5f, 5);
         setName("Mage");
         setWeaponSprite("/animations/mage/staff.png");
+        setOrigin(getAtk());
+        setOriginAttackRange(getAttackRange());
     }
 
     @Override
@@ -58,13 +62,19 @@ public class Mage extends RangedClass implements SpawnAttack, HandleOwnWeapon {
                 this.takeDamage((int)(this.getHp() * 0.25f));
                 break;
             case EMPRESS:
-                this.setHp(
-                        Math.min(
-                                getMaxHp(),
-                                getHp() + (int)(getMaxHp() * 0.2f)
-                        )
-                );
+                int heal = (int) (getMaxHp() * 0.2f);
+
+                int oldHp = getHp();
+                int newHp = Math.min(getMaxHp(), oldHp + heal);
+                int actualHeal = newHp - oldHp;
+
+                this.setHp(newHp);
+
                 damage *= 0.8;
+
+                if (actualHeal > 0) {
+                    Scene2.getInstance().showFloatingText(p, actualHeal, Color.LIMEGREEN, "+");
+                }
                 break;
         }
 
@@ -112,17 +122,25 @@ public class Mage extends RangedClass implements SpawnAttack, HandleOwnWeapon {
 
     @Override
     public void useSpecialSkill() {
-        setHp(getHp() + getBuff());
+        setAttackRange(getAttackRange() + getBuff());
     }
 
     @Override
     public void resetBuff(){
-
+        setAttackRange(getOriginAttackRange());
     }
 
     @Override
     public void reload() {
         super.reload();
         AudioManager.playSFX("/audio/sfx/attack/mage/cardReload.mp3");
+    }
+
+    public int getOriginAttackRange() {
+        return originAttackRange;
+    }
+
+    public void setOriginAttackRange(int originAttackRange) {
+        this.originAttackRange = originAttackRange;
     }
 }

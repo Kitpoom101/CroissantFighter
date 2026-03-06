@@ -67,28 +67,10 @@ public abstract class RangedClass extends Character
     // ===== Animation =====
     @Override
     public void startAttack(Player self) {
-        frameIndex = 0;
-        finished = false;
-        lastFrameTime = System.nanoTime();
-
-        setAttackState(AttackState.Attacking);
     }
 
     @Override
     public void updateAttack(Player self) {
-
-        long now = System.nanoTime();
-
-        if (now - lastFrameTime >= FRAME_DURATION) {
-
-            getWeaponSprite().setVisible(false);
-
-            // 🔥 Reset state ONLY after finishing
-            setAttackState(AttackState.NotAttacking);
-
-            // return player to walk state
-            self.setState(logic.gameLogic.PlayerState.WALK);
-        }
     }
 
     public boolean isAttackFinished() {

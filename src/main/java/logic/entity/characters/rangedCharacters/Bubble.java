@@ -13,7 +13,7 @@ import logic.interfaces.HandleOwnWeapon;
 import logic.interfaces.HaveWeapon;
 import logic.interfaces.SpawnAttack;
 
-public class Bubble extends RangedClass implements SpawnAttack, HandleOwnWeapon {
+public class Bubble extends RangedClass implements SpawnAttack {
 
     private static final int MIN_AMMO = 1;
     private static final int MAX_AMMO = 5;
@@ -78,31 +78,10 @@ public class Bubble extends RangedClass implements SpawnAttack, HandleOwnWeapon 
 
     @Override
     public void startAttack(Player self) {
-
-        setAttackState(AttackState.WillAttack);
-
-        ImageView blower = getWeaponSprite();
-
-        blowerStartTime = System.nanoTime();
     }
 
     @Override
     public void updateAttack(Player self) {
-
-        if (!getWeaponSprite().isVisible()) return;
-
-        long now = System.nanoTime();
-
-        if (now - blowerStartTime >= BLOWER_DURATION) {
-
-            getWeaponSprite().setVisible(false);
-
-            // 🔥 Reset state ONLY after finishing
-            setAttackState(AttackState.NotAttacking);
-
-            // return player to walk state
-            self.setState(logic.gameLogic.PlayerState.WALK);
-        }
     }
 
     @Override
