@@ -70,6 +70,7 @@ your own JavaFX `lib` directory.
     │       └── java/          # JUnit test files
     │
     ├── CharacterUML.png       # UML diagram of the character class structure
+    ├── CroissantFighterReport # Report for our project
     │
     ├── build.gradle
     ├── gradlew
