@@ -16,7 +16,7 @@ import logic.interfaces.SpawnAttack;
 
 public class Mage extends RangedClass implements SpawnAttack, HandleOwnWeapon {
     public Mage() {
-        super(100, 30, 2, 4, 0.5f, 5);
+        super(125, 30, 2, 4, 0.5f, 5);
         setName("Mage");
         setWeaponSprite("/animations/mage/staff.png");
     }
@@ -55,15 +55,29 @@ public class Mage extends RangedClass implements SpawnAttack, HandleOwnWeapon {
                 break;
             case DEATH:
                 damage *= 1.5;
-                this.takeDamage((int)(this.getHp() * 0.25f));
+                int sacrifice = (int) (this.getHp() * 0.25F);
+                this.takeDamage(sacrifice);
+
+                if (sacrifice > 0) {
+                    Scene2.getInstance().showFloatingText(p, sacrifice, Color.DARKRED, "-");
+                }
+
                 break;
+
             case EMPRESS:
-                this.setHp(
-                        Math.min(
-                                getMaxHp(),
-                                getHp() + (int)(getMaxHp() * 0.2f)
-                        )
-                );
+                int healAmount = (int) (this.getMaxHp() * 0.2f);
+                int actualHeal = Math.min(healAmount, this.getMaxHp() - this.getHp());
+                this.setHp(this.getHp() + actualHeal);
+
+                if (actualHeal > 0) {
+                    Scene2.getInstance().showFloatingText(
+                            p,
+                            actualHeal,
+                            Color.LIMEGREEN,
+                            "+"
+                    );
+                }
+
                 damage *= 0.8;
                 break;
         }

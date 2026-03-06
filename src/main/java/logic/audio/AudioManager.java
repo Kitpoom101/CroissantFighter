@@ -20,9 +20,9 @@ public class AudioManager {
     private static MediaPlayer priorityPlayer;
 
     /** Global BGM volume in range {@code [0.0, 1.0]}. */
-    private static double bgmVolume = 0.4;  // 40%
+    private static double bgmVolume = 0.10;  // 40%
     /** Global SFX volume in range {@code [0.0, 1.0]}. */
-    private static double sfxVolume = 1.0;  // 100%
+    private static double sfxVolume = 0.45;  // 100%
 
     /**
      * Starts looping background music from resource path.
