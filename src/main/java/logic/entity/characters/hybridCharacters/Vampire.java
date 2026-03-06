@@ -23,7 +23,6 @@ public class Vampire extends HybridClass implements HaveWeapon, OwnWeaponPos {
 
         setTotalFrames(2);
         setupAttackFrame(getTotalFrames());
-        setAtk(20);
 
         setLifeStealMultiplier(0.35);
         setOriginLifeStealMultiplier(getLifeStealMultiplier());
