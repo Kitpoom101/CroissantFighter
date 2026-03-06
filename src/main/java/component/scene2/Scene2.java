@@ -31,41 +31,63 @@ import java.util.List;
 import static logic.gameLogic.Selection.getPlayer_1_Character;
 import static logic.gameLogic.Selection.getPlayer_2_Character;
 
+/**
+ * Main battle scene that hosts gameplay, HUD, timer, and end-game presentation.
+ */
 public class Scene2 extends Pane {
+    /** Top margin used for HUD placement. */
     private static final double HEALTH_BAR_TOP_MARGIN = 20;
+    /** Side margin used to anchor HUD elements left and right. */
     private static final double HEALTH_BAR_SIDE_MARGIN = 20;
+    /** Vertical spacing between health and skill bars. */
     private static final double SKILL_BAR_VERTICAL_GAP = 10;
+    /** Match duration in seconds. */
     private static final long MATCH_DURATION_SECONDS = 180;
+    /** Match duration converted to nanoseconds for AnimationTimer timestamps. */
     private static final long MATCH_DURATION_NANOS = MATCH_DURATION_SECONDS * 1_000_000_000L;
 
-    // Player models for both sides.
+    /** Player model for the left side. */
     public Player player1;
+    /** Player model for the right side. */
     public Player player2;
+    /** Input/combat logic for player 1. */
     private PlayerLogic playerLogic1;
+    /** Input/combat logic for player 2. */
     private PlayerLogic playerLogic2;
+    /** Health bar for player 1. */
     private HealthBar player1HealthBar;
+    /** Health bar for player 2. */
     private HealthBar player2HealthBar;
+    /** Skill cooldown bar for player 1. */
     private SkillBar player1SkillBar;
+    /** Skill cooldown bar for player 2. */
     private SkillBar player2SkillBar;
-    // Center timer label (MM:SS).
+    /** Center timer label in {@code MM:SS} format. */
     private Label countdownLabel;
-    // Frame loop that drives all runtime updates.
+    /** Frame loop that drives gameplay simulation and HUD refresh. */
     private AnimationTimer gameLoop;
-    // Stops gameplay input/update once someone wins.
+    /** True when match has ended and input/update should stop. */
     private boolean gameOver;
-    // First frame timestamp; used to compute remaining match time.
+    /** Timestamp of first frame, used to calculate elapsed match time. */
     private long matchStartNanos = -1L;
-    // Active projectiles currently in the arena.
+    /** Active projectiles currently simulated in the arena. */
     private List<BaseProjectileAttack> projectileList = new ArrayList<>();
 
-    // Singleton-like access for systems that need current combat scene instance.
+    /** Shared reference used by external systems to access the active battle scene. */
     private static Scene2 instance;
 
-    // Returns the current active scene2 instance.
+    /**
+     * Returns the currently active {@link Scene2} instance.
+     *
+     * @return active scene instance
+     */
     public static Scene2 getInstance() {
         return instance;
     }
 
+    /**
+     * Creates and initializes the battle scene, HUD nodes, players, and input/game loop hooks.
+     */
     public Scene2() {
         // Build players from selections made in character select scene.
         player1 = new Player(getPlayer_1_Character(), 1);
@@ -165,7 +187,10 @@ public class Scene2 extends Pane {
 
     }
 
-    // Applies scene background image (background2.png) with cover behavior.
+    /**
+     * Applies the scene background image using cover-style sizing.
+     * Falls back to a default image and then a plain color if resources are missing.
+     */
     private void setImageBackground() {
         URL imageUrl = getClass().getResource("/background2.png");
         if (imageUrl == null) {
@@ -195,7 +220,11 @@ public class Scene2 extends Pane {
     }
 
 
-    // Register key press/release callbacks and forward inputs to both player controllers.
+    /**
+     * Registers keyboard input handlers and forwards events to both player logic controllers.
+     *
+     * @param scene active JavaFX scene
+     */
     private void setupControls(Scene scene) {
 
         // Key pressed event: start movement/attacks.
@@ -215,7 +244,13 @@ public class Scene2 extends Pane {
         });
     }
 
-    // Starts the per-frame update loop for gameplay simulation and UI refresh.
+    /**
+     * Starts the per-frame game loop.
+     * <p>
+     * Each frame updates movement/combat logic, HUD values, timer countdown,
+     * game-over checks, and projectile simulation/collisions.
+     * </p>
+     */
     private void startGameLoop() {
 
         // AnimationTimer gives a monotonic nanosecond timestamp each frame.
@@ -310,14 +345,21 @@ public class Scene2 extends Pane {
         gameLoop.start();
     }
 
-    // Formats seconds to MM:SS for display.
+    /**
+     * Formats a second count into {@code MM:SS}.
+     *
+     * @param totalSeconds total number of seconds
+     * @return formatted time string
+     */
     private String formatTime(long totalSeconds) {
         long minutes = totalSeconds / 60;
         long seconds = totalSeconds % 60;
         return String.format("%02d:%02d", minutes, seconds);
     }
 
-    // Ends match when one player's HP is zero.
+    /**
+     * Checks HP values and triggers game-over flow if either player reaches zero HP.
+     */
     private void checkGameOver() {
         if (gameOver) return;
         if (player1.getCharacter().getHp() <= 0) {
@@ -327,12 +369,20 @@ public class Scene2 extends Pane {
         }
     }
 
-    // Stops gameplay and shows a centered winner popup with restart action.
+    /**
+     * Convenience overload that builds a winner message from player number.
+     *
+     * @param winnerPlayerNumber winner player number (1 or 2)
+     */
     private void endGameAndShowPopup(int winnerPlayerNumber) {
         endGameAndShowPopup("Player " + winnerPlayerNumber + " win!");
     }
 
-    // Stops gameplay and shows a centered popup with custom message.
+    /**
+     * Stops gameplay loop and displays a centered popup with custom message.
+     *
+     * @param message text displayed in the popup
+     */
     private void endGameAndShowPopup(String message) {
         // Flip game state and stop update loop.
         gameOver = true;
@@ -375,7 +425,11 @@ public class Scene2 extends Pane {
         popup.toFront();
     }
 
-    // Registers a new projectile to both simulation list and scene graph.
+    /**
+     * Registers and renders a projectile.
+     *
+     * @param p projectile instance to add
+     */
     public void addProjectile(BaseProjectileAttack p) {
         projectileList.add(p);
         getChildren().add(p.getSprite());
@@ -385,12 +439,25 @@ public class Scene2 extends Pane {
         System.out.println(p.getDamage());
     }
 
-    // Removes projectile from scene and simulation list.
+    /**
+     * Removes a projectile from both simulation and scene graph.
+     *
+     * @param p projectile instance to remove
+     */
     public void removeProjectile(BaseProjectileAttack p) {
         getChildren().remove(p.getSprite());
         projectileList.remove(p);
     }
 
+
+    /**
+     * Shows a temporary floating label above a target (damage/heal indicator).
+     *
+     * @param target player whose hitbox is used as the text anchor
+     * @param amount numeric value displayed
+     * @param color text color
+     * @param prefix string prefix such as {@code "-"} or {@code "+"}
+     */
     public void showFloatingText(Player target, int amount, Color color, String prefix) {
 
         Label label = new Label(prefix + amount);
@@ -434,6 +501,12 @@ public class Scene2 extends Pane {
         animation.play();
     }
 
+    /**
+     * Handles end-of-match state transition and optional loser death animation.
+     *
+     * @param winner winning player, or {@code null} for draw/time-up
+     * @param loser losing player, or {@code null} for draw/time-up
+     */
     private void handleGameOver(Player winner, Player loser) {
         gameOver = true;
         gameLoop.stop();
@@ -460,6 +533,11 @@ public class Scene2 extends Pane {
         }
     }
 
+    /**
+     * Builds and animates the final victory/draw overlay.
+     *
+     * @param winner winning player, or {@code null} when match ends in draw
+     */
     private void showVictoryOverlay(Player winner) {
 
         VBox overlay = new VBox(20);

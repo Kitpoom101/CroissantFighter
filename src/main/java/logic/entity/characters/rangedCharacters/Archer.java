@@ -11,10 +11,10 @@ import logic.interfaces.HandleOwnWeapon;
 import logic.interfaces.HaveWeapon;
 import logic.interfaces.SpawnAttack;
 
-public class Archer extends RangedClass implements SpawnAttack {
+public class Archer extends RangedClass implements SpawnAttack, HandleOwnWeapon {
     protected int originAttackRange;
     public Archer() {
-        super(125, 35, 3, 6, 0.75f, 3);
+        super(125, 35, 3, 3, 0.75f, 3);
         setName("Archer");
         setWeaponSprite("/animations/archer/attack/Bow.png");
 
@@ -66,6 +66,11 @@ public class Archer extends RangedClass implements SpawnAttack {
         spawnProjectile(arrow);
 
 
+    }
+
+    @Override
+    public void startAttack(Player self) {
+        super.startAttack(self);
     }
 
     @Override

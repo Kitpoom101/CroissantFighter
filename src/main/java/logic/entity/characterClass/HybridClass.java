@@ -6,7 +6,7 @@ import logic.gameLogic.Player;
 import logic.gameLogic.PlayerState;
 import logic.interfaces.Attackable;
 
-public abstract class HybridClass extends Character  {
+public abstract class HybridClass extends Character implements Attackable {
 
     public HybridClass() {
         super(150, 20, 5, 2, 1.0F, 150);

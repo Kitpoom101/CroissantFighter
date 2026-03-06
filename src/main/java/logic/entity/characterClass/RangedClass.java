@@ -35,7 +35,7 @@ public abstract class RangedClass extends Character
     public RangedClass(int hp, int atk, int def,
                        int attackRange, float attackSpeed,
                        int maxAmmo) {
-        super(hp, atk, def, attackRange, attackSpeed, 100);
+        super(hp, atk, def, attackRange, attackSpeed, 125);
         this.maxAmmo = maxAmmo;
         this.currentAmmo = maxAmmo;
         setBuff(10);

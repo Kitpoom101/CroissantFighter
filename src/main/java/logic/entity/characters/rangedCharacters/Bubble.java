@@ -13,7 +13,7 @@ import logic.interfaces.HandleOwnWeapon;
 import logic.interfaces.HaveWeapon;
 import logic.interfaces.SpawnAttack;
 
-public class Bubble extends RangedClass implements SpawnAttack {
+public class Bubble extends RangedClass implements SpawnAttack, HandleOwnWeapon {
 
     private static final int MIN_AMMO = 1;
     private static final int MAX_AMMO = 5;
@@ -25,6 +25,8 @@ public class Bubble extends RangedClass implements SpawnAttack {
         super(150, 20, 4, 3, 0.5f, 1);
         setName("Bubble");
         setWeaponSprite("/animations/bubble/attack/atkprop/bubbleBlower.png");
+
+        setOrigin(getAtk());
     }
 
     @Override
@@ -78,10 +80,31 @@ public class Bubble extends RangedClass implements SpawnAttack {
 
     @Override
     public void startAttack(Player self) {
+
+        setAttackState(AttackState.WillAttack);
+
+        ImageView blower = getWeaponSprite();
+
+        blowerStartTime = System.nanoTime();
     }
 
     @Override
     public void updateAttack(Player self) {
+
+        if (!getWeaponSprite().isVisible()) return;
+
+        long now = System.nanoTime();
+
+        if (now - blowerStartTime >= BLOWER_DURATION) {
+
+            getWeaponSprite().setVisible(false);
+
+            // 🔥 Reset state ONLY after finishing
+            setAttackState(AttackState.NotAttacking);
+
+            // return player to walk state
+            self.setState(logic.gameLogic.PlayerState.WALK);
+        }
     }
 
     @Override
@@ -95,8 +118,13 @@ public class Bubble extends RangedClass implements SpawnAttack {
     }
 
     @Override
-    public void resetBuff() {
+    public void useSpecialSkill() {
+        setAtk(getAtk() + getBuff());
+    }
 
+    @Override
+    public void resetBuff() {
+        setAtk(getOrigin());
     }
 
     @Override

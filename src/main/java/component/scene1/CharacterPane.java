@@ -19,18 +19,31 @@ import logic.entity.characters.rangedCharacters.Mage;
 import java.util.ArrayList;
 import java.util.Objects;
 
+/**
+ * Visual card for one selectable character in scene 1.
+ * <p>
+ * Each pane shows a portrait sprite, tracks selected state, and exposes
+ * the chosen character metadata used by the selection scene.
+ * </p>
+ */
 public class CharacterPane extends StackPane {
 
+    /** Sprite resource paths in the same order as character list indices. */
     private final String[] allSprite = {
             "/Katana.png", "/Hammer.png", "/Pyro.png",
             "/Barista.png", "/Exorcist.png", "/Vampire.png",
             "/Archer.png", "/Bubble.png", "/Mage.png"
     };
+    /** Reserved name list (currently unused). */
     private final String[] names = {"Katana"};
+    /** Character model represented by this pane. */
     private Character character;
-    private final Image charBG = new Image(ClassLoader.getSystemResource("CharPaneBg.png").toString());
-    private final Image charBGSelect = new Image(ClassLoader.getSystemResource("CharPaneSelect.png").toString());
+    /** Normal (unselected) pane background. */
+    private final Image charBG = new Image(getClass().getResource("/CharPaneBG.png").toExternalForm());
+    /** Selected pane background. */
+    private final Image charBGSelect = new Image(getClass().getResource("/CharPaneSelect.png").toExternalForm());
 
+    /** Available character instances indexed to UI card positions. */
     private ArrayList<Character> characterList = new ArrayList<>();
     {
         characterList.add(new Katana());
@@ -44,8 +57,14 @@ public class CharacterPane extends StackPane {
         characterList.add(new Mage());
     }
 
+    /** Display name of the represented character. */
     private String name;
 
+    /**
+     * Creates a character card for the character at the given index.
+     *
+     * @param charNum character index in the selection list
+     */
     public CharacterPane(int charNum){
         setName(charNum);
         setCharacter(charNum);
@@ -70,6 +89,11 @@ public class CharacterPane extends StackPane {
         System.out.println(getName());
     }
 
+    /**
+     * Paints this pane with a solid background color.
+     *
+     * @param backgroundColor color to apply
+     */
     private void draw(Color backgroundColor) {
         BackgroundFill bgFill = new BackgroundFill(backgroundColor, new CornerRadii(5), Insets.EMPTY);
         BackgroundFill[] bgFillA = {bgFill};
@@ -77,10 +101,21 @@ public class CharacterPane extends StackPane {
         this.setBackground(new Background(bgFillA));
     }
 
+    /**
+     * Applies an image background sized to this pane's preferred size.
+     *
+     * @param image background image
+     */
     private void setImageBackground(Image image){
         this.setBackground(new Background(new BackgroundImage(image, null ,null ,null, new BackgroundSize(this.getPrefWidth(), this.getPrefHeight(), false, false, false, false))));
     }
 
+    /**
+     * Loads portrait sprite by index with fallback support.
+     *
+     * @param i sprite index
+     * @return loaded sprite image
+     */
     private Image spriteLoader(int i){
         String path = i < allSprite.length
                 ? allSprite[i] : "/Missing.png";
@@ -92,6 +127,11 @@ public class CharacterPane extends StackPane {
         );
     }
 
+    /**
+     * Toggles selected visual state for this card.
+     *
+     * @param value {@code true} for selected style, {@code false} for normal style
+     */
     public void setSelected(boolean value){
         if(value){
             setImageBackground(charBGSelect);
@@ -102,18 +142,38 @@ public class CharacterPane extends StackPane {
 
     // setter & getter
 
+    /**
+     * Assigns represented character by index.
+     *
+     * @param i character index
+     */
     public void setCharacter(int i){
         this.character = characterList.get(i);
     }
 
+    /**
+     * Returns represented character model.
+     *
+     * @return character represented by this pane
+     */
     public Character getCharacter(){
         return character;
     }
 
+    /**
+     * Returns represented character name.
+     *
+     * @return character name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Sets represented character name from character list index.
+     *
+     * @param i character index
+     */
     public void setName(int i) {
         this.name = characterList.get(i).getName();
     }

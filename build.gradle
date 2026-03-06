@@ -68,6 +68,9 @@ jar {
     // Include source code
     from sourceSets.main.allSource
 
+    // Include resource
+    from sourceSets.main.resources
+
     // Make it executable by setting the main class
     manifest {
         attributes(
