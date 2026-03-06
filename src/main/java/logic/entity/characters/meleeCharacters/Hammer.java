@@ -6,12 +6,27 @@ import logic.entity.characterClass.MeleeClass;
 import logic.gameLogic.AttackState;
 import logic.gameLogic.Player;
 
+/**
+ * Hammer melee character with slower but larger hitbox attack.
+ */
 public class Hammer extends MeleeClass {
+    /**
+     * Creates Hammer with custom stats.
+     *
+     * @param hp HP value
+     * @param atk attack value
+     * @param def defense value
+     * @param attackRange range value
+     * @param attackSpeed attack speed
+     */
     public Hammer(int hp, int atk, int def, int attackRange, float attackSpeed) {
         super(hp, atk, def, attackRange, attackSpeed);
         setName("Hammer");
     }
 
+    /**
+     * Creates Hammer with default tuned stats and animation setup.
+     */
     public Hammer() {
         super();
         setName("Hammer");
@@ -22,12 +37,22 @@ public class Hammer extends MeleeClass {
         setupAttackFrame(getTotalFrames());
     }
 
+    /**
+     * Returns Hammer melee hitbox size.
+     *
+     * @return attack data
+     */
     @Override
     public AttackData getAttackData() {
         return new AttackData(100, 120);
     }
 
 
+    /**
+     * Loads Hammer attack animation frames.
+     *
+     * @param totalFrame total frame count to load
+     */
     @Override
     public void setupAttackFrame(int totalFrame) {
         attackFrames = new Image[totalFrame];
@@ -40,6 +65,11 @@ public class Hammer extends MeleeClass {
         }
     }
 
+    /**
+     * Updates animation and flags strike frame for hit processing.
+     *
+     * @param self owning player
+     */
     @Override
     public void updateAttack(Player self) {
         super.updateAttack(self);

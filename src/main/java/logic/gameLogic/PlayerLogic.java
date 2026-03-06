@@ -9,6 +9,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import logic.audio.AudioManager;
 import logic.entity.AttackData;
 import logic.entity.characterClass.HybridClass;
 import logic.entity.characterClass.MeleeClass;
@@ -17,55 +18,112 @@ import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
 import javafx.util.Duration;
+import logic.entity.characters.hybridCharacters.Exorcist;
 import logic.entity.characters.hybridCharacters.Vampire;
+import logic.entity.characters.rangedCharacters.Archer;
+import logic.entity.characters.rangedCharacters.Bubble;
+import logic.entity.characters.rangedCharacters.Mage;
 import logic.interfaces.HaveWeapon;
+import logic.interfaces.OwnWeaponPos;
+import logic.interfaces.UsesAmmo;
 
+import java.security.Key;
+
+/**
+ * Runtime controller for a single player.
+ * <p>
+ * Handles input mapping, movement physics, attacks, skill activation/cooldown,
+ * hit detection, and visual combat feedback.
+ * </p>
+ */
 public class PlayerLogic {
 
-    // store player
+    /** Controlled player instance. */
     private Player player;
+    /** Opponent player instance used for collision and damage calculations. */
     private Player enemy;
+    /** Player slot number used to select key bindings. */
     private int playerNum;
 
-    // store keycode
+    /** Key binding for moving left. */
     private KeyCode leftKey;
+    /** Key binding for moving right. */
     private KeyCode rightKey;
+    /** Key binding for normal attack. */
     private KeyCode attackKey;
+    /** Key binding for skill usage. */
     private KeyCode specialAttackKey;
+    /** Key binding for jump. */
+    private KeyCode jumpKey;
+    /** Key binding for manual reload (ammo classes). */
+    private KeyCode reloadKey;
 
-    // ====== HITBOX ===== //
+    /** Vertical velocity used by jump/gravity simulation. */
+    private double velocityY = 0;
+
+    /** Gravity acceleration per frame. */
+    private final double GRAVITY = 0.3;
+    /** Initial jump impulse. */
+    private final double JUMP_FORCE = -12;
+    /** Maximum downward fall speed clamp. */
+    private final double MAX_FALL_SPEED = 7;
+
+    /** True when character stands on the ground. */
+    private boolean onGround = true;
+
+    /** Temporary melee attack hitbox node. */
     private Rectangle attackHitbox;
 
+    /** True when an attack action is currently active. */
     private boolean attacking = false;
+    /** Timestamp when temporary attack hitbox became visible. */
     private long hitboxStartTime = 0;
+    /** Lifespan of temporary melee hitbox in nanoseconds. */
     private final long HITBOX_DURATION = 500_000_000L; // 0.5 sec in nanoseconds
-    // ====== HITBOX ===== //
 
-    // Attack
+    /** Timestamp of last attack used for attack-speed cooldown checks. */
     private long lastAttackTime = 0;
+    /** Prevents repeated attack trigger while attack key is held down. */
     private boolean attackHeld = false;
 
-    // store movement
+    /** Left movement input state. */
     private boolean moveLeft;
+    /** Right movement input state. */
     private boolean moveRight;
 
+    /** UI text showing ammo/reload information for ammo-based characters. */
+    private Text ammoText;
+
+    /** Legacy movement speed constant (currently unused). */
     private final double speed = 5;
 
-    // ===== Skill ===== //
+    /** True while a temporary skill buff is currently active. */
     private boolean skillActive = false;
+    /** Cooldown duration for skill recharge in nanoseconds. */
     private static final long SKILL_COOLDOWN_NANOS = 8_000_000_000L;
+    /** Start timestamp for current cooldown cycle, or {@code -1L} when inactive. */
     private long skillCooldownStartNanos = -1L;
 
+    /** UI text showing skill buff activation feedback. */
     private Text buffText;
 
-    /* ===== MOVEMENT PHYSICS ===== */
-
+    /** Horizontal velocity used by acceleration/friction movement model. */
     private double velocityX = 0;
 
+    /** Horizontal acceleration per frame while movement key is pressed. */
     private final double ACCELERATION = 0.4;
+    /** Maximum horizontal speed clamp. */
     private final double MAX_SPEED = 3;
+    /** Friction multiplier applied every frame. */
     private final double FRICTION = 0.85;
 
+    /**
+     * Creates a controller for one player and sets up default key bindings and UI helpers.
+     *
+     * @param player controlled player
+     * @param enemy opposing player
+     * @param i player index used for input scheme selection
+     */
     public PlayerLogic(Player player, Player enemy, int i) {
         this.player = player;
         this.enemy = enemy;
@@ -76,12 +134,16 @@ public class PlayerLogic {
             rightKey = KeyCode.D;
             attackKey = KeyCode.E;
             specialAttackKey = KeyCode.Q;
+            jumpKey = KeyCode.W;
+            reloadKey = KeyCode.R;
         }
         else if(playerNum == 2){
             leftKey = KeyCode.J;
             rightKey = KeyCode.L;
-            attackKey = KeyCode.I;
-            specialAttackKey = KeyCode.O;
+            attackKey = KeyCode.O;
+            specialAttackKey = KeyCode.U;
+            jumpKey = KeyCode.I;
+            reloadKey = KeyCode.P;
         }
 
         // for hit box //
@@ -95,11 +157,24 @@ public class PlayerLogic {
         buffText = new Text("");
         buffText.setStyle("-fx-font-size: 24px; -fx-fill: black;");
         buffText.setOpacity(0);
+
+        // for ammo //
+        ammoText = new Text();
+        ammoText.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+        ammoText.setStroke(Color.BLACK);
+        ammoText.setStrokeWidth(0.5);
+        ammoText.setVisible(false);
+        //player.getPlayerRoot().getChildren().add(ammoText);
+
     }
 
     /* ---------- INPUT ---------- */
 
-    /* KEY PRESSED */
+    /**
+     * Handles key-press input for movement, attack, jump, reload, and skill activation.
+     *
+     * @param event JavaFX key event
+     */
     public void handleKeyPressed(KeyEvent event) {
 
         if(event.getCode() == leftKey)
@@ -117,9 +192,17 @@ public class PlayerLogic {
                 player.setState(PlayerState.ATTACK);
                 player.getCharacter().setAttackState(AttackState.Attacking);
                 player.getCharacter().startAttack(player);
-            } else if (!(player.getCharacter() instanceof MeleeClass)) {
-                player.setState(PlayerState.ATTACK);
-                attack();
+            } else if (!(player.getCharacter() instanceof HaveWeapon)) {
+
+                long now = System.nanoTime();
+
+                if (now - lastAttackTime >= getAttackInterval()) {
+
+                    lastAttackTime = now;
+
+                    player.setState(PlayerState.ATTACK);
+                    attack();
+                }
             }
         }
 
@@ -129,9 +212,26 @@ public class PlayerLogic {
                 skill();
             }
         }
+
+        if (event.getCode() == reloadKey) {
+            if (player.getCharacter() instanceof UsesAmmo ammoUser) {
+                ammoUser.reload();
+            }
+        }
+
+        if(event.getCode() == jumpKey){
+            if(onGround){
+                velocityY = JUMP_FORCE;
+                onGround = false;
+            }
+        }
     }
 
-    /* KEY RELEASED */
+    /**
+     * Handles key-release input and clears hold-state flags.
+     *
+     * @param event JavaFX key event
+     */
     public void handleKeyReleased(KeyEvent event) {
 
         if(event.getCode() == leftKey)
@@ -145,6 +245,9 @@ public class PlayerLogic {
         }
     }
 
+    /**
+     * Activates the character special skill, applies buff text, and starts cooldown flow.
+     */
     private void skill() {
 
         if(skillActive) return;
@@ -160,10 +263,24 @@ public class PlayerLogic {
 
         if(character instanceof MeleeClass){
             showBuffText("DEF UP BY " + character.getBuff() + " !!");
-        } else if (character instanceof RangedClass) {
-            showBuffText("RANGE UP BY " + character.getBuff() + " !!");
+        } else if (character instanceof RangedClass rangedClass) {
+            if (rangedClass instanceof Archer){
+                showBuffText("RANGE UP BY " + character.getBuff() + " \n" +
+                        "ATTACK UP BY " + character.getBuff());
+            }else if (rangedClass instanceof Bubble){
+                showBuffText("ATTACK UP BY " + character.getBuff());
+            }else if (rangedClass instanceof Mage){
+                showBuffText("HEAL BY " + character.getBuff());
+            }
+
         } else if (character instanceof HybridClass){
-            showBuffText("ATTACK UP BY " + character.getBuff() + " !!");
+            if (character instanceof Vampire){
+                showBuffText("ATTACK UP BY " + character.getBuff() + " !!" +
+                        "\nAND MORE LIFE STEAL");
+            }else{
+                showBuffText("ATTACK UP BY " + character.getBuff() + " !!");
+            }
+
         } else {
             showBuffText("How?");
         }
@@ -190,6 +307,9 @@ public class PlayerLogic {
         startSkillCooldown();
     }
 
+    /**
+     * Starts/restarts skill cooldown timer and transitions skill state back to usable when done.
+     */
     private void startSkillCooldown(){
 
         player.getCharacter()
@@ -208,6 +328,11 @@ public class PlayerLogic {
         cooldown.play();
     }
 
+    /**
+     * Returns normalized cooldown progress for skill bar rendering.
+     *
+     * @return progress in range {@code [0.0, 1.0]}
+     */
     public double getSkillCooldownProgress() {
         SkillState state = player.getCharacter().getSkillState();
         if (state == SkillState.CanUseSkill) {
@@ -221,6 +346,11 @@ public class PlayerLogic {
         return Math.max(0.0, Math.min((double) elapsed / SKILL_COOLDOWN_NANOS, 1.0));
     }
 
+    /**
+     * Plays temporary buff message animation above the controlled character.
+     *
+     * @param message text to display
+     */
     private void showBuffText(String message){
 
         buffText.setText(message);
@@ -249,10 +379,18 @@ public class PlayerLogic {
         sequence.play();
     }
 
+    /**
+     * Returns the buff message text node for scene attachment.
+     *
+     * @return buff text node
+     */
     public Text getBuffText() {
         return buffText;
     }
 
+    /**
+     * Executes attack behavior based on current character type (ranged/hybrid/melee).
+     */
     private void attack() {
         attacking = true;
 
@@ -263,7 +401,22 @@ public class PlayerLogic {
         double playerY = sprite.getLayoutY();
 
         // 🔥 ถ้าเป็น ranged
-        if (data == null) {
+        if (player.getCharacter() instanceof RangedClass ranged) {
+
+            float startX = (float) (playerX + sprite.getBoundsInParent().getWidth() / 2);
+            float startY = (float) (playerY + sprite.getBoundsInParent().getHeight() / 2);
+
+            ranged.tryAttack(
+                    player,
+                    startX,
+                    startY,
+                    player.isFacingRight()
+            );
+
+            return;
+        }
+
+        if (data == null && player.getCharacter() instanceof HybridClass) {
 
             float startX = (float) (playerX + sprite.getBoundsInParent().getWidth() / 2);
             float startY = (float) (playerY + sprite.getBoundsInParent().getHeight() / 2);
@@ -282,12 +435,19 @@ public class PlayerLogic {
         attackHitbox.setWidth(data.getWidth());
         attackHitbox.setHeight(data.getHeight());
 
-        attackHitbox.setLayoutY(playerY);
+        AudioManager.playSFX("/audio/sfx/attack/blackFlash.mp3");
+
+        if (!(player.getCharacter() instanceof OwnWeaponPos)){
+            attackHitbox.setLayoutY(playerY);
+        }
 
         if (player.isFacingRight()) {
             if (player.getCharacter() instanceof Vampire){
                 attackHitbox.setLayoutX(
-                        playerX + sprite.getBoundsInParent().getWidth() + 120
+                        playerX + sprite.getBoundsInParent().getWidth() + 30
+                );
+                attackHitbox.setLayoutY(
+                        playerY + 35
                 );
             }else{
                 attackHitbox.setLayoutX(
@@ -298,7 +458,10 @@ public class PlayerLogic {
         } else {
             if (player.getCharacter() instanceof Vampire){
                 attackHitbox.setLayoutX(
-                        playerX - data.getWidth() - 120
+                        playerX - data.getWidth() - 30
+                );
+                attackHitbox.setLayoutY(
+                        playerY + 35
                 );
             }else{
                 attackHitbox.setLayoutX(
@@ -314,6 +477,9 @@ public class PlayerLogic {
         checkHit();
     }
 
+    /**
+     * Checks melee hitbox intersection against enemy hitbox and applies damage/lifesteal.
+     */
     private void checkHit() {
 
         if (attackHitbox.getBoundsInParent()
@@ -321,17 +487,41 @@ public class PlayerLogic {
                         .localToScene(enemy.getHitbox().getBoundsInLocal())
                 )) {
 
+            int rawDamage = player.getCharacter().getAtk();
+            enemy.getCharacter().takeDamage(rawDamage);
+
+            int finalDamage = Math.max(1, rawDamage - enemy.getCharacter().getDef());
+
+            Scene2.getInstance().showFloatingText(enemy, finalDamage, Color.DARKRED, "-");
+
+
             System.out.println("HIT!");
 
-            enemy.getCharacter().takeDamage(player.getCharacter().getAtk());
+            // for calculating vampire damage
+            if (player.getCharacter() instanceof Vampire vampire){
+                player.getCharacter().setHp((int) Math.min(
+                            vampire.getMaxHp(),
+                            ((vampire.getAtk() - enemy.getCharacter().getDef() * 0.5)
+                                    * vampire.getLifeStealMultiplier())
+                                    + vampire.getHp()
+                        )
+                );
+            }
         }
     }
 
+    /**
+     * Returns the active attack hitbox node for rendering/debugging.
+     *
+     * @return attack hitbox rectangle
+     */
     public Rectangle getAttackHitbox() {
         return attackHitbox;
     }
 
-    /* CALLED EVERY FRAME */
+    /**
+     * Per-frame update entry point for movement, physics, attack flow, and UI helpers.
+     */
     public void update() {
 
         /* acceleration */
@@ -362,9 +552,18 @@ public class PlayerLogic {
         /* apply movement */
         // only when walk state
         //if (player.getState() == PlayerState.WALK){
-        player.translate(velocityX, 0);
+        // apply gravity
+        velocityY += GRAVITY;
+
+        if (velocityY > MAX_FALL_SPEED)
+            velocityY = MAX_FALL_SPEED;
+
+// move player
+        player.translate(velocityX, velocityY);
+
         // ===== PREVENT PLAYER MOVEMENT ===== //
         clampToArenaBounds();
+        checkGroundCollision();
 
 
         // ===== WEAPON SPRITE FOLLOW ===== //
@@ -377,8 +576,52 @@ public class PlayerLogic {
 
         // ===== UPDATE HITBOX ===== //
         updateHitboxTimer();
+
+        // for ammo
+
+        if (player.getCharacter() instanceof UsesAmmo ammoUser) {
+
+            ammoUser.updateAmmo();
+
+            ammoText.setVisible(true);
+            Group sprite = player.getPlayerRoot();
+
+            double textWidth = ammoText.getBoundsInLocal().getWidth();
+
+            ammoText.setLayoutX(
+                    sprite.getLayoutX()
+                            + sprite.getBoundsInParent().getWidth() / 2
+                            - textWidth / 2 - 10
+            );
+
+            ammoText.setLayoutY(
+                    sprite.getLayoutY() - 10
+            );
+
+            if (ammoUser.isReloading()) {
+                ammoText.setText("Reloading...");
+                ammoText.setFill(Color.YELLOW);
+            } else {
+                ammoText.setText("Ammo: " +
+                        ammoUser.getCurrentAmmo() +
+                        "/" +
+                        ammoUser.getMaxAmmo());
+
+                if (ammoUser.getCurrentAmmo() == 0)
+                    ammoText.setFill(Color.RED);
+                else
+                    ammoText.setFill(Color.WHITE);
+            }
+
+        } else {
+            ammoText.setVisible(false);
+        }
+
     }
 
+    /**
+     * Hides the temporary melee hitbox after its configured lifetime expires.
+     */
     private void updateHitboxTimer() {
 
         if(!attackHitbox.isVisible()) return;
@@ -390,6 +633,9 @@ public class PlayerLogic {
         }
     }
 
+    /**
+     * Updates weapon animation frames and triggers attack execution at hit frames.
+     */
     private void attackAnimation(){
         if(player.getState() == PlayerState.ATTACK && player.getCharacter() instanceof HaveWeapon){
             player.getWeaponSprite().setVisible(true);
@@ -407,6 +653,9 @@ public class PlayerLogic {
         }
     }
 
+    /**
+     * Unlocks next attack when attack-speed cooldown interval has elapsed.
+     */
     private void handleAttackSpeed() {
 
         if(player.getCharacter().getAttackState() != AttackState.AttackCooldown)
@@ -420,6 +669,11 @@ public class PlayerLogic {
         }
     }
 
+    /**
+     * Computes minimum nanosecond interval between attacks from character attack speed.
+     *
+     * @return attack interval in nanoseconds
+     */
     private long getAttackInterval() {
         float attackSpeed =
                 player.getCharacter().getAttackSpeed();
@@ -427,20 +681,33 @@ public class PlayerLogic {
         return (long)(1_000_000_000L / attackSpeed);
     }
 
+    /**
+     * Keeps weapon sprite aligned to player orientation and position.
+     */
     private void weaponSpriteFollow() {
         if (player.getCharacter() instanceof HaveWeapon){
             Group body = player.getPlayerRoot();
 
             // weapon sprite position
-            player.getWeaponSprite().setLayoutY(body.getLayoutY());
+            if (!(player.getCharacter() instanceof Vampire)){
+                player.getWeaponSprite().setLayoutY(body.getLayoutY());
+            }
 
             if(player.isFacingRight()){
                 player.getWeaponSprite().setScaleX(1);
+                if (player.getCharacter() instanceof Vampire){
+                    vampireWeapon(body, player.isFacingRight());
+                    return;
+                }
                 player.getWeaponSprite().setLayoutX(
                         body.getLayoutX() + body.getBoundsInParent().getWidth()
                 );
             }else{
                 player.getWeaponSprite().setScaleX(-1);
+                if (player.getCharacter() instanceof Vampire){
+                    vampireWeapon(body, player.isFacingRight());
+                    return;
+                }
                 player.getWeaponSprite().setLayoutX(
                         body.getLayoutX() - player.getWeaponSprite().getImage().getWidth()
                 );
@@ -448,6 +715,51 @@ public class PlayerLogic {
         }
     }
 
+    /**
+     * Applies custom weapon position offsets for vampire animations.
+     *
+     * @param body player root node
+     * @param right true when facing right, false when facing left
+     */
+    private void vampireWeapon(Group body, boolean right) {
+        if (right){
+            if (player.getCharacter().getFrameIndex() == 0) {
+                player.getWeaponSprite().setLayoutY(
+                        body.getLayoutY() + body.getBoundsInParent().getHeight() / 2
+                );
+                player.getWeaponSprite().setLayoutX(
+                        body.getLayoutX() - body.getBoundsInParent().getWidth() / 8
+                );
+            } else {
+                player.getWeaponSprite().setLayoutY(
+                        body.getLayoutY()
+                );
+                player.getWeaponSprite().setLayoutX(
+                        body.getLayoutX() + body.getBoundsInParent().getWidth()
+                );
+            }
+        }else{
+            if (player.getCharacter().getFrameIndex() == 0) {
+                player.getWeaponSprite().setLayoutY(
+                        body.getLayoutY() + body.getBoundsInParent().getHeight() / 2
+                );
+                player.getWeaponSprite().setLayoutX(
+                        body.getLayoutX() + body.getBoundsInParent().getWidth() / 3
+                );
+            } else {
+                player.getWeaponSprite().setLayoutY(
+                        body.getLayoutY()
+                );
+                player.getWeaponSprite().setLayoutX(
+                        body.getLayoutX() - body.getBoundsInParent().getWidth() * 1.5
+                );
+            }
+        }
+    }
+
+    /**
+     * Clamps player horizontal position inside arena bounds.
+     */
     private void clampToArenaBounds() {
         if (!(player.getPlayerRoot().getParent() instanceof Region arena)) {
             return;
@@ -469,5 +781,33 @@ public class PlayerLogic {
         } else if (sprite.getLayoutX() > maxX) {
             sprite.setLayoutX(maxX);
         }
+    }
+
+    /**
+     * Resolves simple ground collision and resets vertical motion when touching ground.
+     */
+    private void checkGroundCollision() {
+
+        if (!(player.getPlayerRoot().getParent() instanceof Region arena))
+            return;
+
+        Group sprite = player.getPlayerRoot();
+
+        double groundY = arena.getHeight() - sprite.getBoundsInParent().getHeight();
+
+        if (sprite.getLayoutY() >= groundY) {
+            sprite.setLayoutY(groundY);
+            velocityY = 0;
+            onGround = true;
+        }
+    }
+
+    /**
+     * Returns the ammo text node used by ammo-based characters.
+     *
+     * @return ammo text node
+     */
+    public Text getAmmoText() {
+        return ammoText;
     }
 }

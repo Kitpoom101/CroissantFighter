@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import logic.audio.AudioManager;
 import logic.entity.Character;
 import logic.gameLogic.SelectState;
 
@@ -19,18 +20,33 @@ import java.net.URL;
 import static logic.gameLogic.Selection.setPlayer_1_Character;
 import static logic.gameLogic.Selection.setPlayer_2_Character;
 
+/**
+ * Character selection scene shown before the match starts.
+ * <p>
+ * This screen lets both players:
+ * </p>
+ * <ul>
+ *   <li>Browse character cards.</li>
+ *   <li>Preview selected characters.</li>
+ *   <li>Confirm or cancel picks in a two-step flow.</li>
+ * </ul>
+ */
 public class CharacterSelectScene extends StackPane {
 
-    // The currently highlighted character tile in the row.
+    /** Currently highlighted character tile, or {@code null} if none selected. */
     private CharacterPane selectedPane;
-    // Top banner that shows each player's selected character name/state.
+    /** Top status bar that displays current player selections. */
     private final PlayerSelection playerSelection;
-    // Large previews for player 1 and player 2.
+    /** Large image preview for player 1 selection. */
     private final ImageView player1PreviewImage;
+    /** Large image preview for player 2 selection. */
     private final ImageView player2PreviewImage;
-    // Selection flow state: P1 picks -> P2 picks -> DONE.
+    /** Selection state machine: player 1 selection, player 2 selection, then done. */
     private SelectState selectState = SelectState.PLAYER1_SELECT;
 
+    /**
+     * Builds the full character selection UI, binds input handlers, and starts scene BGM.
+     */
     public CharacterSelectScene(){
         // Root vertical layout for all UI controls in this scene.
         VBox ui = new VBox();
@@ -51,18 +67,25 @@ public class CharacterSelectScene extends StackPane {
         // Create 9 character cards and wire click-to-select behavior.
         for (int i = 0; i < 9; i++) {
             CharacterPane pane = new CharacterPane(i);
-            pane.setOnMouseClicked(e ->
-                selectCharacter(pane)
-            );
+            pane.setOnMouseClicked(e -> {
+                        selectCharacter(pane);
+                AudioManager.playSFX("/audio/sfx/onMouseClicked/chaSelect.mp3");
+            });
             characterRow.getChildren().add(pane);
         }
 
         // Action buttons for confirming/canceling current selection step.
         Button confirmBtn = new Button("Confirm");
-        confirmBtn.setOnAction(e -> confirmSelection());
+        confirmBtn.setOnAction(e -> {
+            AudioManager.playSFX("/audio/sfx/onMouseClicked/clickSFX.mp3");
+            confirmSelection();
+        });
 
         Button cancelBtn = new Button("Cancel");
-        cancelBtn.setOnAction(e -> cancelSelection());
+        cancelBtn.setOnAction(e ->  {
+            AudioManager.playSFX("/audio/sfx/onMouseClicked/cancelClick.mp3");
+            cancelSelection();
+        });
 
         // Container for action buttons.
         HBox actionRow = new HBox(10);
@@ -109,9 +132,13 @@ public class CharacterSelectScene extends StackPane {
         getChildren().add(ui);
 
         setImageBackground();
+
+        AudioManager.playBGM("/audio/bgm/bgmSelectionSceneBalladDuParis.mp3");
     }
 
-    // Applies a full-scene background image with "cover" behavior.
+    /**
+     * Applies the background image for this screen using cover behavior.
+     */
     private void setImageBackground(){
         Image image = new Image(getClass().getResource("/CroissantShop.png").toExternalForm());
         BackgroundSize size = new BackgroundSize(
@@ -131,7 +158,11 @@ public class CharacterSelectScene extends StackPane {
         this.setBackground(new Background(bg));
     }
 
-    // Keeps exactly one card selected at a time.
+    /**
+     * Updates highlighted character card so only one card is selected at a time.
+     *
+     * @param pane character card clicked by the user
+     */
     private void selectCharacter(CharacterPane pane){
 
         if(selectedPane != null){
@@ -142,7 +173,12 @@ public class CharacterSelectScene extends StackPane {
         selectedPane.setSelected(true);
     }
 
-    // Handles the confirm button according to the current select state.
+    /**
+     * Processes current selection and advances the two-player selection flow.
+     * <p>
+     * Once both players are confirmed, transitions to {@link Scene2}.
+     * </p>
+     */
     private void confirmSelection(){
 
         // When both players are done, move to gameplay scene.
@@ -179,7 +215,9 @@ public class CharacterSelectScene extends StackPane {
         selectedPane = null;
     }
 
-    // Handles cancel button: rollback one selection step.
+    /**
+     * Cancels current step and rolls selection flow back by one stage.
+     */
     private void cancelSelection() {
         // Remove current temporary highlight first.
         if (selectedPane != null) {
@@ -202,7 +240,11 @@ public class CharacterSelectScene extends StackPane {
         }
     }
 
-    // Creates a standardized preview image holder for both players.
+    /**
+     * Creates a standardized preview image node for player preview panels.
+     *
+     * @return configured preview {@link ImageView}
+     */
     private ImageView createPreviewImageView() {
         ImageView imageView = new ImageView();
         imageView.setFitWidth(230);
@@ -210,7 +252,12 @@ public class CharacterSelectScene extends StackPane {
         return imageView;
     }
 
-    // Loads a character portrait by name, with fallback when missing.
+    /**
+     * Loads the portrait image for a character.
+     *
+     * @param characterName character identifier used in resource naming
+     * @return character portrait image, or fallback image when missing
+     */
     private Image loadCharacterImage(String characterName) {
         URL imageUrl = getClass().getResource("/" + characterName + ".png");
         if (imageUrl == null) {
@@ -220,8 +267,15 @@ public class CharacterSelectScene extends StackPane {
         return new Image(imageUrl.toExternalForm());
     }
 
-    // Factory mapping from selected UI name to concrete Character subclass.
-    // Returned as base type so game logic can use polymorphism.
+    /**
+     * Creates a new character instance from selected character name.
+     * <p>
+     * Returned as base type {@link Character} to keep downstream logic polymorphic.
+     * </p>
+     *
+     * @param name selected character name
+     * @return newly created concrete character object
+     */
     private Character createNewCharacter(String name) {
         switch (name) {
             case "Katana": return new Katana();

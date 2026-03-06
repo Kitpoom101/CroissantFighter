@@ -2,7 +2,7 @@ package component.scene2;
 
 import application.SceneHandler;
 import component.scene1.CharacterSelectScene;
-import javafx.animation.AnimationTimer;
+import javafx.animation.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -13,9 +13,15 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.util.Duration;
+import logic.audio.AudioManager;
 import logic.entity.BaseProjectileAttack;
+import logic.entity.characters.hybridCharacters.Barista;
+import logic.entity.characters.rangedCharacters.Bubble;
 import logic.gameLogic.Player;
 import logic.gameLogic.PlayerLogic;
+import logic.gameLogic.PlayerState;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -25,41 +31,63 @@ import java.util.List;
 import static logic.gameLogic.Selection.getPlayer_1_Character;
 import static logic.gameLogic.Selection.getPlayer_2_Character;
 
+/**
+ * Main battle scene that hosts gameplay, HUD, timer, and end-game presentation.
+ */
 public class Scene2 extends Pane {
+    /** Top margin used for HUD placement. */
     private static final double HEALTH_BAR_TOP_MARGIN = 20;
+    /** Side margin used to anchor HUD elements left and right. */
     private static final double HEALTH_BAR_SIDE_MARGIN = 20;
+    /** Vertical spacing between health and skill bars. */
     private static final double SKILL_BAR_VERTICAL_GAP = 10;
+    /** Match duration in seconds. */
     private static final long MATCH_DURATION_SECONDS = 180;
+    /** Match duration converted to nanoseconds for AnimationTimer timestamps. */
     private static final long MATCH_DURATION_NANOS = MATCH_DURATION_SECONDS * 1_000_000_000L;
 
-    // Player models for both sides.
+    /** Player model for the left side. */
     public Player player1;
+    /** Player model for the right side. */
     public Player player2;
+    /** Input/combat logic for player 1. */
     private PlayerLogic playerLogic1;
+    /** Input/combat logic for player 2. */
     private PlayerLogic playerLogic2;
+    /** Health bar for player 1. */
     private HealthBar player1HealthBar;
+    /** Health bar for player 2. */
     private HealthBar player2HealthBar;
+    /** Skill cooldown bar for player 1. */
     private SkillBar player1SkillBar;
+    /** Skill cooldown bar for player 2. */
     private SkillBar player2SkillBar;
-    // Center timer label (MM:SS).
+    /** Center timer label in {@code MM:SS} format. */
     private Label countdownLabel;
-    // Frame loop that drives all runtime updates.
+    /** Frame loop that drives gameplay simulation and HUD refresh. */
     private AnimationTimer gameLoop;
-    // Stops gameplay input/update once someone wins.
+    /** True when match has ended and input/update should stop. */
     private boolean gameOver;
-    // First frame timestamp; used to compute remaining match time.
+    /** Timestamp of first frame, used to calculate elapsed match time. */
     private long matchStartNanos = -1L;
-    // Active projectiles currently in the arena.
+    /** Active projectiles currently simulated in the arena. */
     private List<BaseProjectileAttack> projectileList = new ArrayList<>();
 
-    // Singleton-like access for systems that need current combat scene instance.
+    /** Shared reference used by external systems to access the active battle scene. */
     private static Scene2 instance;
 
-    // Returns the current active scene2 instance.
+    /**
+     * Returns the currently active {@link Scene2} instance.
+     *
+     * @return active scene instance
+     */
     public static Scene2 getInstance() {
         return instance;
     }
 
+    /**
+     * Creates and initializes the battle scene, HUD nodes, players, and input/game loop hooks.
+     */
     public Scene2() {
         // Build players from selections made in character select scene.
         player1 = new Player(getPlayer_1_Character(), 1);
@@ -68,10 +96,16 @@ public class Scene2 extends Pane {
         // Create gameplay logic controllers (each knows self + enemy).
         playerLogic1 = new PlayerLogic(player1, player2, 1);
         playerLogic2 = new PlayerLogic(player2, player1, 2);
+
+        getChildren().addAll(
+                playerLogic1.getAmmoText(),
+                playerLogic2.getAmmoText()
+        );
         
         // Initialize health bars with each character's starting HP.
-        player1HealthBar = new HealthBar(player1.getCharacter().getHp());
-        player2HealthBar = new HealthBar(player2.getCharacter().getHp());
+        // ใช้ HealthBar ใหม่พร้อมชื่อตัวละคร
+        player1HealthBar = new HealthBar(player1.getCharacter().getHp(), player1.getCharacter().getName(), true);
+        player2HealthBar = new HealthBar(player2.getCharacter().getHp(), player2.getCharacter().getName(), false);
         player1SkillBar = new SkillBar();
         player2SkillBar = new SkillBar();
         // Initialize timer label with full match duration.
@@ -146,12 +180,17 @@ public class Scene2 extends Pane {
             }
         });
 
+        AudioManager.playBGM("/audio/bgm/bgmScene2TraditionellMusette.mp3");
+
         // Register current instance for static access (projectile spawning path).
         instance = this;
 
     }
 
-    // Applies scene background image (background2.png) with cover behavior.
+    /**
+     * Applies the scene background image using cover-style sizing.
+     * Falls back to a default image and then a plain color if resources are missing.
+     */
     private void setImageBackground() {
         URL imageUrl = getClass().getResource("/background2.png");
         if (imageUrl == null) {
@@ -181,7 +220,11 @@ public class Scene2 extends Pane {
     }
 
 
-    // Register key press/release callbacks and forward inputs to both player controllers.
+    /**
+     * Registers keyboard input handlers and forwards events to both player logic controllers.
+     *
+     * @param scene active JavaFX scene
+     */
     private void setupControls(Scene scene) {
 
         // Key pressed event: start movement/attacks.
@@ -201,7 +244,13 @@ public class Scene2 extends Pane {
         });
     }
 
-    // Starts the per-frame update loop for gameplay simulation and UI refresh.
+    /**
+     * Starts the per-frame game loop.
+     * <p>
+     * Each frame updates movement/combat logic, HUD values, timer countdown,
+     * game-over checks, and projectile simulation/collisions.
+     * </p>
+     */
     private void startGameLoop() {
 
         // AnimationTimer gives a monotonic nanosecond timestamp each frame.
@@ -232,9 +281,10 @@ public class Scene2 extends Pane {
 
                 // End match immediately when timer reaches zero.
                 if (remainingSeconds <= 0) {
-                    endGameAndShowPopup("Time's up, your too slow");
+                    handleGameOver(null, null); // Draw or Time Out logic
                     return;
                 }
+
 
                 // Check if someone has reached 0 HP.
                 checkGameOver();
@@ -256,11 +306,25 @@ public class Scene2 extends Pane {
                                     .localToScene(target.getHitbox().getBoundsInLocal())
                             )) {
 
+                        if (p.hasKnockback()) {
+
+                            double randomX = 67 + Math.random() * 8;
+                            double randomY = 67 + Math.random() * 30;
+
+                            target.translate(p.getDirectionX() * randomX, -randomY);
+                        }
                         int damage = p.getDamage();
                         target.getCharacter().takeDamage(damage);
 
-                        if (damage - target.getCharacter().getDef() > 0) {
-                            showDamageText(target, damage - target.getCharacter().getDef());
+                        if (p.getOwner().getCharacter() instanceof Bubble) {
+                            AudioManager.playRandomBubblePop();
+                        } else if (p.getOwner().getCharacter() instanceof Barista) {
+                            AudioManager.playSFX("/audio/sfx/attack/breakingDishes.mp3");
+                        }
+
+                        int finalDamage = damage - target.getCharacter().getDef();
+                        if (finalDamage > 0) {
+                            showFloatingText(target, finalDamage, Color.DARKRED, "-");
                         }
                         // Remove projectile visual from scene and list from simulation.
                         getChildren().remove(p.getSprite());
@@ -281,36 +345,44 @@ public class Scene2 extends Pane {
         gameLoop.start();
     }
 
-    // Formats seconds to MM:SS for display.
+    /**
+     * Formats a second count into {@code MM:SS}.
+     *
+     * @param totalSeconds total number of seconds
+     * @return formatted time string
+     */
     private String formatTime(long totalSeconds) {
         long minutes = totalSeconds / 60;
         long seconds = totalSeconds % 60;
         return String.format("%02d:%02d", minutes, seconds);
     }
 
-    // Ends match when one player's HP is zero.
+    /**
+     * Checks HP values and triggers game-over flow if either player reaches zero HP.
+     */
     private void checkGameOver() {
-        // Avoid repeated end-game handling.
         if (gameOver) return;
-
-        // Read current HP values.
-        int player1Hp = player1.getCharacter().getHp();
-        int player2Hp = player2.getCharacter().getHp();
-
-        // Declare the opponent as winner when a player's HP reaches zero.
-        if (player1Hp <= 0) {
-            endGameAndShowPopup(2);
-        } else if (player2Hp <= 0) {
-            endGameAndShowPopup(1);
+        if (player1.getCharacter().getHp() <= 0) {
+            handleGameOver(player2, player1);
+        } else if (player2.getCharacter().getHp() <= 0) {
+            handleGameOver(player1, player2);
         }
     }
 
-    // Stops gameplay and shows a centered winner popup with restart action.
+    /**
+     * Convenience overload that builds a winner message from player number.
+     *
+     * @param winnerPlayerNumber winner player number (1 or 2)
+     */
     private void endGameAndShowPopup(int winnerPlayerNumber) {
         endGameAndShowPopup("Player " + winnerPlayerNumber + " win!");
     }
 
-    // Stops gameplay and shows a centered popup with custom message.
+    /**
+     * Stops gameplay loop and displays a centered popup with custom message.
+     *
+     * @param message text displayed in the popup
+     */
     private void endGameAndShowPopup(String message) {
         // Flip game state and stop update loop.
         gameOver = true;
@@ -353,7 +425,11 @@ public class Scene2 extends Pane {
         popup.toFront();
     }
 
-    // Registers a new projectile to both simulation list and scene graph.
+    /**
+     * Registers and renders a projectile.
+     *
+     * @param p projectile instance to add
+     */
     public void addProjectile(BaseProjectileAttack p) {
         projectileList.add(p);
         getChildren().add(p.getSprite());
@@ -363,19 +439,31 @@ public class Scene2 extends Pane {
         System.out.println(p.getDamage());
     }
 
-    // Removes projectile from scene and simulation list.
+    /**
+     * Removes a projectile from both simulation and scene graph.
+     *
+     * @param p projectile instance to remove
+     */
     public void removeProjectile(BaseProjectileAttack p) {
         getChildren().remove(p.getSprite());
         projectileList.remove(p);
     }
 
-    private void showDamageText(Player target, int damage) {
-        Label damageLabel = new Label("-" + damage);
-        damageLabel.setTextFill(Color.DARKRED);
-        damageLabel.setFont(Font.font("Monospaced", 20));
-        damageLabel.setStyle("-fx-font-weight: bold;");
+    /**
+     * Shows a temporary floating label above a target (damage/heal indicator).
+     *
+     * @param target player whose hitbox is used as the text anchor
+     * @param amount numeric value displayed
+     * @param color text color
+     * @param prefix string prefix such as {@code "-"} or {@code "+"}
+     */
+    public void showFloatingText(Player target, int amount, Color color, String prefix) {
 
-        // Position above the player's hitbox
+        Label label = new Label(prefix + amount);
+        label.setTextFill(color);
+        label.setFont(Font.font("Monospaced", 20));
+        label.setStyle("-fx-font-weight: bold;");
+
         double x = target.getHitbox().localToScene(
                 target.getHitbox().getBoundsInLocal()
         ).getMinX();
@@ -384,30 +472,132 @@ public class Scene2 extends Pane {
                 target.getHitbox().getBoundsInLocal()
         ).getMinY();
 
-        damageLabel.setLayoutX(x + 20); // slight horizontal offset
-        damageLabel.setLayoutY(y - 10); // slightly above head
+        label.setLayoutX(x + 20);
+        label.setLayoutY(y - 10);
 
-        getChildren().add(damageLabel);
-        damageLabel.toFront();
+        getChildren().add(label);
+        label.toFront();
 
-        // Floating + fade animation
-        javafx.animation.FadeTransition fade = new javafx.animation.FadeTransition(
-                javafx.util.Duration.seconds(0.8),
-                damageLabel
-        );
+        javafx.animation.FadeTransition fade =
+                new javafx.animation.FadeTransition(
+                        javafx.util.Duration.seconds(0.8),
+                        label
+                );
         fade.setFromValue(1.0);
         fade.setToValue(0.0);
 
-        javafx.animation.TranslateTransition move = new javafx.animation.TranslateTransition(
-                javafx.util.Duration.seconds(0.8),
-                damageLabel
-        );
-        move.setByY(-30); // float upward
+        javafx.animation.TranslateTransition move =
+                new javafx.animation.TranslateTransition(
+                        javafx.util.Duration.seconds(0.8),
+                        label
+                );
+        move.setByY(-30);
 
         javafx.animation.ParallelTransition animation =
                 new javafx.animation.ParallelTransition(fade, move);
 
-        animation.setOnFinished(e -> getChildren().remove(damageLabel));
+        animation.setOnFinished(e -> getChildren().remove(label));
         animation.play();
     }
+
+    /**
+     * Handles end-of-match state transition and optional loser death animation.
+     *
+     * @param winner winning player, or {@code null} for draw/time-up
+     * @param loser losing player, or {@code null} for draw/time-up
+     */
+    private void handleGameOver(Player winner, Player loser) {
+        gameOver = true;
+        gameLoop.stop();
+
+        if (loser != null && winner != null) {
+            loser.setState(PlayerState.DEAD);
+
+            // 1. Death Animation: ล้มลง 90 องศา
+            RotateTransition rotate = new RotateTransition(Duration.seconds(0.5), loser.getPlayerRoot());
+            rotate.setToAngle(loser.isFacingRight() ? 90 : -90);
+
+            // 2. Fade Out: จางหายไป
+            FadeTransition fade = new FadeTransition(Duration.seconds(1), loser.getPlayerRoot());
+            fade.setFromValue(1.0);
+            fade.setToValue(0.0);
+            fade.setDelay(Duration.seconds(0.5));
+
+            SequentialTransition deathAnim = new SequentialTransition(rotate, fade);
+            deathAnim.setOnFinished(e -> showVictoryOverlay(winner));
+            deathAnim.play();
+            AudioManager.playSFX("/audio/sfx/gameOverHandler/dieSFX.mp3");
+        } else {
+            showVictoryOverlay(null);
+        }
+    }
+
+    /**
+     * Builds and animates the final victory/draw overlay.
+     *
+     * @param winner winning player, or {@code null} when match ends in draw
+     */
+    private void showVictoryOverlay(Player winner) {
+
+        VBox overlay = new VBox(20);
+        overlay.setAlignment(Pos.CENTER);
+        overlay.setBackground(new Background(
+                new BackgroundFill(Color.rgb(0, 0, 0, 0.7), null, null)
+        ));
+        overlay.setPrefSize(getWidth(), getHeight());
+
+        Label titleLabel;
+        Label subtitleLabel = new Label();
+
+        if (winner == null) {
+            titleLabel = new Label("TIME UP!");
+            subtitleLabel.setText("DRAW");
+            AudioManager.playPrioritySFX("/audio/sfx/gameOverHandler/drawSFX.mp3");
+        } else {
+            titleLabel = new Label("VICTORY");
+
+            int playerNumber = (winner == player1) ? 1 : 2;
+            String characterName = winner.getCharacter().getName();
+
+            subtitleLabel.setText(
+                    "PLAYER " + playerNumber + " (" + characterName + ") WINS!"
+            );
+
+            AudioManager.playPrioritySFX("/audio/sfx/gameOverHandler/winningSFX.mp3");
+        }
+
+        titleLabel.setFont(Font.font("Verdana", FontWeight.EXTRA_BOLD, 80));
+        titleLabel.setTextFill(Color.GOLD);
+
+        subtitleLabel.setFont(Font.font("Verdana", FontWeight.BOLD, 36));
+        subtitleLabel.setTextFill(Color.WHITE);
+
+        Button restartBtn = new Button("REMATCH");
+        restartBtn.setStyle(
+                "-fx-background-color: #ffcc00; " +
+                        "-fx-text-fill: black; " +
+                        "-fx-font-weight: bold; " +
+                        "-fx-font-size: 24px;"
+        );
+        restartBtn.setOnAction(e -> {
+            AudioManager.playSFX("/audio/sfx/onMouseClicked/clickSFX.mp3");
+            SceneHandler.switchRoot(new CharacterSelectScene());
+        });
+
+        overlay.getChildren().addAll(titleLabel, subtitleLabel, restartBtn);
+        overlay.setOpacity(0);
+        getChildren().add(overlay);
+
+        FadeTransition fade = new FadeTransition(Duration.seconds(1), overlay);
+        fade.setToValue(1.0);
+
+        ScaleTransition scale = new ScaleTransition(Duration.seconds(0.5), titleLabel);
+        scale.setFromX(0);
+        scale.setFromY(0);
+        scale.setToX(1);
+        scale.setToY(1);
+
+        new ParallelTransition(fade, scale).play();
+    }
+
 }
