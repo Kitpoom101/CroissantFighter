@@ -43,6 +43,7 @@ public class Player {
 
         hitbox.setLayoutX(25);
         hitbox.setLayoutY(20);
+        hitbox.setVisible(false);
 
         playerRoot.getChildren().addAll(sprite, hitbox, character.getWeaponSprite());
 
